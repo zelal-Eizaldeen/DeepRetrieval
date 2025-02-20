@@ -15,6 +15,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.strategy=fsdp \
     actor_rollout_ref.actor.ppo_mini_batch_size=16 \
     actor_rollout_ref.actor.ppo_micro_batch_size=8 \
+    critic.ppo_micro_batch_size=8 \
     actor_rollout_ref.rollout.log_prob_micro_batch_size=2 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=2 \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.2 \
@@ -23,7 +24,6 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     critic.model.enable_gradient_checkpointing=True \
     critic.optim.lr=1e-5 \
-    critic.ppo_micro_batch_size=8 \
     critic.model.enable_gradient_checkpointing=True \
     algorithm.kl_ctrl.kl_coef=0.001 \
     trainer.logger=['wandb'] \

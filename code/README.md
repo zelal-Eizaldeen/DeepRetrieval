@@ -27,6 +27,18 @@ conda activate zero
 python examples/data_preprocess/patient_trial_matching.py
 ```
 
+**Reward function**
+```
+code/verl/utils/reward_score
+```
+
+**Modify the compute_score_fn in code/verl/trainer/main_ppo.py**
+
+**Monitor info**
+```
+code/verl/trainer/ppo/ray_trainer.py - compute_reward_metrics()
+```
+
 ### Run Training
 ```
 conda activate zero
