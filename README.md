@@ -1,5 +1,14 @@
 # DeepRetrieval
 
+
+![alt text](/images/framework.png "reward curve during training (on pubmed)")
+
+
+
+Wandb Training Report:
+https://api.wandb.ai/links/patjj/zmimgfuq
+
+
 ## Installation
 
 ```
@@ -51,3 +60,7 @@ For the following code, if you see Out-of-vram, try add `critic.model.enable_gra
 ```
 sh code/scripts/literature_search_train.sh #
 ```
+
+### Reward Curve During Training
+
+![alt text](/images/reward_curve.png "reward curve during training (on pubmed)")
