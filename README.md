@@ -74,7 +74,7 @@ sh code/scripts/literature_search_train.sh
 ![alt text](/images/reward_curve.png "reward curve during training (on pubmed)")
 
 
-## Evaluation
+## Run Evaluation
 
 ```
 sh code/scripts/eval/inst/liter.sh
