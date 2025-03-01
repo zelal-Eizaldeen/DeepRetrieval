@@ -80,7 +80,7 @@ sh code/scripts/literature_search_train.sh
 sh code/scripts/eval/inst/liter.sh
 ```
 
-**Result**
+**Result (checkpoint date: Feb 16)**
 
 | Model | Method | Recall (Publication) | Recall (Trial) |
 |-------|--------|----------------------|----------------|
