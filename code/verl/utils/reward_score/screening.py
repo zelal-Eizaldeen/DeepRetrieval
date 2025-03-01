@@ -14,8 +14,8 @@ def extract_solution(solution_str):
         else:
             print("[Error] Failed to locate second Assistant: marker")
             return None, solution_str
-    elif "<|im_start|>assistant" in solution_str:
-        processed_str = solution_str.split("<|im_start|>assistant", 1)[1].strip()
+    # elif "<|im_start|>assistant" in solution_str:
+    #     processed_str = solution_str.split("<|im_start|>assistant", 1)[1].strip()
     else:
         print("[Error] Failed to locate model response header")
         return None, processed_str
@@ -111,11 +111,17 @@ def calculate_answer_score(answer_text, label, criteria_length, do_print=False):
         pred_evaluation = answer_data["evaluations"]
         
         # Check if the number of evaluations matches the criteria length
-        if len(pred_evaluation) != criteria_length:
-            if do_print:
-                print(f"[Error] Predicted evaluation length ({len(pred_evaluation)}) does not match criteria length ({criteria_length})")
-            return -1.5
+        # length_score = 0
+        # if len(pred_evaluation) != criteria_length:
+        #     if do_print:
+        #         print(f"[Warning] Predicted evaluation length ({len(pred_evaluation)}) does not match criteria length ({criteria_length})")
+        #     length_score = -0.5
         
+        # length_score = 0
+        # if len(pred_evaluation) != criteria_length:
+        #     if do_print:
+        #         print(f"[Warning] Predicted evaluation length ({len(pred_evaluation)}) does not match criteria length ({criteria_length})")
+        #     return -0.5
         # Calculate average evaluation score
         total_score = 0
         for eval_item in pred_evaluation:
@@ -133,6 +139,8 @@ def calculate_answer_score(answer_text, label, criteria_length, do_print=False):
         
         # Multiply by label to reward/punish appropriately
         answer_score = avg_score * label * 2
+        
+        #TODO direct (overall prediction) label reward
         
         if do_print:
             print(f"Average evaluation score: {avg_score}")
@@ -184,6 +192,14 @@ def validate_criteria_design(processed_str, do_print=False):
         criteria = list(criteria_json.values())
         criteria_length = len(criteria)
         
+        
+        if criteria_length < 2:
+            if do_print:
+                print("[Error] Too few criteria (<2)")
+            # errors.append("too_few_criteria")
+            return False, criteria_length
+        
+        
         # Check number of criteria
         if criteria_length > 7:
             if do_print:
@@ -224,17 +240,21 @@ def compute_score(solution_str, ground_truth):
 
     # Validate response structure
     response_format_correct = validate_response_structure(processed_str, do_print)
-    criteria_format_correct, criteria_length = validate_criteria_design(processed_str, do_print)
-    format_correct = response_format_correct and criteria_format_correct
+    # criteria_format_correct, criteria_length = validate_criteria_design(processed_str, do_print)
+    # format_correct = response_format_correct and criteria_format_correct
 
     # Calculate format score (reduced penalties)
-    if format_correct:
+    # if format_correct:
+    #     format_score = 1
+    # else:
+    #     if not response_format_correct:
+    #         format_score = -2
+        # elif response_format_correct and not criteria_format_correct:
+        #     format_score = -1.5
+    if response_format_correct:
         format_score = 1
     else:
-        if not response_format_correct:
-            format_score = -2  # Reduced penalty
-        elif response_format_correct and not criteria_format_correct:
-            format_score = -1  # Reduced penalty
+        format_score = -2
 
     if do_print:
         print(f"--------------------------------")
@@ -243,8 +263,9 @@ def compute_score(solution_str, ground_truth):
 
     # Calculate answer score
     answer_score = 0
-    if format_correct and answer_text:
-        answer_score = calculate_answer_score(answer_text, label, criteria_length, do_print)
+    if response_format_correct and answer_text:
+        # answer_score = calculate_answer_score(answer_text, label, criteria_length, do_print)
+        answer_score = calculate_answer_score(answer_text, label, 0, do_print)
 
     # Total score (combine format, reasoning, and answer scores)
     total_score = format_score + answer_score

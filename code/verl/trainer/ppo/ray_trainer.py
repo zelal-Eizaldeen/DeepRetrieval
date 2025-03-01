@@ -256,7 +256,7 @@ def compute_data_metrics(batch, use_critic=True):
     }
     return metrics
 
-def compute_reward_metrics_searching(batch):
+def compute_reward_metrics(batch):
     reward_tensor = batch.batch['token_level_scores'].sum(-1)
 
     reward_metrics = {}
@@ -291,7 +291,7 @@ def compute_reward_metrics_searching(batch):
     return reward_metrics
 
 
-def compute_reward_metrics(batch):
+def compute_reward_metrics_(batch):
     reward_tensor = batch.batch['token_level_scores'].sum(-1)
 
     reward_metrics = {}
@@ -302,8 +302,8 @@ def compute_reward_metrics(batch):
     reward_metrics["reward/format_error_ratio"] = format_errors.detach().item()
     
     # criteria format score monitoring
-    criteria_format_errors = torch.sum(reward_tensor == -1).float() / reward_tensor.numel()
-    reward_metrics["reward/criteria_error_ratio"] = criteria_format_errors.detach().item()
+    # criteria_format_errors = torch.sum(reward_tensor == -1.5).float() / reward_tensor.numel()
+    # reward_metrics["reward/criteria_error_ratio"] = criteria_format_errors.detach().item()
     
     # Answer score distribution
     reward_metrics["reward/excellent"] = torch.sum(reward_tensor >= 2).float() / reward_tensor.numel()

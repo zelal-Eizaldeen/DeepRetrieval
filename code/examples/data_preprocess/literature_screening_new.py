@@ -34,12 +34,11 @@ The Assistant should:
 3. Provide evaluations in JSON format within <answer> </answer> tags.
 
 Note:
-If the information within the provided paper content is insufficient to conclusively evaluate a criterion, the Assistant should opt for "UNCERTAIN" as the response. Avoid making assumptions or extrapolating beyond the provided data, as accurate and reliable responses are crucial, and fabricating information (hallucinations) could lead to serious errors in the systematic review.
-If the information is not applicable, the Assistant should opt for "UNCERTAIN".
+If the information within the provided paper content is insufficient to conclusively evaluate a criterion, you should opt for "UNCERTAIN" as your response. Avoid making assumptions or extrapolating beyond the provided data, as accurate and reliable responses are crucial, and fabricating information (hallucinations) could lead to serious errors in the systematic review.
+If the information is not applicable N/A, you should opt for "UNCERTAIN".
 Use "PARTIAL" when the paper meets some aspects of the criterion but not all; ensure that the partial fulfillment is based on the provided data and not on assumptions or incomplete information.
 Each pair of tags (<criteria> </criteria> and <think> </think> and <answer> </answer>) MUST ONLY APPEAR ONCE in the response.
 The length of evaluations should be the same as the number of criteria, and the eligibility should be in the same order as the criteria.
-The Assistant should not output anything after "</answer>" in its response.
 
 For example:
 ==================Example==================
@@ -73,27 +72,33 @@ The study includes adult patients with type 2 diabetes, and the intervention is 
 <answer>
 {
     "evaluations": [
-        {
+        {   
+            "criterion": "criterion 1 - Study includes adult patients with type 2 diabetes",
             "rationale": "Study explicitly includes adults aged 30-65 years with type 2 diabetes",
             "eligibility": "YES"
         },
         {
+            "criterion": "criterion 2 - Intervention involves metformin monotherapy",
             "rationale": "Patients received metformin 1000mg daily as monotherapy treatment",
             "eligibility": "YES"
         },
         {
+            "criterion": "criterion 3 - Reports both HbA1c and glucose outcomes",
             "rationale": "Reports glucose outcomes but HbA1c data is incomplete",
             "eligibility": "PARTIAL"
         },
         {
+            "criterion": "criterion 4 - Minimum one year follow up period",
             "rationale": "Study duration was only 12 weeks, far below one year requirement",
             "eligibility": "NO"
         },
         {
+            "criterion": "criterion 5 - Sample size at least 300 patients",
             "rationale": "Total patient number not clearly stated for final analysis",
             "eligibility": "UNCERTAIN"
         },
         {
+            "criterion": "criterion 6 - Reports complete safety data",
             "rationale": "No comprehensive safety data reported beyond hypoglycemic events",
             "eligibility": "NO"
         }

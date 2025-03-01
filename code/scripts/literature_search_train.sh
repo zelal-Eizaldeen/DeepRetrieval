@@ -1,6 +1,4 @@
 export CUDA_VISIBLE_DEVICES=0,1
-export WANDB_API_KEY="306617ef72f115b128196d10542fe8942f33a63e"
-# export HF_HOME="/srv/local/data/linjc/hub"
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
@@ -36,6 +34,6 @@ python3 -m verl.trainer.main_ppo \
     trainer.project_name=literature_search \
     trainer.experiment_name=literature_search_3b_continue \
     trainer.default_local_dir=/shared/eng/pj20/lmr_model/literature_search_3b \
-    actor_rollout_ref.model.path=/shared/eng/pj20/lmr_model/literature_search_3b/actor/global_step_100 \
-    critic.model.path=/shared/eng/pj20/lmr_model/literature_search_3b/critic/global_step_100 \
+    actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct \
+    critic.model.path=Qwen/Qwen2.5-3B-Instruct \
     trainer.total_epochs=15 2>&1 | tee exp_log/3b-ppo-verl_demo_$DATE.log

@@ -1,4 +1,4 @@
-# Panacea-R1
+# DeepRetrieval
 
 ## Installation
 
@@ -24,20 +24,20 @@ pip install wandb IPython matplotlib
 **Data Preparation**
 ```
 conda activate zero
-python examples/data_preprocess/patient_trial_matching.py
+python examples/data_preprocess/literature_mining.py
 ```
 
 **Reward function**
 ```
-code/verl/utils/reward_score
+code/verl/utils/reward_score/literature.py
 ```
 
 **Modify the compute_score_fn in code/verl/trainer/main_ppo.py**
 
 **Monitor info**
-```
-code/verl/trainer/ppo/ray_trainer.py - compute_reward_metrics()
-```
+
+modify `compute_reward_metrics()` in `code/verl/trainer/ppo/ray_trainer.py`
+
 
 ### Run Training
 ```
@@ -49,16 +49,5 @@ For the following code, if you see Out-of-vram, try add `critic.model.enable_gra
 
 **3B+ model**
 ```
-export N_GPUS=2
-export BASE_MODEL=Qwen/Qwen2.5-3B-Instruct
-export DATA_DIR=data/matching/qwen-instruct
-export ROLLOUT_TP_SIZE=2
-export EXPERIMENT_NAME=matching-qwen2.5-3b-inst-ppo
-export VLLM_ATTENTION_BACKEND=XFORMERS
-export WANDB_API_KEY="[Your_key]"
-export HF_HOME="/srv/local/data/linjc/hub"
-
-export CUDA_VISIBLE_DEVICES=0,1
-
-bash scripts/train_tiny_zero_ppo.sh
+sh code/scripts/literature_search_train.sh #
 ```
