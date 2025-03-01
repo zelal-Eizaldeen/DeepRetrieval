@@ -5,7 +5,7 @@
 
 
 
-[Wandb Training Report](https://api.wandb.ai/links/patjj/zmimgfuq)
+[Wandb Training Report (w/ PubMed Search Engine)](https://api.wandb.ai/links/patjj/zmimgfuq)
 
 
 **Note: This codebase is built upon the [verl](https://github.com/volcengine/verl) framework**
