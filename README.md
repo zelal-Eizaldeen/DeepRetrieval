@@ -47,7 +47,7 @@ code/verl/utils/reward_score/literature.py
 modify `compute_reward_metrics()` in `code/verl/trainer/ppo/ray_trainer.py`
 
 
-### Run Training
+## Run Training
 ```
 conda activate zero
 ```
@@ -55,11 +55,22 @@ conda activate zero
 For the following code, if you see Out-of-vram, try add `critic.model.enable_gradient_checkpointing=True` to the script
 
 
-**3B+ model**
+**Run 3B model (Qwen/Qwen2.5-3B-Instruct):**
 ```
-sh code/scripts/literature_search_train.sh #
+sh code/scripts/literature_search_train.sh 
 ```
 
 ### Reward Curve During Training
 
 ![alt text](/images/reward_curve.png "reward curve during training (on pubmed)")
+
+
+## Evaluation
+
+```
+sh code/scripts/eval/inst/liter.sh
+```
+
+
+
+Thanks for your interests!
