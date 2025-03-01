@@ -5,8 +5,7 @@
 
 
 
-Wandb Training Report:
-https://api.wandb.ai/links/patjj/zmimgfuq
+[Wandb Training Report](https://api.wandb.ai/links/patjj/zmimgfuq)
 
 
 ## Installation
