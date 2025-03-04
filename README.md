@@ -105,6 +105,7 @@ sh code/scripts/eval/inst/liter.sh
 
 
 ## Cite
+Current version (will update the author list upon project completion):
 ```
 @misc{jiang2025deepretrievalpowerfulquerygeneration,
       title={DeepRetrieval: Powerful Query Generation for Information Retrieval with Reinforcement Learning}, 
