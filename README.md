@@ -1,6 +1,11 @@
-# DeepRetrieval - Hacking Search Engines and Retrievers with LLM+RL
+<div align="center">
 
-### **Let the Model Learn How to Search!**
+# DeepRetrieval - Hacking Search Engines and Retrievers with LLM+RL
+### **Let LLMs learn how to search!**
+
+</div>
+
+
 
 ![alt text](/images/framework.png "reward curve during training (on pubmed)")
 
@@ -9,7 +14,6 @@
 [Wandb Training Report (w/ PubMed Search Engine)](https://api.wandb.ai/links/patjj/zmimgfuq)
 
 
-**Note: This codebase is built upon the [verl](https://github.com/volcengine/verl) framework**
 ## Installation
 
 ```
@@ -104,6 +108,10 @@ sh code/scripts/eval/inst/liter.sh
 
 *Table: Comparison of different models and methods on publication search and trial search tasks. Bold numbers indicate the best performance.*
 
+
+## Acknowledge
+
+This implementation is mainly based on [verl](https://github.com/volcengine/verl). The base model during the pilot experiment is [Qwen2.5-3B](https://huggingface.co/Qwen/Qwen2.5-3B). We sincerely appreciate their contributions to the open-source community.
 
 ## Cite
 Current version (will update the author list upon project completion):
