@@ -3,10 +3,22 @@
 
 ![alt text](/images/framework.png "reward curve during training (on pubmed)")
 
-
+[Preliminary Technical Report (ArXiv preprint)](https://arxiv.org/pdf/2503.00223)
 
 [Wandb Training Report (w/ PubMed Search Engine)](https://api.wandb.ai/links/patjj/zmimgfuq)
 
+## Cite
+```
+@misc{jiang2025deepretrievalpowerfulquerygeneration,
+      title={DeepRetrieval: Powerful Query Generation for Information Retrieval with Reinforcement Learning}, 
+      author={Pengcheng Jiang},
+      year={2025},
+      eprint={2503.00223},
+      archivePrefix={arXiv},
+      primaryClass={cs.IR},
+      url={https://arxiv.org/abs/2503.00223}, 
+}
+```
 
 **Note: This codebase is built upon the [verl](https://github.com/volcengine/verl) framework**
 ## Installation
