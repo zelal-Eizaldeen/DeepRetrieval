@@ -1,6 +1,6 @@
 <div align="center">
 
-# DeepRetrieval - Hacking Search Engines and Retrievers with LLM+RL
+# DeepRetrieval - Hacking Search Engines & Retrievers with LLM + RL
 ### **Let LLMs learn how to search!**
 
 </div>
