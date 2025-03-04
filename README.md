@@ -1,5 +1,6 @@
-# DeepRetrieval - Powerful Query Generation for Information Retrieval with LLM and RL
+# DeepRetrieval - Hacking Search Engines and Retrievers with LLM+RL
 
+### **Let the Model Learn How to Search!**
 
 ![alt text](/images/framework.png "reward curve during training (on pubmed)")
 
