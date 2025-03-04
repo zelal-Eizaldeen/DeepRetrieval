@@ -113,7 +113,7 @@ sh code/scripts/eval/inst/liter.sh
 
 This implementation is mainly based on [verl](https://github.com/volcengine/verl). The base model during the experiment is [Qwen2.5-3B](https://huggingface.co/Qwen/Qwen2.5-3B). We sincerely appreciate their contributions to the open-source community.
 
-## Cite
+## Cite DeepRetrieval
 Current version (will update the author list upon project completion):
 ```
 @misc{jiang2025deepretrievalpowerfulquerygeneration,
