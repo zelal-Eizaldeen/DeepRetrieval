@@ -103,11 +103,12 @@ sh code/scripts/eval/inst/liter.sh
 | | ICL | 20.92 | 24.68 |
 | | ICL+Few-shot | 19.11 | 9.27 |
 | **Mistral-7B** | Zero-shot | 7.18 | 8.08 |
-| **LEADS** | Zero-shot | 24.68 | 32.11 |
+| **LEADS**$^{*}$ | Zero-shot | 24.68 | 32.11 |
 | **DeepRetrieval** | Zero-shot | **60.82** | **70.84** |
 
 *Table: Comparison of different models and methods on publication search and trial search tasks. Bold numbers indicate the best performance.*
 
+$^{*}$ *LEADS: a state-of-the-art literature mining LLM trained on 20K reviews and 400K publications [https://arxiv.org/pdf/2501.16255]*
 
 ## Acknowledge
 
