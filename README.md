@@ -45,7 +45,7 @@ python examples/data_preprocess/literature_mining.py
 
 For example, for PubMed, you may get it following the instruction [here](https://support.nlm.nih.gov/kbArticle/?pn=KA-05317).
 
-Then, put it in under `verl/utils/reward_score/apis/` as `pubmed_api.key`.
+Then, put it in under `code/verl/utils/reward_score/apis/` as `pubmed_api.key`.
 
 
 **3. Reward function Related (optional)**
