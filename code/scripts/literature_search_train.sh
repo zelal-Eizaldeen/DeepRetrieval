@@ -33,7 +33,6 @@ python3 -m verl.trainer.main_ppo \
     trainer.test_freq=200 \
     trainer.project_name=literature_search \
     trainer.experiment_name=literature_search_3b_continue \
-    trainer.default_local_dir=/shared/eng/pj20/lmr_model/literature_search_3b \
     actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct \
     critic.model.path=Qwen/Qwen2.5-3B-Instruct \
-    trainer.total_epochs=15 2>&1 | tee exp_log/3b-ppo-verl_demo_$DATE.log
+    trainer.total_epochs=15 2>&1 | tee exp_log/3b-ppo-verl_demo_$DATE.log 

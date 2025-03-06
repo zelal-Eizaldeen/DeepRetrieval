@@ -33,31 +33,33 @@ pip3 install flash-attn --no-build-isolation
 # quality of life
 pip install wandb IPython matplotlib
 ```
-
 ## Get started
 
-**Data Preparation**
+**1. Data Preparation (required)**
 ```
 conda activate zero
 python examples/data_preprocess/literature_mining.py
 ```
 
-**Reward function**
-```
-code/verl/utils/reward_score/literature.py
-```
-Reward Design:
+**2. Get Your Search Engine API Key (required if use search engine)**
+
+For example, for PubMed, you may get it following the instruction [here](https://support.nlm.nih.gov/kbArticle/?pn=KA-05317).
+
+Then, put it in under `verl/utils/reward_score/apis/` as `pubmed_api.key`.
+
+
+**3. Reward function Related (optional)**
+
+Reward Design (in `code/verl/utils/reward_score/literature.py`):
 
 
 | Recall      | ≥ 0.7 | ≥ 0.5 | ≥ 0.4 | ≥ 0.3 | ≥ 0.1 | ≥ 0.05 | < 0.05 |
 |-------------|-------|-------|-------|-------|-------|--------|--------|
 | **Reward**  | +5.0  | +4.0  | +3.0  | +1.0  | +0.5  | +0.1   | -3.5   |
 
-*Table: Reward tiers based on recall performance. Higher recall values receive significantly larger rewards, incentivizing the model to generate more effective queries.*
 
-**Modify the compute_score_fn in code/verl/trainer/main_ppo.py**
 
-**Monitor info**
+**4. Customize Monitor Info (optional)**
 
 modify `compute_reward_metrics()` in `code/verl/trainer/ppo/ray_trainer.py`
 
