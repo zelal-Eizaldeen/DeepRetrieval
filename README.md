@@ -34,11 +34,16 @@ pip3 install flash-attn --no-build-isolation
 pip install wandb IPython matplotlib
 ```
 ## Get started
+```
+cd code
+```
+
 
 **1. Data Preparation (required)**
+For example, for PubMed:
 ```
 conda activate zero
-python examples/data_preprocess/literature_mining.py
+python data_preprocess/pubmed.py
 ```
 
 **2. Get Your Search Engine API Key (required if use search engine)**
@@ -71,10 +76,9 @@ conda activate zero
 
 For the following code, if you see Out-of-vram, try add `critic.model.enable_gradient_checkpointing=True` to the script
 
-
-**Run 3B model (Qwen/Qwen2.5-3B-Instruct):**
+For example, for PubMed:
 ```
-sh code/scripts/literature_search_train.sh 
+sh scripts/train/pubmed_train.sh 
 ```
 
 ### Reward Curve During Training
@@ -85,7 +89,7 @@ sh code/scripts/literature_search_train.sh
 ## Run Evaluation
 
 ```
-sh code/scripts/eval/inst/liter.sh
+sh scripts/eval/pubmed_test.sh
 ```
 
 **Result (checkpoint date: Feb 16)**
