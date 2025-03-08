@@ -9,8 +9,8 @@
 **/wandb
 
 scripts/hidden
-data
 temp
+others
 condor_scripts
 .bash_history
 logs
@@ -120,3 +120,5 @@ tests/e2e/toy_examples/deepspeed/synchronous/output.txt
 
 # vim
 *.swp
+
+*.ipynb

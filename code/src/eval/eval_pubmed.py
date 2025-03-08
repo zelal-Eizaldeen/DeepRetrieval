@@ -30,7 +30,7 @@ _request_lock = Lock()  # Thread-safe lock for request tracking
 
 def load_model(model_path):
     tokenizer = AutoTokenizer.from_pretrained(model_path, padding_side='left')
-    model = AutoModelForCausalLM.from_pretrained(model_path, attn_implementation="flash_attention_2", torch_dtype=torch.bfloat16, device_map='auto',)
+    model = AutoModelForCausalLM.from_pretrained(model_path, attn_implementation="flash_attention_2", torch_dtype=torch.bfloat16)
     model.eval()
     return tokenizer, model
 
@@ -111,7 +111,7 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
     targets = df['label'].tolist()
     pub_dates = df['pub_date'].tolist()
     
-    model.to(device)
+    model = model.to(device)
     generated_texts = {}
     error_count = 0
     recalls = []
@@ -178,7 +178,7 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_path", type=str, default="/shared/eng/pj20/lmr_model/literature_search_3b/actor/global_step_1200")
-    parser.add_argument("--data_path", type=str, default="data/literature_mining/base/test_full.parquet")
+    parser.add_argument("--data_path", type=str, default="data/search_engine/pubmed/test_full.parquet")
     parser.add_argument("--model_name", type=str, default="matching-qwen2.5-3b-inst-ppo-2gpus")
     parser.add_argument("--save_dir", type=str, default="results")
     parser.add_argument("--batch_size", type=int, default=8)

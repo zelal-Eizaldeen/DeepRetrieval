@@ -25,11 +25,11 @@ O: Outcome - What are the relevant outcomes or effects being measured?
 """
 
 
-def make_prefix(dp, template_type):
+def make_prefix(dp, dataset):
     # input_str = dp['input']
-    if template_type == 'base':
-        input_str = """A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer.\n""" + INSTRUCTION
-        input_str += """The Assistant should show his thinking process in <think> </think> tags. The Assistant should return the final answer in JSON format in <answer> </answer> tags, 
+
+    input_str = """A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer.\n""" + INSTRUCTION
+    input_str += """The Assistant should show his thinking process in <think> </think> tags. The Assistant should return the final answer in JSON format in <answer> </answer> tags, 
 For example:
 <think>
 [thinking process]
@@ -49,7 +49,7 @@ Assistant: Let me solve this step by step.
 <think>
 """
 
-    # elif template_type == 'gpt':
+    # elif dataset == 'gpt':
     #     input_str += "Solve this step by step and return the final answer in <answer> </answer> tags, for example, <answer>  </answer>."
     # else:
     #     raise NotImplementedError
@@ -71,44 +71,51 @@ def load_matching_dataset():
     
     data_train = []
     data_test = []
-    with open('/home/pj20/server-04/LMR/Panacea-R1/data/pubmed_search_origin/train.jsonl', 'r') as f:
+    data_val = []
+    
+    with open('data/raw_data/pubmed/train.jsonl', 'r') as f:
         for line in f:
             data_train.append(json.loads(line))
 
-    with open('/home/pj20/server-04/LMR/Panacea-R1/data/pubmed_search_origin/test.jsonl', 'r') as f:
+    with open('data/raw_data/pubmed/test.jsonl', 'r') as f:
         cnt = 0
         for line in f:
-            data_test.append(json.loads(line))
+            data_val.append(json.loads(line))
             cnt += 1
             if cnt > 100:
                 break
+            
+        for line in f:
+            data_test.append(json.loads(line))
     
     train_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['publication_pmids'], 'pub_date': x['pub_date']} for x in data_train]
     test_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['publication_pmids'], 'pub_date': x['pub_date']} for x in data_test]
+    val_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['publication_pmids'], 'pub_date': x['pub_date']} for x in data_val]
     
-    return train_data, test_data
+    return train_data, test_data, val_data
 
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--local_dir', default='data/literature_mining')
+    parser.add_argument('--local_dir', default='data/search_engine')
     parser.add_argument('--hdfs_dir', default=None)
-    parser.add_argument('--template_type', type=str, default='base', choices=['base', 'qwen-instruct', 'gpt'])
+    parser.add_argument('--dataset', type=str, default='pubmed')
 
     args = parser.parse_args()
     
-    data_source = 'literature'
+    data_source = args.dataset
     
-    train_data, test_data = load_matching_dataset()
+    train_data, test_data, val_data = load_matching_dataset()
 
     train_dataset = Dataset.from_list(train_data)
     test_dataset = Dataset.from_list(test_data)
+    val_dataset = Dataset.from_list(val_data)
 
 
     def make_map_fn(split):
         def process_fn(example, idx):
-            question = make_prefix(example, template_type=args.template_type)
+            question = make_prefix(example, dataset=args.dataset)
             solution = {
                 "target": example['label'],
             }
@@ -133,10 +140,11 @@ if __name__ == '__main__':
     
     train_dataset = train_dataset.map(function=make_map_fn('train'), with_indices=True)
     test_dataset = test_dataset.map(function=make_map_fn('test'), with_indices=True)
-
+    val_dataset = val_dataset.map(function=make_map_fn('val'), with_indices=True)
     # shuffle the dataset
     train_dataset = train_dataset.shuffle(seed=42)
     test_dataset = test_dataset.shuffle(seed=42)
+    val_dataset = val_dataset.shuffle(seed=42)
     
     lengths_list = []
     for d in train_dataset:
@@ -146,17 +154,23 @@ if __name__ == '__main__':
     for d in test_dataset:
         lengths_list_test.append(len(d['prompt'][0]['content'].split()))
         
+    lengths_list_val = []
+    for d in val_dataset:
+        lengths_list_val.append(len(d['prompt'][0]['content'].split()))
+        
     print(f"Average length of train dataset: {sum(lengths_list) / len(lengths_list)}")
     print(f"Average length of test dataset: {sum(lengths_list_test) / len(lengths_list_test)}")
-
-    local_dir = os.path.join(args.local_dir, args.template_type)
-    hdfs_dir = os.path.join(args.hdfs_dir, args.template_type) if args.hdfs_dir is not None else None
+    print(f"Average length of val dataset: {sum(lengths_list_val) / len(lengths_list_val)}")
+    
+    local_dir = os.path.join(args.local_dir, args.dataset)
+    hdfs_dir = os.path.join(args.hdfs_dir, args.dataset) if args.hdfs_dir is not None else None
     
     os.makedirs(local_dir, exist_ok=True)
     
     train_dataset.to_parquet(os.path.join(local_dir, 'train.parquet'))
-    test_dataset.to_parquet(os.path.join(local_dir, 'test.parquet'))
-
+    test_dataset.to_parquet(os.path.join(local_dir, 'test_full.parquet'))
+    val_dataset.to_parquet(os.path.join(local_dir, 'test.parquet'))
+    
     if hdfs_dir is not None:
         makedirs(hdfs_dir)
         copy(src=local_dir, dst=hdfs_dir) 

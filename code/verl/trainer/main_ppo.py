@@ -26,27 +26,18 @@ sys.path.insert(0, project_root)  # This will now add Panacea-R1 to the path
 
 from verl import DataProto
 import torch
-from verl.utils.reward_score import gsm8k, math, multiply, countdown, matching, literature, screening
+from verl.utils.reward_score import pubmed, screening
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
 from verl.utils.apis.pubmed import PubmedAPI
 from verl.utils.apis.ctgov import CTGovAPI
 
 
 def _select_rm_score_fn(data_source):
-    if data_source == 'openai/gsm8k':
-        return gsm8k.compute_score
-    elif data_source == 'lighteval/MATH':
-        return math.compute_score
-    elif "multiply" in data_source or "arithmetic" in data_source:
-        return multiply.compute_score
-    elif "countdown" in data_source:
-        return countdown.compute_score
-    elif "matching" in data_source:
-        return matching.compute_score
-    elif "screening" in data_source:
+
+    if "screening" in data_source:
         return screening.compute_score
-    elif "literature" in data_source:
-        return literature.compute_score
+    elif "pubmed" in data_source:
+        return pubmed.compute_score
     else:
         raise NotImplementedError
 
@@ -111,7 +102,7 @@ class RewardManager():
             
             compute_score_fn = _select_rm_score_fn(data_source)
 
-            if 'literature' in data_source and 'screening' not in data_source:
+            if 'pubmed' in data_source:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, search_api=api, literature_type=literature_type, pub_date=pub_date)
             else:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth)
