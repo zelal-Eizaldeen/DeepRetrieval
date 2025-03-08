@@ -11,7 +11,7 @@
 
 [Preliminary Technical Report (ArXiv preprint)](https://arxiv.org/pdf/2503.00223)
 
-[Wandb Training Report (w/ PubMed Search Engine)](https://api.wandb.ai/links/patjj/zmimgfuq)
+[Wandb Training Log](https://wandb.ai/patjj/literature_search?nw=nwuserpj20)
 
 
 ## Installation
