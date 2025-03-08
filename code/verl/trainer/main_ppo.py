@@ -90,7 +90,7 @@ class RewardManager():
             ground_truth = data_item.non_tensor_batch['reward_model']['ground_truth']
             # select rm_score
             data_source = data_item.non_tensor_batch['data_source']
-            if 'literature' in data_source and 'screening' not in data_source:
+            if 'pubmed' in data_source or 'ctgov' in data_source:
                 pub_date = data_item.non_tensor_batch['pub_date']
                 literature_type = 'publication'
                 if literature_type == 'publication':
@@ -102,7 +102,7 @@ class RewardManager():
             
             compute_score_fn = _select_rm_score_fn(data_source)
 
-            if 'pubmed' in data_source:
+            if 'pubmed' in data_source or 'ctgov' in data_source:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, search_api=api, literature_type=literature_type, pub_date=pub_date)
             else:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth)
