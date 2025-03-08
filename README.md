@@ -55,7 +55,7 @@ Then, put it in under `code/verl/utils/reward_score/apis/` as `pubmed_api.key`.
 
 **3. Reward function Related (optional)**
 
-Reward Design (in `code/verl/utils/reward_score/literature.py`):
+Reward Design (e.g., in `code/verl/utils/reward_score/pubmed.py`):
 
 
 | Recall      | ≥ 0.7 | ≥ 0.5 | ≥ 0.4 | ≥ 0.3 | ≥ 0.1 | ≥ 0.05 | < 0.05 |
