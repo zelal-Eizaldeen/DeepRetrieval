@@ -14,26 +14,14 @@ import pdb
 
 
 INSTRUCTION = """
-The Assistant is a clinical specialist. He is conducting research and doing a medical literature review. His task is to create query terms for a search URL to find relevant literature on PubMed or ClinicalTrials.gov.
-
-The research is defined using the PICO framework:
-P: Patient, Problem or Population - Who or what is the research about?
-I: Intervention - What is the main intervention or exposure being considered?
-C: Comparison - What is the intervention being compared to?
-O: Outcome - What are the relevant outcomes or effects being measured?
-
+You are a query rewriting expert. Your task is to create query terms for user query to find relevant literature in a Wikipedia corpus using BM25.
 """
 
 
-def make_prefix(dp, dataset):
-    # input_str = dp['input']
+def make_prefix(dp):
 
-    input_str = """A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer.\n""" + INSTRUCTION
-    input_str += """The Assistant should show his thinking process in <think> </think> tags. The Assistant should return the final answer in JSON format in <answer> </answer> tags, 
-For example:
-<think>
-[thinking process]
-</think>
+    input_str = """<|im_start|>system\nYou are a helpful assistant. You first thinks about the reasoning process in the mind and then provides the user with the answer.<|im_end|>\n<|im_start|>user\n""" + INSTRUCTION
+    input_str += """\nShow your work in <think> </think> tags. Your final response must be in JSON format within <answer> </answer> tags. For example,
 <answer>
 {
     "query": "...."
@@ -41,50 +29,54 @@ For example:
 </answer>. 
 Note: The query should use Boolean operators (AND, OR) and parentheses for grouping terms appropriately.
 
-User: The research is defined by the following PICO:
+Here's the user query:
 """
 
-    input_str +=  dp['input'] + """
-Assistant: Let me solve this step by step. 
+    input_str +=  dp['query'] + """
+Assistant: Let me rewrite the query with reasoning. 
 <think>
 """
+
     return input_str
-
-
-def convert_dict_to_str(pico_dict):
-    pico_str = ""
-    pico_str += f"P: {pico_dict['P']}\n"
-    pico_str += f"I: {pico_dict['I']}\n"
-    pico_str += f"C: {pico_dict['C']}\n"
-    pico_str += f"O: {pico_dict['O']}\n"
-    return pico_str
 
 
 
 def load_matching_dataset():
+    # code/data/raw_data/scifact/qrels/*.tsv
+    with open("code/data/raw_data/scifact/qrels/train.tsv", "r", encoding="utf-8") as file:
+        qrel_train = [line.strip().split("\t") for line in file]
     
-    data_train = []
-    data_test = []
-    data_val = []
+    qrel_train = qrel_train[1:]  # remove the header
     
-    with open('data/raw_data/pubmed/train.jsonl', 'r') as f:
-        for line in f:
-            data_train.append(json.loads(line))
+    with open("code/data/raw_data/scifact/qrels/test.tsv", "r", encoding="utf-8") as file:
+        qrel_test = [line.strip().split("\t") for line in file]
 
-    with open('data/raw_data/pubmed/test.jsonl', 'r') as f:
-        cnt = 0
-        for line in f:
-            data_val.append(json.loads(line))
-            cnt += 1
-            if cnt > 100:
-                break
-            
-        for line in f:
-            data_test.append(json.loads(line))
-    
-    train_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['publication_pmids'], 'pub_date': x['pub_date']} for x in data_train]
-    test_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['publication_pmids'], 'pub_date': x['pub_date']} for x in data_test]
-    val_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['publication_pmids'], 'pub_date': x['pub_date']} for x in data_val]
+    qrel_test = qrel_test[1:]  # remove the header
+
+    with open("code/data/raw_data/scifact/qrels/dev.tsv", "r", encoding="utf-8") as file:
+        qrel_val = [line.strip().split("\t") for line in file]
+
+    # read code/data/raw_data/scifact/queries.jsonl
+    with open("code/data/raw_data/scifact/queries.jsonl", "r", encoding="utf-8") as file:
+        queries = [json.loads(line) for line in file]
+
+    # transform the queries into a dictionary
+    queries_dict = {q['_id']: q['text'] for q in queries}
+    # process the data
+    def process_qrel(qrel):
+        data = []
+        for qid, docid, label in qrel:
+            data.append({
+                "qid": qid,
+                'query': queries_dict[qid],
+                "target": docid,
+                "label": int(label)
+            })
+        return data
+
+    train_data = process_qrel(qrel_train)
+    test_data = process_qrel(qrel_test)
+    val_data = process_qrel(qrel_val)
     
     return train_data, test_data, val_data
 
@@ -92,9 +84,9 @@ def load_matching_dataset():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--local_dir', default='data/search_engine')
+    parser.add_argument('--local_dir', default='code/data/corpus/scifact')
     parser.add_argument('--hdfs_dir', default=None)
-    parser.add_argument('--dataset', type=str, default='pubmed')
+    parser.add_argument('--dataset', type=str, default='scifact')
 
     args = parser.parse_args()
     
@@ -109,9 +101,9 @@ if __name__ == '__main__':
 
     def make_map_fn(split):
         def process_fn(example, idx):
-            question = make_prefix(example, dataset=args.dataset)
+            question = make_prefix(example)
             solution = {
-                "target": example['label'],
+                "target": example['target'],
             }
             data = {
                 "data_source": data_source,
@@ -162,8 +154,8 @@ if __name__ == '__main__':
     os.makedirs(local_dir, exist_ok=True)
     
     train_dataset.to_parquet(os.path.join(local_dir, 'train.parquet'))
-    test_dataset.to_parquet(os.path.join(local_dir, 'test_full.parquet'))
-    val_dataset.to_parquet(os.path.join(local_dir, 'test.parquet'))
+    test_dataset.to_parquet(os.path.join(local_dir, 'test.parquet'))
+    val_dataset.to_parquet(os.path.join(local_dir, 'val.parquet'))
     
     if hdfs_dir is not None:
         makedirs(hdfs_dir)
