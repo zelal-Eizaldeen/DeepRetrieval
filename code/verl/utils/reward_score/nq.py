@@ -9,7 +9,15 @@ from pyserini.eval.evaluate_dpr_retrieval import has_answers
 from src.Lucene.utils import ndcg_for_rank
 
 
-searcher = LuceneSearcher.from_prebuilt_index('wikipedia-dpr-100w')
+# Instead of initializing at import time, we'll create a global variable but initialize it later
+_searcher = None
+
+def get_searcher():
+    """Lazily initialize and return the searcher instance."""
+    global _searcher
+    if _searcher is None:
+        _searcher = LuceneSearcher.from_prebuilt_index('wikipedia-dpr-100w')
+    return _searcher
 
 
 def extract_solution(solution_str):
@@ -115,6 +123,9 @@ def extract_json_from_llm_output(text):
         
         
 def run_index_search_bm25(search_query, topk=50):
+    
+    searcher = get_searcher()
+    
     # Rate limit checking
     hits = searcher.search(search_query, k=topk)
     
