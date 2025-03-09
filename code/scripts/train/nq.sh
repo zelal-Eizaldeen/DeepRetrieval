@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=5,0,6,7
+export CUDA_VISIBLE_DEVICES=0,5,6,7
 
 PROJECT_NAME=nq_search
 EXP_NAME=nq_search_3b
