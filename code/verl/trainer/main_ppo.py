@@ -18,11 +18,9 @@ Note that we don't combine the main with ray_trainer as ray_trainer is used by o
 import sys
 import os
 
-# Debug: Print current directory and Python path
 current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(os.path.dirname(current_dir))  # Remove one dirname call to point to Panacea-R1
-# Add the project root to Python path
-sys.path.insert(0, project_root)  # This will now add Panacea-R1 to the path
+project_root = os.path.dirname(os.path.dirname(current_dir))  
+sys.path.insert(0, project_root)  
 
 from verl import DataProto
 import torch
