@@ -291,6 +291,29 @@ def compute_reward_metrics(batch):
     return reward_metrics
 
 
+def compute_reward_metrics_ndcg(batch):
+    reward_tensor = batch.batch['token_level_scores'].sum(-1)
+
+    format_score = 0.1
+
+    reward_metrics = {}
+    reward_metrics["reward/mean"] = torch.mean(reward_tensor).detach().item()
+    # Calculate all_correct ratio (value == 3)
+    all_correct = torch.sum(reward_tensor > format_score).float() / reward_tensor.numel()
+    reward_metrics["reward/all_correct_ratio"] = all_correct.detach().item()
+    # Calculate format_error ratio (value == -1)
+    format_error = torch.sum(reward_tensor < 0).float() / reward_tensor.numel()
+    reward_metrics["reward/format_error_ratio"] = format_error.detach().item()
+    # Calculate wrong answer ratio (value == -1)
+    all_wrong = torch.sum(reward_tensor == 0).float() / reward_tensor.numel()
+    reward_metrics["reward/wrong_answer_ratio"] = all_wrong.detach().item()
+    
+    # avg value of reward > format_score
+    ndcg = (torch.sum(reward_tensor[reward_tensor > format_score] - format_score).float()) / reward_tensor.numel()
+    reward_metrics["reward/ndcg"] = ndcg
+    
+    return reward_metrics
+
 def compute_reward_metrics_(batch):
     reward_tensor = batch.batch['token_level_scores'].sum(-1)
 
@@ -520,9 +543,15 @@ class RayPPOTrainer(object):
         metric_dict = {}
         for data_source, rewards in data_source_reward.items():
             # metric_dict[f'val/test_score/{data_source}'] = np.mean(rewards)
-            count_equal_3 = sum(1 for reward in rewards if reward == 3)
-            total_count = len(rewards)
-            metric_dict[f'val/test_score/{data_source}'] = count_equal_3 / total_count if total_count > 0 else 0
+            if 'scifact' in data_source or 'fiqa' in data_source or 'trec_covid' in data_source:
+                format_score = 0.1
+                count_ndcg = sum(reward - format_score for reward in rewards if reward > format_score)
+                total_count = len(rewards)
+                metric_dict[f'val/test_score/{data_source}'] = count_ndcg / total_count if total_count > 0 else 0
+            else:
+                count_equal_3 = sum(1 for reward in rewards if reward == 3)
+                total_count = len(rewards)
+                metric_dict[f'val/test_score/{data_source}'] = count_equal_3 / total_count if total_count > 0 else 0
 
         return metric_dict
 
@@ -744,7 +773,10 @@ class RayPPOTrainer(object):
                         metrics.update(actor_output_metrics)
 
                     # reward
-                    reward_metrics = compute_reward_metrics(batch)
+                    if 'scifact'in self.config.data.train_files or 'fiqa' in self.config.data.train_files:
+                        reward_metrics = compute_reward_metrics_ndcg(batch)
+                    else:
+                        reward_metrics = compute_reward_metrics(batch)
                     metrics.update(reward_metrics)
 
                     # validate

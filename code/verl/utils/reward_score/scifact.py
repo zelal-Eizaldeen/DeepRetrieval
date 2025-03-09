@@ -11,7 +11,7 @@ sys.path.append('./')
 from src.Lucene.scifact.search import PyseriniMultiFieldSearch
 from src.Lucene.utils import ndcg_at_k
 
-search_system = PyseriniMultiFieldSearch(index_dir="data/corpus/scifact/pyserini_index")
+search_system = PyseriniMultiFieldSearch(index_dir="data/local_index_search/scifact/pyserini_index")
 
 
 def extract_solution(solution_str):
@@ -49,7 +49,7 @@ def validate_response_structure(processed_str: str, do_print: bool) -> bool:
         print("\n[Structure Validation]")
     validation_passed = True
 
-    processed_str = '<think> </think>' + processed_str
+    # processed_str = '<think> </think>' + processed_str
     
     # Check required tags
     tags = {
@@ -119,9 +119,9 @@ def calculate_answer_score(json_str, label, do_print=False):
         data = json.loads(json_str)
         query = data['query']
         target = label
-        results = retriver_items(query, top_k=3000, threads=32)
+        results = retriver_items(query, top_k=1000, threads=32)
         asin_results = [item[0] for item in results[query]]
-        answer_score = ndcg_at_k(asin_results, target, 3000)
+        answer_score = ndcg_at_k(asin_results, target, 1000)
 
     except:
         print("[Error] Error in evaluation")
@@ -182,7 +182,7 @@ def compute_score(solution_str, ground_truth, format_reward=0.1, answer_reward=1
         print("="*80 + "\n")
 
     return total_score
-    
+
 
 if __name__ == '__main__':
     solution_str = """<|im_start|>assistant:  <answer>{"query": "Microstructural development of human"}</answer>
