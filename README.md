@@ -16,6 +16,7 @@
 
 ## Installation
 
+**General Installation (for all retrieval methods):**
 ```
 conda create -n zero python=3.9
 # install torch [or you can skip this step and let vllm to install the correct version for you]
@@ -33,6 +34,24 @@ pip3 install flash-attn --no-build-isolation
 # quality of life
 pip install wandb IPython matplotlib
 ```
+
+**For Search Engine Retrieval, you can skip the following steps.**
+
+If using sparse retrieval (e.g., BM25) or dense retrieval (e.g., DPR), please also install the following:
+```
+# we use pyserini for efficient retrieval and evaluation
+pip install pyserini    # the version we used is 0.22.1
+
+# if you don't have faiss installed, install it with:
+pip install faiss-gpu    # the version we used is 1.7.2
+
+# if you don't have java installed, install it with:
+pip install install-jdk
+python
+import jdk
+jdk.install('11')
+```
+
 ## Get started
 ```
 cd code
