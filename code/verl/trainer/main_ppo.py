@@ -26,7 +26,7 @@ sys.path.insert(0, project_root)  # This will now add Panacea-R1 to the path
 
 from verl import DataProto
 import torch
-from verl.utils.reward_score import pubmed, screening
+from verl.utils.reward_score import pubmed, screening, scifact
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
 from verl.utils.apis.pubmed import PubmedAPI
 from verl.utils.apis.ctgov import CTGovAPI
@@ -38,6 +38,8 @@ def _select_rm_score_fn(data_source):
         return screening.compute_score
     elif "pubmed" in data_source:
         return pubmed.compute_score
+    elif 'scifact' in data_source:
+        return scifact.compute_score
     else:
         raise NotImplementedError
 
