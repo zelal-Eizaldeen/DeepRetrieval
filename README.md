@@ -127,7 +127,7 @@ sh scripts/eval/pubmed.sh
 | | ICL+Few-shot | 19.11 | 9.27 |
 | **Mistral-7B** | Zero-shot | 7.18 | 8.08 |
 | **LEADS**$^{*}$ | Zero-shot | 24.68 | 32.11 |
-| **DeepRetrieval** | Zero-shot | **60.82** | **70.84** |
+| **DeepRetrieval** | Zero-shot | **64.57** | **70.84** |
 
 *Table: Comparison of different models and methods on publication search and trial search tasks. Bold numbers indicate the best performance.*
 
