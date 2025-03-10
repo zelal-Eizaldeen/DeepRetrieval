@@ -94,7 +94,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--local_dir', default='data/search_engine')
     parser.add_argument('--hdfs_dir', default=None)
-    parser.add_argument('--dataset', type=str, default='pubmed')
+    parser.add_argument('--dataset', type=str, default='ctgov')
 
     args = parser.parse_args()
     

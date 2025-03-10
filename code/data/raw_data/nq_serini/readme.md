@@ -38,5 +38,12 @@ scores:
 ```
 
 
+Test data (with groundtruth documents):
+```bash
+wget https://public.ukp.informatik.tu-darmstadt.de/thakur/BEIR/datasets/nq.zip
+unzip nq.zip
+```
+
+
 
 

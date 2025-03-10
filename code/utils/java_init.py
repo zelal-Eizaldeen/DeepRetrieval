@@ -1,7 +1,17 @@
 import os
+import sys
 
 def get_jdk_path():
+    # Try to get home directory from environment or use a fallback
     home = os.environ.get('HOME')
+    if home is None:
+        # Fallback to user's home directory using os.path.expanduser
+        home = os.path.expanduser('~')
+        if home == '~':
+            # If still no home directory, try to get it from the current user
+            import pwd
+            home = pwd.getpwuid(os.getuid()).pw_dir
+    
     jdk_dir = os.path.join(home, ".jdk")
     
     if not os.path.exists(jdk_dir):
@@ -17,5 +27,13 @@ def get_jdk_path():
     latest_version = sorted(jdk_versions)[-1]
     return os.path.join(home, ".jdk", latest_version)
 
-os.environ['JAVA_HOME'] = get_jdk_path()
-os.environ['PATH'] = os.environ['PATH'] + ':' + os.path.join(os.environ['JAVA_HOME'], 'bin')
+try:
+    os.environ['JAVA_HOME'] = get_jdk_path()
+    os.environ['PATH'] = os.environ['PATH'] + ':' + os.path.join(os.environ['JAVA_HOME'], 'bin')
+except Exception as e:
+    print(f"Error setting up Java environment: {str(e)}", file=sys.stderr)
+    sys.exit(1)
+    
+    
+if __name__ == "__main__":
+    print(get_jdk_path())

@@ -22,9 +22,11 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(os.path.dirname(current_dir))  
 sys.path.insert(0, project_root)  
 
+import utils.java_init
+
 from verl import DataProto
 import torch
-from verl.utils.reward_score import pubmed, screening, scifact, nq_serini
+from verl.utils.reward_score import pubmed, ctgov, screening, scifact, nq_serini
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
 from verl.utils.apis.pubmed import PubmedAPI
 from verl.utils.apis.ctgov import CTGovAPI
@@ -36,6 +38,8 @@ def _select_rm_score_fn(data_source):
         return screening.compute_score
     elif "pubmed" in data_source:
         return pubmed.compute_score
+    elif "ctgov" in data_source:
+        return ctgov.compute_score
     elif 'scifact' in data_source:
         return scifact.compute_score
     elif 'nq_serini' in data_source:
@@ -92,9 +96,10 @@ class RewardManager():
             ground_truth = data_item.non_tensor_batch['reward_model']['ground_truth']
             # select rm_score
             data_source = data_item.non_tensor_batch['data_source']
+            
             if 'pubmed' in data_source or 'ctgov' in data_source:
                 pub_date = data_item.non_tensor_batch['pub_date']
-                literature_type = 'publication'
+                literature_type = 'publication' if 'pubmed' in data_source else 'trial'
                 if literature_type == 'publication':
                     api = self.pubmed_api
                 elif literature_type == 'trial':
