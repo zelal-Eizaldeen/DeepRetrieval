@@ -69,24 +69,34 @@ if __name__ == '__main__':
 
     data_train = []
     data_test = []
+    data_val = []
 
-    with open('/shared/rsaas/LEADS_project/LEADS_dataset/data/search/publication/train.jsonl', 'r') as f:
+    with open('/home/pj20/server-04/LMR/code/data/raw_data/ctgov/train.jsonl', 'r') as f:
         for line in f:
             data_train.append(json.loads(line))
 
-    with open('/shared/rsaas/LEADS_project/LEADS_dataset/data/search/publication/test.jsonl', 'r') as f:
+    with open('/home/pj20/server-04/LMR/code/data/raw_data/ctgov/test.jsonl', 'r') as f:
         for line in f:
             data_test.append(json.loads(line))
+
+    with open('/home/pj20/server-04/LMR/code/data/raw_data/ctgov/dev.jsonl', 'r') as f:
+        for line in f:
+            data_val.append(json.loads(line))
             
     data_train = get_pub_date(data_train)
     data_test = get_pub_date(data_test)
+    data_val = get_pub_date(data_val)
     
-    with open('/home/pj20/server-04/LMR/Panacea-R1/data/pubmed_search_origin/train.jsonl', 'w') as f:
+    with open('/home/pj20/server-04/LMR/code/data/raw_data/ctgov/train.jsonl', 'w') as f:
         for item in data_train:
             f.write(json.dumps(item) + '\n')
 
-    with open('/home/pj20/server-04/LMR/Panacea-R1/data/pubmed_search_origin/test.jsonl', 'w') as f:
+    with open('/home/pj20/server-04/LMR/code/data/raw_data/ctgov/test.jsonl', 'w') as f:
         for item in data_test:
+            f.write(json.dumps(item) + '\n')
+    
+    with open('/home/pj20/server-04/LMR/code/data/raw_data/ctgov/dev.jsonl', 'w') as f:
+        for item in data_val:
             f.write(json.dumps(item) + '\n')
     
     

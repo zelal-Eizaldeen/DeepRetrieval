@@ -290,6 +290,35 @@ def compute_reward_metrics(batch):
 
     return reward_metrics
 
+def compute_reward_metrics_nq_serini(batch):
+    reward_tensor = batch.batch['token_level_scores'].sum(-1)
+
+    reward_metrics = {}
+    reward_metrics["reward/mean"] = torch.mean(reward_tensor).detach().item()
+    # Calculate all_correct ratio (value == 3)
+    seventy_recall = torch.sum(reward_tensor == 6).float() / reward_tensor.numel()
+    reward_metrics["reward/hit@5"] = seventy_recall.detach().item()
+    
+    fifty_recall = torch.sum(reward_tensor >= 4).float() / reward_tensor.numel()
+    reward_metrics["reward/hit@10"] = fifty_recall.detach().item()
+    
+    forty_recall = torch.sum(reward_tensor >= 3).float() / reward_tensor.numel()
+    reward_metrics["reward/hit@20"] = forty_recall.detach().item()
+    
+    thirty_recall = torch.sum(reward_tensor >= 2).float() / reward_tensor.numel()
+    reward_metrics["reward/hit@50"] = thirty_recall.detach().item()
+    
+    ten_recall = torch.sum(reward_tensor >= 1.5).float() / reward_tensor.numel()
+    reward_metrics["reward/hit@100"] = ten_recall.detach().item()
+    
+    # Calculate format_error ratio (value == -1)
+    format_error = torch.sum(reward_tensor == -4).float() / reward_tensor.numel()
+    reward_metrics["reward/format_error_ratio"] = format_error.detach().item()
+    # Calculate wrong answer ratio (value == -1)
+    format_error = torch.sum(reward_tensor == -2.5).float() / reward_tensor.numel()
+    reward_metrics["reward/wrong_answer_ratio"] = format_error.detach().item()
+
+    return reward_metrics
 
 def compute_reward_metrics_ndcg(batch):
     reward_tensor = batch.batch['token_level_scores'].sum(-1)
@@ -773,8 +802,10 @@ class RayPPOTrainer(object):
                         metrics.update(actor_output_metrics)
 
                     # reward
-                    if 'scifact'in self.config.data.train_files or 'fiqa' in self.config.data.train_files or 'nq' in self.config.data.train_files:
+                    if 'scifact'in self.config.data.train_files or 'fiqa' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_ndcg(batch)
+                    elif 'nq_serini' in self.config.data.train_files:
+                        reward_metrics = compute_reward_metrics_nq_serini(batch)
                     else:
                         reward_metrics = compute_reward_metrics(batch)
                     metrics.update(reward_metrics)
