@@ -7,8 +7,8 @@ EXP_NAME=scifact_search_3b
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
 python3 -m verl.trainer.main_ppo \
-    data.train_files=data/corpus/scifact/scifact/train.parquet \
-    data.val_files=data/corpus/scifact/scifact/val.parquet \
+    data.train_files=data/local_index_search/scifact/train.parquet \
+    data.val_files=data/local_index_search/scifact/val.parquet \
     data.train_batch_size=64 \
     data.val_batch_size=64 \
     data.max_prompt_length=256 \

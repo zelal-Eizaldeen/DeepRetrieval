@@ -6,12 +6,17 @@ import operator
 import pdb
 import json
 import sys
+import os
 sys.path.append('./')
 
 from src.Lucene.scifact.search import PyseriniMultiFieldSearch
 from src.Lucene.utils import ndcg_at_k
 
-search_system = PyseriniMultiFieldSearch(index_dir="data/local_index_search/scifact/pyserini_index")
+if not os.path.exists("data/local_index_search/scifact/pyserini_index"):
+    print("[Warning] Pyserini index not found for scifact")
+    search_system = None
+else:
+    search_system = PyseriniMultiFieldSearch(index_dir="data/local_index_search/scifact/pyserini_index")
 
 
 def extract_solution(solution_str):

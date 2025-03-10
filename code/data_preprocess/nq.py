@@ -14,15 +14,14 @@ import pdb
 
 
 INSTRUCTION = """
-The Assistant is a query rewriting expert. His task is to create query terms for user query to find relevant literature in a Wikipedia corpus using BM25.
+You are a query rewriting expert. Your task is to create query terms for user query to find relevant literature in a Wikipedia corpus using BM25.
 """
 
 
 def make_prefix(dp):
 
-    input_str = """A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer.\n""" + INSTRUCTION
-    input_str += """The Assistant should show his thinking process in <think> </think> tags. The Assistant should return the final answer in JSON format in <answer> </answer> tags, 
-For example:
+    input_str = """<|im_start|>system\nYou are a helpful assistant. You first thinks about the reasoning process in the mind and then provides the user with the answer.<|im_end|>\n<|im_start|>user\n""" + INSTRUCTION
+    input_str += """\nShow your work in <think> </think> tags. Your final response must be in JSON format within <answer> </answer> tags. For example,
 <think>
 [thinking process]
 </think>
@@ -44,7 +43,6 @@ Assistant: Let me rewrite the query with reasoning.
     return input_str
 
 
-
 def load_matching_dataset():
     
     data_train = []
@@ -60,8 +58,12 @@ def load_matching_dataset():
             data_test.append(json.loads(line))
             
     with open('data/raw_data/nq/dev.jsonl', 'r') as f:
-        for line in f[:200]:
+        cnt = 0
+        for line in f:
             data_val.append(json.loads(line))
+            cnt += 1
+            if cnt > 200:
+                break
     
     train_data = [{'input': x['question'], 'label': x['answers']} for x in data_train]
     test_data = [{'input': x['question'], 'label': x['answers']} for x in data_test]
@@ -70,10 +72,9 @@ def load_matching_dataset():
     return train_data, test_data, val_data
 
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--local_dir', default='data/search_engine')
+    parser.add_argument('--local_dir', default='data/local_index_search')
     parser.add_argument('--hdfs_dir', default=None)
     parser.add_argument('--dataset', type=str, default='nq')
 
@@ -143,8 +144,8 @@ if __name__ == '__main__':
     os.makedirs(local_dir, exist_ok=True)
     
     train_dataset.to_parquet(os.path.join(local_dir, 'train.parquet'))
-    test_dataset.to_parquet(os.path.join(local_dir, 'test_full.parquet'))
-    val_dataset.to_parquet(os.path.join(local_dir, 'test.parquet'))
+    test_dataset.to_parquet(os.path.join(local_dir, 'test.parquet'))
+    val_dataset.to_parquet(os.path.join(local_dir, 'val.parquet'))
     
     if hdfs_dir is not None:
         makedirs(hdfs_dir)

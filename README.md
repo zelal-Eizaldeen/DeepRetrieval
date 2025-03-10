@@ -46,13 +46,10 @@ pip install pyserini    # the version we used is 0.22.1
 pip install faiss-gpu    # the version we used is 1.7.2
 
 # if you don't have java installed, install it with:
-pip install install-jdk
-python
-import jdk
-jdk.install('11')
+pip install install-jdk && python -c "import jdk; jdk.install('11')"
 ```
 
-## Get started
+## Get Started
 ```
 cd code
 ```
@@ -98,7 +95,7 @@ For the following code, if you see Out-of-vram, try add `critic.model.enable_gra
 
 For example, for PubMed:
 ```
-sh scripts/train/pubmed_train.sh 
+sh scripts/train/pubmed.sh 
 ```
 
 ### Reward Curve During Training
@@ -109,7 +106,7 @@ sh scripts/train/pubmed_train.sh
 ## Run Evaluation
 
 ```
-sh scripts/eval/pubmed_test.sh
+sh scripts/eval/pubmed.sh
 ```
 
 **Result (checkpoint date: Feb 16)**
