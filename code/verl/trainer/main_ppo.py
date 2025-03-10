@@ -106,6 +106,8 @@ class RewardManager():
 
             if 'pubmed' in data_source or 'ctgov' in data_source:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, search_api=api, literature_type=literature_type, pub_date=pub_date)
+            elif 'scifact' in data_source or 'fiqa' in data_source:
+                score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, data_source=data_source)
             else:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth)
             

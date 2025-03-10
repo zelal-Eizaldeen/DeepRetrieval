@@ -118,15 +118,15 @@ def retriver_items(query, top_k=3000, threads=16):
     results = search_system.batch_search([query], top_k=top_k, threads=threads)
     return results
     
-def calculate_answer_score(json_str, label, do_print=False):
+def calculate_answer_score(json_str, label, top_k, do_print=False):
     """Calculate answer score based on final_prediction idx."""
     try:
         data = json.loads(json_str)
         query = data['query']
         target = label
-        results = retriver_items(query, top_k=1000, threads=32)
+        results = retriver_items(query, top_k=top_k, threads=32)
         asin_results = [item[0] for item in results[query]]
-        answer_score = ndcg_at_k(asin_results, target, 1000)
+        answer_score = ndcg_at_k(asin_results, target, top_k)
 
     except:
         print("[Error] Error in evaluation")
@@ -134,7 +134,7 @@ def calculate_answer_score(json_str, label, do_print=False):
     
     return answer_score
 
-def compute_score(solution_str, ground_truth, format_reward=0.1, answer_reward=1.):
+def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, answer_reward=1.):
     """The scoring function for countdown task.
     
     Args:
@@ -167,8 +167,13 @@ def compute_score(solution_str, ground_truth, format_reward=0.1, answer_reward=1
         print(f"Target: {label} |")
     
     answer_score = 0
+    if 'test' in data_source or 'val' in data_source:
+        top_k = 10
+    else:
+        top_k = 1000
+    
     if format_correct and answer_text:
-        answer_score = calculate_answer_score(answer_text, label, do_print)
+        answer_score = calculate_answer_score(answer_text, label, top_k, do_print)
 
     if answer_score > 0:
         total_score = format_score + answer_score
