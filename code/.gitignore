@@ -17,6 +17,7 @@ logs
 exp_logs
 *.key
 *pyserini_index
+corpus.jsonl
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

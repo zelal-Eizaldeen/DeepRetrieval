@@ -1,6 +1,6 @@
 import re
 import os
-from datasets import Dataset, load_dataset
+from datasets import Dataset, load_dataset, concatenate_datasets
 from random import randint, seed, choice
 from typing import List, Tuple
 from tqdm import tqdm
@@ -14,8 +14,7 @@ import pdb
 
 
 INSTRUCTION = """
-You are a query rewriting expert. Your task is to create query terms for user query to find relevant literature in a Wikipedia corpus using BM25.
-"""
+You are a query generating expert. Given a scientific claim, your task is to create query terms to retrieve documents that support or refute the claim."""
 
 
 def make_prefix(dp):
@@ -29,11 +28,10 @@ def make_prefix(dp):
 </answer>. 
 Note: The query should use Boolean operators (AND, OR) and parentheses for grouping terms appropriately.
 
-Here's the user query:
+Here's the scientific claim:
 """
-
     input_str +=  dp['query'] + """
-Assistant: Let me rewrite the query with reasoning. 
+Assistant: Let me think step by step. 
 <think>
 """
 
@@ -106,7 +104,7 @@ if __name__ == '__main__':
                 "target": example['target'],
             }
             data = {
-                "data_source": data_source,
+                "data_source": data_source + '_' + split,
                 "prompt": [{
                     "role": "user",
                     "content": question,
@@ -129,8 +127,8 @@ if __name__ == '__main__':
     val_dataset = val_dataset.map(function=make_map_fn('val'), with_indices=True)
     # shuffle the dataset
     train_dataset = train_dataset.shuffle(seed=42)
-    test_dataset = test_dataset.shuffle(seed=42)
-    val_dataset = val_dataset.shuffle(seed=42)
+
+    val_dataset = concatenate_datasets([val_dataset, test_dataset])
     
     lengths_list = []
     for d in train_dataset:
