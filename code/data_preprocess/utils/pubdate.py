@@ -1,27 +1,16 @@
 import sys
 import os
+import json
+from datetime import datetime
+import re
+from tqdm import tqdm
+from verl.utils.apis.pubmed import PubmedAPI
+from verl.utils.apis.ctgov import CTGovAPI
 
 # Debug: Print current directory and Python path
 current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(os.path.dirname(current_dir))  # Remove one dirname call to point to Panacea-R1
-# Add the project root to Python path
-sys.path.insert(0, project_root)  # This will now add Panacea-R1 to the path
-
-print("Python path after:", sys.path)
-print("Checking if verl exists:", os.path.exists(os.path.join(project_root, 'verl')))
-print("Checking if utils exists:", os.path.exists(os.path.join(project_root, 'verl', 'utils')))
-print("Checking if apis exists:", os.path.exists(os.path.join(project_root, 'verl', 'utils', 'apis')))
-
-import json
-# Import directly from the files instead of using the package structure
-from verl.utils.apis.pubmed import PubmedAPI
-from verl.utils.apis.ctgov import CTGovAPI
-import re
-from datetime import datetime
-from tqdm import tqdm
-
-
-
+project_root = os.path.dirname(os.path.dirname(current_dir))
+sys.path.insert(0, project_root)
 
 def convert_date(date_str):
     # Default date if the input is empty or invalid
@@ -49,45 +38,105 @@ def convert_date(date_str):
     # Format the date string to YYYY/MM/DD
     return f"{year}/{month.zfill(2)}/{day.zfill(2)}"
 
+def save_checkpoint(data, output_file, checkpoint_file):
+    # Save the current progress
+    with open(output_file, 'w') as f:
+        for item in data:
+            f.write(json.dumps(item) + '\n')
+    
+    # Save checkpoint info
+    checkpoint_info = {
+        'processed_count': len(data),
+        'timestamp': datetime.now().isoformat()
+    }
+    with open(checkpoint_file, 'w') as f:
+        json.dump(checkpoint_info, f)
 
+def load_checkpoint(checkpoint_file):
+    if os.path.exists(checkpoint_file):
+        with open(checkpoint_file, 'r') as f:
+            return json.load(f)
+    return None
+
+def get_pub_date(data, output_file, checkpoint_file, pubmed_api):
+    # Load checkpoint if exists
+    checkpoint = load_checkpoint(checkpoint_file)
+    start_idx = checkpoint['processed_count'] if checkpoint else 0
+    
+    # Load existing processed data if checkpoint exists
+    if checkpoint and os.path.exists(output_file):
+        processed_data = []
+        with open(output_file, 'r') as f:
+            for line in f:
+                processed_data.append(json.loads(line))
+        data = processed_data + data[start_idx:]
+    
+    try:
+        for i, item in enumerate(tqdm(data[start_idx:], initial=start_idx)):
+            if 'pub_date' in item.keys():
+                continue
+            
+            try:
+                pmid = item['origin']['pmid']
+                pub_date = pubmed_api.get_papers_by_pmids([pmid])['Publication Date'].fillna('').tolist()[0]
+                item['pub_date'] = convert_date(pub_date)
+                
+                # Save checkpoint every 100 items
+                if (i + 1) % 100 == 0:
+                    save_checkpoint(data[:i+1], output_file, checkpoint_file)
+                    
+            except Exception as e:
+                print(f"Error processing item {i}: {str(e)}")
+                continue
+                
+        # Save final results
+        save_checkpoint(data, output_file, checkpoint_file)
+        return data
         
-
-def get_pub_date(data):
-    for item in tqdm(data):
-        pmid = item['origin']['pmid']
-        pub_date = pubmed_api.get_papers_by_pmids([pmid])['Publication Date'].fillna('').tolist()[0]
-        item['pub_date'] = convert_date(pub_date)
-    return data
-
+    except Exception as e:
+        print(f"Error during processing: {str(e)}")
+        # Save progress before raising the error
+        save_checkpoint(data[:i], output_file, checkpoint_file)
+        raise
 
 if __name__ == '__main__':
-    
+    # Initialize APIs
     if os.path.exists('verl/utils/reward_score/apis/pubmed_api.key'):
         api_key = open('verl/utils/reward_score/apis/pubmed_api.key', 'r').read().strip()
         pubmed_api = PubmedAPI(api_key=api_key)
     ctgov_api = CTGovAPI()
 
-    data_train = []
-    data_test = []
+    # Define data paths
+    data_paths = {
+        'train': '/home/pj20/server-04/LMR/code/data/raw_data/ctgov/train.jsonl',
+        'test': '/home/pj20/server-04/LMR/code/data/raw_data/ctgov/test.jsonl',
+        'dev': '/home/pj20/server-04/LMR/code/data/raw_data/ctgov/dev.jsonl'
+    }
 
-    with open('/shared/rsaas/LEADS_project/LEADS_dataset/data/search/publication/train.jsonl', 'r') as f:
-        for line in f:
-            data_train.append(json.loads(line))
-
-    with open('/shared/rsaas/LEADS_project/LEADS_dataset/data/search/publication/test.jsonl', 'r') as f:
-        for line in f:
-            data_test.append(json.loads(line))
+    for split_name, data_path in data_paths.items():
+        print(f"\nProcessing {split_name} split...")
+        
+        # Load data
+        data = []
+        with open(data_path, 'r') as f:
+            for line in f:
+                data.append(json.loads(line))
+        
+        # Define checkpoint file
+        checkpoint_file = f"{data_path}.checkpoint"
+        
+        try:
+            # Process data with checkpointing
+            processed_data = get_pub_date(data, data_path, checkpoint_file, pubmed_api)
+            print(f"Successfully processed {split_name} split")
             
-    data_train = get_pub_date(data_train)
-    data_test = get_pub_date(data_test)
-    
-    with open('/home/pj20/server-04/LMR/Panacea-R1/data/pubmed_search_origin/train.jsonl', 'w') as f:
-        for item in data_train:
-            f.write(json.dumps(item) + '\n')
-
-    with open('/home/pj20/server-04/LMR/Panacea-R1/data/pubmed_search_origin/test.jsonl', 'w') as f:
-        for item in data_test:
-            f.write(json.dumps(item) + '\n')
+            # Remove checkpoint file after successful completion
+            if os.path.exists(checkpoint_file):
+                os.remove(checkpoint_file)
+                
+        except Exception as e:
+            print(f"Error processing {split_name} split: {str(e)}")
+            print("Progress has been saved. You can resume by running the script again.")
     
     
 
