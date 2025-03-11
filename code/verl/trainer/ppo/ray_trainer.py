@@ -343,6 +343,31 @@ def compute_reward_metrics_ndcg(batch):
     
     return reward_metrics
 
+def compute_reward_metrics_recall_ndcg(batch):
+    reward_tensor = batch.batch['token_level_scores'].sum(-1)
+
+    format_score = 0.1
+    recall_score = 0.2
+
+    reward_metrics = {}
+    reward_metrics["reward/mean"] = torch.mean(reward_tensor).detach().item()
+    # Calculate all_correct ratio (value == 3)
+    all_correct = torch.sum(reward_tensor > format_score).float() / reward_tensor.numel()
+    reward_metrics["reward/all_correct_ratio"] = all_correct.detach().item()
+    # Calculate format_error ratio (value == -1)
+    format_error = torch.sum(reward_tensor < 0).float() / reward_tensor.numel()
+    reward_metrics["reward/format_error_ratio"] = format_error.detach().item()
+    # Calculate wrong answer ratio (value == -1)
+    all_wrong = torch.sum(reward_tensor == 0).float() / reward_tensor.numel()
+    reward_metrics["reward/wrong_answer_ratio"] = all_wrong.detach().item()
+    
+    # avg value of reward > format_score
+    ndcg = (torch.sum(reward_tensor[reward_tensor > format_score] - format_score - recall_score).float()) / reward_tensor.numel()
+    reward_metrics["reward/ndcg"] = ndcg
+    
+    return reward_metrics
+
+
 def compute_reward_metrics_(batch):
     reward_tensor = batch.batch['token_level_scores'].sum(-1)
 
@@ -802,8 +827,10 @@ class RayPPOTrainer(object):
                         metrics.update(actor_output_metrics)
 
                     # reward
-                    if 'scifact'in self.config.data.train_files or 'fiqa' in self.config.data.train_files or 'nfcorpus' in self.config.data.train_files or 'msmarco' in self.config.data.train_files:
+                    if 'scifact'in self.config.data.train_files or 'fiqa' in self.config.data.train_files or 'nfcorpus' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_ndcg(batch)
+                    elif 'msmarco' in self.config.data.train_files:
+                        reward_metrics = compute_reward_metrics_recall_ndcg(batch)
                     elif 'nq_serini' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_nq_serini(batch)
                     else:

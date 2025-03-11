@@ -128,17 +128,38 @@ def retriver_items(query, top_k=3000, mode='sparse'):
     doc_list = [json.loads(hit.lucene_document.get('raw'))['id'] for hit in hits]
     return doc_list
     
-def calculate_answer_score(json_str, label, scores, top_k, mode='sparse', do_print=False):
+def calculate_answer_score(json_str, label, scores, top_k, test_k, mode='sparse', do_print=False):
     """Calculate answer score based on final_prediction idx."""
     try:
         data = json.loads(json_str)
         query = data['query']
-        targets = label
+        targets = [str(l) for l in label]
         results = retriver_items(query, top_k=top_k, mode=mode)
-        answer_score = ndcg_at_k(results, targets, top_k, rel_scores=scores)
-
-    except:
-        print("[Error] Error in evaluation")
+        hit_count = len(set(results) & set(targets))
+        recall = hit_count / len(targets)
+        
+        
+        if recall > 0:
+            recall_score = 0.2
+        else:
+            recall_score = 0
+        
+        ndcg_score = ndcg_at_k(results, targets, top_k, rel_scores=scores)
+        # ndcg_test_score = ndcg_at_k(results, targets, test_k, rel_scores=scores)
+        
+        answer_score = recall_score + ndcg_score
+        
+        
+        if do_print:
+            print(f"Retrieved results: {results}")
+            print(f"Target: {label} ")
+            print(f"NDCG score: {ndcg_score}")
+            print(f"Recall: {recall}")
+            
+            
+    except Exception as e:
+        if do_print:
+            print(f"[Error] Error in evaluation: {e}")
         answer_score = -2
     
     return answer_score
@@ -159,7 +180,7 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
     
     answer_text, processed_str = extract_solution(solution_str)
     
-    do_print = random.randint(1, 32) == 1
+    do_print = random.randint(1, 16) == 1
 
     # Validate response structure
     response_format_correct = validate_response_structure(processed_str, do_print)
@@ -174,7 +195,6 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
     if do_print:
         print(f"--------------------------------")
         print(f"Solution string: {solution_str}")
-        print(f"Target: {label} |")
     
     answer_score = 0
     if 'test' in data_source or 'val' in data_source:
@@ -187,8 +207,9 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
     elif 'dense' in data_source:
         mode = 'dense'
     
+    test_k = 10
     if format_correct and answer_text:
-        answer_score = calculate_answer_score(answer_text, label, scores, top_k, mode, do_print)
+        answer_score = calculate_answer_score(answer_text, label, scores, top_k, test_k, mode, do_print)
 
     if answer_score > 0:
         total_score = format_score + answer_score
