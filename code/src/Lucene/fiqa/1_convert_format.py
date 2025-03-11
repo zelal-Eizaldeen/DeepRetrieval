@@ -12,9 +12,9 @@ def convert_jsonl_for_pyserini(input_file, output_file):
             # Create JSON document with a clear structure
             doc = {
                 "id": data["_id"],  # Unique identifier for search results
-                "contents": data['title'] + '\n' + data['text'],  # Required field for Pyserini
+                "contents": data['text'],  # Required field for Pyserini
             }
-
+            
             docs.append(json.dumps(doc))
 
     with open(output_file, "w", encoding="utf-8") as f:
@@ -24,8 +24,8 @@ def convert_jsonl_for_pyserini(input_file, output_file):
     print(f"✅ Converted JSONL saved to {output_file}")
 
 
-ori_data_dir = "code/data/raw_data/scifact/corpus.jsonl"
-output_file = "code/data/local_index_search/scifact/jsonl_docs/pyserini_corpus.jsonl"
+ori_data_dir = "code/data/raw_data/fiqa/corpus.jsonl"
+output_file = "code/data/local_index_search/fiqa/jsonl_docs/pyserini_corpus.jsonl"
 
 os.makedirs(os.path.dirname(output_file), exist_ok=True)
 

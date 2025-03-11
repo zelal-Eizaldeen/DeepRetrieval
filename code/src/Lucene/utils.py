@@ -5,7 +5,7 @@ def dcg_at_k(retrieved, target, k):
     Compute DCG@k (Discounted Cumulative Gain).
     """
     retrieved = retrieved[:k]
-    gains = [1.0 if item == target else 0.0 for item in retrieved]
+    gains = np.array(retrieved) == target
     discounts = np.log2(np.arange(2, len(gains) + 2))
     return np.sum(gains / discounts)
 

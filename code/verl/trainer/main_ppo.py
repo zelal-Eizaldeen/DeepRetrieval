@@ -24,7 +24,7 @@ sys.path.insert(0, project_root)
 
 from verl import DataProto
 import torch
-from verl.utils.reward_score import pubmed, screening, scifact, nq
+from verl.utils.reward_score import pubmed, screening, scifact, nq, fiqa
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
 from verl.utils.apis.pubmed import PubmedAPI
 from verl.utils.apis.ctgov import CTGovAPI
@@ -40,6 +40,8 @@ def _select_rm_score_fn(data_source):
         return scifact.compute_score
     elif 'nq' in data_source:
         return nq.compute_score
+    elif 'fiqa' in data_source:
+        return fiqa.compute_score
     else:
         raise NotImplementedError
 
