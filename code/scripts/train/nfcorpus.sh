@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=3,4
+export CUDA_VISIBLE_DEVICES=6,7
 
 PROJECT_NAME=nfcorpus_search
 EXP_NAME=nfcorpus_search_3b

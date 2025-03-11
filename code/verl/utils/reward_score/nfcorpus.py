@@ -146,7 +146,7 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
         score: the score for the correct answer
     """
 
-    label = str(ground_truth['target'])
+    label = [str(x) for x in ground_truth['target']]
     scores = ground_truth['score']
     
     answer_text, processed_str = extract_solution(solution_str)

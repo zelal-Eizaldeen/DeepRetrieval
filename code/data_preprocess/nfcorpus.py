@@ -110,7 +110,7 @@ def load_matching_dataset():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--local_dir', default='code/data/local_index_search/nfcorpus')
+    parser.add_argument('--local_dir', default='code/data/local_index_search')
     parser.add_argument('--hdfs_dir', default=None)
     parser.add_argument('--dataset', type=str, default='nfcorpus')
 
