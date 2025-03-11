@@ -122,17 +122,13 @@ def retriver_items(query, top_k=3000, threads=16):
     
 def calculate_answer_score(json_str, label, scores, top_k, do_print=False):
     """Calculate answer score based on final_prediction idx."""
-    try:
-        data = json.loads(json_str)
-        query = data['query']
-        target = label
-        results = retriver_items(query, top_k=top_k, threads=32)
-        pred_results = [item[0] for item in results[query]]
-        answer_score = ndcg_at_k(pred_results, target, top_k, rel_scores=scores)
+    data = json.loads(json_str)
+    query = data['query']
+    target = label
+    results = retriver_items(query, top_k=top_k, threads=32)
+    pred_results = [item[0] for item in results[query]]
+    answer_score = ndcg_at_k(pred_results, target, top_k, rel_scores=scores)
     
-    except:
-        print("[Error] Error in evaluation")
-        answer_score = -2
     
     return answer_score
 
@@ -147,10 +143,7 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
         score: the score for the correct answer
     """
 
-    if isinstance(ground_truth['target'], list):
-        label = [str(x) for x in ground_truth['target']]
-    else:
-        label = str(ground_truth['target'])
+    label = [str(x) for x in ground_truth['target']]
     scores = ground_truth['score']
     
     answer_text, processed_str = extract_solution(solution_str)
@@ -201,8 +194,8 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
 
 
 if __name__ == '__main__':
-    solution_str = """<|im_start|>assistant:  <think></think> <answer>{"query": "Microstructural development of human"}</answer>
+    solution_str = """<|im_start|>assistant:  <think></think> <answer>{"query": "EBITDA personal finance OR Personal Net Income (NOT corporate finance)"}</answer>
 """
-    ground_truth = {'target': list(range(0, 20000)) + ['592347'], 'score': [1]* 20001}
+    ground_truth = {'target': ['477434'], 'score': [1]}
     scores = compute_score(solution_str, ground_truth, data_source='fiqa_test')
     print(scores)
