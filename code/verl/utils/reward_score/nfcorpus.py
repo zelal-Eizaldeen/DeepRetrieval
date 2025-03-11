@@ -9,16 +9,14 @@ import sys
 import os
 sys.path.append('./')
 
-from src.Lucene.fiqa.search import PyseriniMultiFieldSearch
+from src.Lucene.nfcorpus.search import PyseriniMultiFieldSearch
 from src.Lucene.utils import ndcg_at_k
 
-DATASET_NAME = "fiqa"
-
-if not os.path.exists(f"data/local_index_search/{DATASET_NAME}/pyserini_index"):
-    print(f"[Warning] Pyserini index not found for {DATASET_NAME}")
+if not os.path.exists("data/local_index_search/nfcorpus/pyserini_index"):
+    print("[Warning] Pyserini index not found for nfcorpus")
     search_system = None
 else:
-    search_system = PyseriniMultiFieldSearch(index_dir=f"data/local_index_search/{DATASET_NAME}/pyserini_index")
+    search_system = PyseriniMultiFieldSearch(index_dir="data/local_index_search/nfcorpus/pyserini_index")
 
 
 def extract_solution(solution_str):
@@ -92,6 +90,7 @@ def validate_response_structure(processed_str: str, do_print: bool) -> bool:
     
     return validation_passed
 
+
 def check_json_format(json_str, do_print=False):
     """Check if the given string is a valid JSON and follows the expected structure."""
     try:
@@ -129,7 +128,7 @@ def calculate_answer_score(json_str, label, scores, top_k, do_print=False):
         results = retriver_items(query, top_k=top_k, threads=32)
         pred_results = [item[0] for item in results[query]]
         answer_score = ndcg_at_k(pred_results, target, top_k, rel_scores=scores)
-    
+
     except:
         print("[Error] Error in evaluation")
         answer_score = -2
@@ -147,10 +146,7 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
         score: the score for the correct answer
     """
 
-    if isinstance(ground_truth['target'], list):
-        label = [str(x) for x in ground_truth['target']]
-    else:
-        label = str(ground_truth['target'])
+    label = str(ground_truth['target'])
     scores = ground_truth['score']
     
     answer_text, processed_str = extract_solution(solution_str)
@@ -180,7 +176,7 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
     
     if format_correct and answer_text:
         answer_score = calculate_answer_score(answer_text, label, scores, top_k, do_print)
-    
+
     if answer_score > 0:
         total_score = format_score + answer_score
     else:
@@ -201,8 +197,8 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
 
 
 if __name__ == '__main__':
-    solution_str = """<|im_start|>assistant:  <think></think> <answer>{"query": "Microstructural development of human"}</answer>
+    solution_str = """<|im_start|>assistant:  <answer>{"query": "Microstructural development of human"}</answer>
 """
-    ground_truth = {'target': list(range(0, 20000)) + ['592347'], 'score': [1]* 20001}
-    scores = compute_score(solution_str, ground_truth, data_source='fiqa_test')
+    ground_truth = {'target': '4983'}
+    scores = compute_score(solution_str, ground_truth)
     print(scores)

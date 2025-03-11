@@ -14,12 +14,12 @@ import pdb
 
 
 INSTRUCTION = """
-You are an expert in query generation. Given a financial question, your task is to create query terms to retrieve user replies that best answer the question."""
+You are an expert in query generation. Given a question, your task is to create query terms to retrieve relevant documents that best answer the question."""
 
 
 def make_prefix(dp):
 
-    input_str = """<|im_start|>system\nYou are a helpful assistant. You first thinks about the reasoning process in the mind and then provides the user with the answer.<|im_end|>\n<|im_start|>user\n""" + INSTRUCTION
+    input_str = """<|im_start|>system\nYou are a helpful assistant. You first think about the reasoning process in the mind and then provide the user with the answer.<|im_end|>\n<|im_start|>user\n""" + INSTRUCTION
     input_str += """\nShow your work in <think> </think> tags. Your final response must be in JSON format within <answer> </answer> tags. For example,
 <answer>
 {
@@ -28,7 +28,7 @@ def make_prefix(dp):
 </answer>. 
 Note: The query should use Boolean operators (AND, OR) and parentheses for grouping terms appropriately.
 
-Here's the financial question:
+Here's the question:
 """
     input_str +=  dp['query'] + """
 Assistant: Let me think step by step. 
@@ -36,6 +36,7 @@ Assistant: Let me think step by step.
 """
 
     return input_str
+
 
 
 def parse_qrel(qrel):
@@ -58,30 +59,31 @@ def parse_qrel(qrel):
 
     return query_dict
 
+
 def load_matching_dataset():
-    # code/data/raw_data/fiqa/qrels/*.tsv
-    with open("code/data/raw_data/fiqa/qrels/train.tsv", "r", encoding="utf-8") as file:
+    # code/data/raw_data/nfcorpus/qrels/*.tsv
+    with open("code/data/raw_data/nfcorpus/qrels/train.tsv", "r", encoding="utf-8") as file:
         qrel_train = [line.strip().split("\t") for line in file]
     
     qrel_train = qrel_train[1:]  # remove the header
     
-    with open("code/data/raw_data/fiqa/qrels/test.tsv", "r", encoding="utf-8") as file:
+    with open("code/data/raw_data/nfcorpus/qrels/test.tsv", "r", encoding="utf-8") as file:
         qrel_test = [line.strip().split("\t") for line in file]
 
     qrel_test = qrel_test[1:]  # remove the header
 
-    with open("code/data/raw_data/fiqa/qrels/dev.tsv", "r", encoding="utf-8") as file:
+    with open("code/data/raw_data/nfcorpus/qrels/dev.tsv", "r", encoding="utf-8") as file:
         qrel_val = [line.strip().split("\t") for line in file]
 
     qrel_val = qrel_val[1:]  # remove the header
 
-
     qrel_train = parse_qrel(qrel_train)
     qrel_test = parse_qrel(qrel_test)
     qrel_val = parse_qrel(qrel_val)
-    
-    # read code/data/raw_data/fiqa/queries.jsonl
-    with open("code/data/raw_data/fiqa/queries.jsonl", "r", encoding="utf-8") as file:
+
+
+    # read code/data/raw_data/nfcorpus/queries.jsonl
+    with open("code/data/raw_data/nfcorpus/queries.jsonl", "r", encoding="utf-8") as file:
         queries = [json.loads(line) for line in file]
 
     # transform the queries into a dictionary
@@ -97,7 +99,7 @@ def load_matching_dataset():
                 "score": value['scores']
             })
         return data
-    
+
     train_data = process_qrel(qrel_train)
     test_data = process_qrel(qrel_test)
     val_data = process_qrel(qrel_val)
@@ -108,15 +110,16 @@ def load_matching_dataset():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--local_dir', default='code/data/local_index_search')
+    parser.add_argument('--local_dir', default='code/data/local_index_search/nfcorpus')
     parser.add_argument('--hdfs_dir', default=None)
-    parser.add_argument('--dataset', type=str, default='fiqa')
+    parser.add_argument('--dataset', type=str, default='nfcorpus')
 
     args = parser.parse_args()
     
     data_source = args.dataset
     
     train_data, test_data, val_data = load_matching_dataset()
+
 
     train_dataset = Dataset.from_list(train_data)
     test_dataset = Dataset.from_list(test_data)

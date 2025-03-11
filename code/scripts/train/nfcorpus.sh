@@ -1,13 +1,13 @@
-export CUDA_VISIBLE_DEVICES=4,5
+export CUDA_VISIBLE_DEVICES=3,4
 
-PROJECT_NAME=fiqa_search
-EXP_NAME=fiqa_search_3b
+PROJECT_NAME=nfcorpus_search
+EXP_NAME=nfcorpus_search_3b
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
 python3 -m verl.trainer.main_ppo \
-    data.train_files=data/local_index_search/fiqa/train.parquet \
-    data.val_files=data/local_index_search/fiqa/val.parquet \
+    data.train_files=data/local_index_search/nfcorpus/train.parquet \
+    data.val_files=data/local_index_search/nfcorpus/val.parquet \
     data.train_batch_size=64 \
     data.val_batch_size=64 \
     data.max_prompt_length=256 \

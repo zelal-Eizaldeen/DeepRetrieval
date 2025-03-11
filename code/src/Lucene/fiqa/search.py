@@ -8,7 +8,7 @@ class PyseriniMultiFieldSearch:
         """Initialize Pyserini MultiField Searcher"""
         self.searcher = LuceneSearcher(index_dir)
         self.searcher.set_bm25(1.2, 0.75)  # Set BM25 scoring for ranking
-
+    
     def batch_search(self, queries, top_k=10, threads=4):
         """
         Perform parallel search across multiple fields using batch_search
@@ -45,7 +45,7 @@ class PyseriniMultiFieldSearch:
 
 # Example Usage
 if __name__ == "__main__":
-    search_system = PyseriniMultiFieldSearch(index_dir='code/data/corpus/scifact/pyserini_index')
+    search_system = PyseriniMultiFieldSearch(index_dir='code/data/local_index_search/scifact/pyserini_index')
     
     queries = [
         "Organic Skin Care",
