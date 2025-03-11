@@ -125,8 +125,8 @@ def calculate_answer_score(json_str, label, top_k, do_print=False):
         query = data['query']
         target = label
         results = retriver_items(query, top_k=top_k, threads=32)
-        asin_results = [item[0] for item in results[query]]
-        answer_score = ndcg_at_k(asin_results, target, top_k)
+        pred_results = [item[0] for item in results[query]]
+        answer_score = ndcg_at_k(pred_results, target, top_k)
 
     except:
         print("[Error] Error in evaluation")

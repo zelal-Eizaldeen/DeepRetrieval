@@ -24,7 +24,7 @@ sys.path.insert(0, project_root)
 
 from verl import DataProto
 import torch
-from verl.utils.reward_score import pubmed, screening, scifact, nq, fiqa
+from verl.utils.reward_score import pubmed, screening, scifact, nq, fiqa, nfcorpus
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
 from verl.utils.apis.pubmed import PubmedAPI
 from verl.utils.apis.ctgov import CTGovAPI
@@ -42,6 +42,8 @@ def _select_rm_score_fn(data_source):
         return nq.compute_score
     elif 'fiqa' in data_source:
         return fiqa.compute_score
+    elif 'nfcorpus' in data_source:
+        return nfcorpus.compute_score
     else:
         raise NotImplementedError
 
@@ -86,7 +88,7 @@ class RewardManager():
             response_ids = data_item.batch['responses']
             valid_response_length = data_item.batch['attention_mask'][prompt_length:].sum()
             valid_response_ids = response_ids[:valid_response_length]
-            
+
             # decode
             sequences = torch.cat((valid_prompt_ids, valid_response_ids))
             sequences_str = self.tokenizer.decode(sequences)
@@ -108,7 +110,7 @@ class RewardManager():
 
             if 'pubmed' in data_source or 'ctgov' in data_source:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, search_api=api, literature_type=literature_type, pub_date=pub_date)
-            elif 'scifact' in data_source or 'fiqa' in data_source:
+            elif 'scifact' in data_source or 'fiqa' in data_source or 'nfcorpus' in data_source:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, data_source=data_source)
             else:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth)
