@@ -802,7 +802,7 @@ class RayPPOTrainer(object):
                         metrics.update(actor_output_metrics)
 
                     # reward
-                    if 'scifact'in self.config.data.train_files or 'fiqa' in self.config.data.train_files or 'nfcorpus' in self.config.data.train_files:
+                    if 'scifact'in self.config.data.train_files or 'fiqa' in self.config.data.train_files or 'nfcorpus' in self.config.data.train_files or 'msmarco' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_ndcg(batch)
                     elif 'nq_serini' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_nq_serini(batch)
