@@ -1,5 +1,5 @@
-INPUT_DIR=code/data/local_index_search/scifact/jsonl_docs
-INDEX_DIR=code/data/local_index_search/scifact/pyserini_index
+INPUT_DIR=code/data/local_index_search/nfcorpus/jsonl_docs
+INDEX_DIR=code/data/local_index_search/nfcorpus/pyserini_index
 
 python -m pyserini.index.lucene -collection JsonCollection \
  -input $INPUT_DIR \

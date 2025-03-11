@@ -9,14 +9,14 @@ import sys
 import os
 sys.path.append('./')
 
-from src.Lucene.scifact.search import PyseriniMultiFieldSearch
+from src.Lucene.nfcorpus.search import PyseriniMultiFieldSearch
 from src.Lucene.utils import ndcg_at_k
 
-if not os.path.exists("data/local_index_search/scifact/pyserini_index"):
-    print("[Warning] Pyserini index not found for scifact")
+if not os.path.exists("data/local_index_search/nfcorpus/pyserini_index"):
+    print("[Warning] Pyserini index not found for nfcorpus")
     search_system = None
 else:
-    search_system = PyseriniMultiFieldSearch(index_dir="data/local_index_search/scifact/pyserini_index")
+    search_system = PyseriniMultiFieldSearch(index_dir="data/local_index_search/nfcorpus/pyserini_index")
 
 
 def extract_solution(solution_str):
@@ -90,6 +90,7 @@ def validate_response_structure(processed_str: str, do_print: bool) -> bool:
     
     return validation_passed
 
+
 def check_json_format(json_str, do_print=False):
     """Check if the given string is a valid JSON and follows the expected structure."""
     try:
@@ -118,7 +119,7 @@ def retriver_items(query, top_k=3000, threads=16):
     results = search_system.batch_search([query], top_k=top_k, threads=threads)
     return results
     
-def calculate_answer_score(json_str, label, top_k, do_print=False):
+def calculate_answer_score(json_str, label, scores, top_k, do_print=False):
     """Calculate answer score based on final_prediction idx."""
     try:
         data = json.loads(json_str)
@@ -126,7 +127,7 @@ def calculate_answer_score(json_str, label, top_k, do_print=False):
         target = label
         results = retriver_items(query, top_k=top_k, threads=32)
         pred_results = [item[0] for item in results[query]]
-        answer_score = ndcg_at_k(pred_results, target, top_k)
+        answer_score = ndcg_at_k(pred_results, target, top_k, rel_scores=scores)
 
     except:
         print("[Error] Error in evaluation")
@@ -145,7 +146,8 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
         score: the score for the correct answer
     """
 
-    label = str(ground_truth['target'])
+    label = [str(x) for x in ground_truth['target']]
+    scores = ground_truth['score']
     
     answer_text, processed_str = extract_solution(solution_str)
     
@@ -173,7 +175,7 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
         top_k = 1000
     
     if format_correct and answer_text:
-        answer_score = calculate_answer_score(answer_text, label, top_k, do_print)
+        answer_score = calculate_answer_score(answer_text, label, scores, top_k, do_print)
 
     if answer_score > 0:
         total_score = format_score + answer_score

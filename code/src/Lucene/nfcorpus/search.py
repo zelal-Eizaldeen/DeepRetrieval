@@ -7,7 +7,7 @@ class PyseriniMultiFieldSearch:
     def __init__(self, index_dir="pyserini_index"):
         """Initialize Pyserini MultiField Searcher"""
         self.searcher = LuceneSearcher(index_dir)
-        self.searcher.set_bm25(1.2, 0.75)  # Set BM25 scoring for ranking
+        # self.searcher.set_bm25(1.2, 0.75)  # Set BM25 scoring for ranking
 
     def batch_search(self, queries, top_k=10, threads=4):
         """
@@ -20,7 +20,7 @@ class PyseriniMultiFieldSearch:
 
         # contents
         field_queries = [
-            f"(contents:{query})"
+            f"contents:{query}"
             for query in queries
         ]
         
@@ -45,7 +45,7 @@ class PyseriniMultiFieldSearch:
 
 # Example Usage
 if __name__ == "__main__":
-    search_system = PyseriniMultiFieldSearch(index_dir='code/data/local_index_search/scifact/pyserini_index')
+    search_system = PyseriniMultiFieldSearch(index_dir='code/data/local_index_search/nfcorpus/pyserini_index')
     
     queries = [
         "Organic Skin Care",

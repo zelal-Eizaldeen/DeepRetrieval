@@ -14,7 +14,7 @@ import pdb
 
 
 INSTRUCTION = """
-You are a query generating expert. Given a scientific claim, your task is to create query terms to retrieve documents that support or refute the claim."""
+You are an expert in query generation. Given a financial question, your task is to create query terms to retrieve user replies that best answer the question."""
 
 
 def make_prefix(dp):
@@ -28,7 +28,7 @@ def make_prefix(dp):
 </answer>. 
 Note: The query should use Boolean operators (AND, OR) and parentheses for grouping terms appropriately.
 
-Here's the scientific claim:
+Here's the financial question:
 """
     input_str +=  dp['query'] + """
 Assistant: Let me think step by step. 
@@ -38,24 +38,50 @@ Assistant: Let me think step by step.
     return input_str
 
 
+def parse_qrel(qrel):
+    """
+    Parse a TSV file and return a dictionary where:
+    - Keys are query IDs.
+    - Values are dictionaries containing 'targets' (list of corpus IDs) and 'scores' (list of scores).
+    """
+    query_dict = {}
+
+    # Skip the header
+    for line in qrel:
+        query_id, corpus_id, score = line
+
+        if query_id not in query_dict:
+            query_dict[query_id] = {"targets": [], "scores": []}
+
+        query_dict[query_id]["targets"].append(corpus_id)
+        query_dict[query_id]["scores"].append(int(score))
+
+    return query_dict
 
 def load_matching_dataset():
-    # code/data/raw_data/scifact/qrels/*.tsv
-    with open("code/data/raw_data/scifact/qrels/train.tsv", "r", encoding="utf-8") as file:
+    # code/data/raw_data/fiqa/qrels/*.tsv
+    with open("code/data/raw_data/fiqa/qrels/train.tsv", "r", encoding="utf-8") as file:
         qrel_train = [line.strip().split("\t") for line in file]
     
     qrel_train = qrel_train[1:]  # remove the header
     
-    with open("code/data/raw_data/scifact/qrels/test.tsv", "r", encoding="utf-8") as file:
+    with open("code/data/raw_data/fiqa/qrels/test.tsv", "r", encoding="utf-8") as file:
         qrel_test = [line.strip().split("\t") for line in file]
 
     qrel_test = qrel_test[1:]  # remove the header
 
-    with open("code/data/raw_data/scifact/qrels/dev.tsv", "r", encoding="utf-8") as file:
+    with open("code/data/raw_data/fiqa/qrels/dev.tsv", "r", encoding="utf-8") as file:
         qrel_val = [line.strip().split("\t") for line in file]
 
-    # read code/data/raw_data/scifact/queries.jsonl
-    with open("code/data/raw_data/scifact/queries.jsonl", "r", encoding="utf-8") as file:
+    qrel_val = qrel_val[1:]  # remove the header
+
+
+    qrel_train = parse_qrel(qrel_train)
+    qrel_test = parse_qrel(qrel_test)
+    qrel_val = parse_qrel(qrel_val)
+    
+    # read code/data/raw_data/fiqa/queries.jsonl
+    with open("code/data/raw_data/fiqa/queries.jsonl", "r", encoding="utf-8") as file:
         queries = [json.loads(line) for line in file]
 
     # transform the queries into a dictionary
@@ -63,15 +89,15 @@ def load_matching_dataset():
     # process the data
     def process_qrel(qrel):
         data = []
-        for qid, docid, label in qrel:
+        for qid, value in qrel.items():
             data.append({
                 "qid": qid,
                 'query': queries_dict[qid],
-                "target": docid,
-                "label": int(label)
+                "target": value['targets'],
+                "score": value['scores']
             })
         return data
-
+    
     train_data = process_qrel(qrel_train)
     test_data = process_qrel(qrel_test)
     val_data = process_qrel(qrel_val)
@@ -84,7 +110,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--local_dir', default='code/data/local_index_search')
     parser.add_argument('--hdfs_dir', default=None)
-    parser.add_argument('--dataset', type=str, default='scifact')
+    parser.add_argument('--dataset', type=str, default='fiqa')
 
     args = parser.parse_args()
     
@@ -102,6 +128,7 @@ if __name__ == '__main__':
             question = make_prefix(example)
             solution = {
                 "target": example['target'],
+                'score': example['score']
             }
             data = {
                 "data_source": data_source + '_' + split,

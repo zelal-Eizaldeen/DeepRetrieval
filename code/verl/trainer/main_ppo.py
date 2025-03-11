@@ -26,7 +26,7 @@ import utils.java_init
 
 from verl import DataProto
 import torch
-from verl.utils.reward_score import pubmed, ctgov, screening, scifact, nq_serini
+from verl.utils.reward_score import pubmed, ctgov, screening, scifact, nq_serini, fiqa, nfcorpus
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
 from verl.utils.apis.pubmed import PubmedAPI
 from verl.utils.apis.ctgov import CTGovAPI
@@ -42,6 +42,10 @@ def _select_rm_score_fn(data_source):
         return ctgov.compute_score
     elif 'scifact' in data_source:
         return scifact.compute_score
+    elif 'fiqa' in data_source:
+        return fiqa.compute_score
+    elif 'nfcorpus' in data_source:
+        return nfcorpus.compute_score
     elif 'nq_serini' in data_source:
         return nq_serini.compute_score
     else:
@@ -111,7 +115,7 @@ class RewardManager():
 
             if 'pubmed' in data_source or 'ctgov' in data_source:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, search_api=api, literature_type=literature_type, pub_date=pub_date)
-            elif 'scifact' in data_source or 'fiqa' in data_source:
+            elif 'scifact' in data_source or 'fiqa' in data_source or 'nfcorpus' in data_source:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, data_source=data_source)
             else:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth)

@@ -572,7 +572,7 @@ class RayPPOTrainer(object):
         metric_dict = {}
         for data_source, rewards in data_source_reward.items():
             # metric_dict[f'val/test_score/{data_source}'] = np.mean(rewards)
-            if 'scifact' in data_source or 'fiqa' in data_source or 'trec_covid' in data_source:
+            if 'scifact' in data_source or 'fiqa' in data_source or 'nfcorpus' in data_source:
                 format_score = 0.1
                 count_ndcg = sum(reward - format_score for reward in rewards if reward > format_score)
                 total_count = len(rewards)
@@ -802,7 +802,7 @@ class RayPPOTrainer(object):
                         metrics.update(actor_output_metrics)
 
                     # reward
-                    if 'scifact'in self.config.data.train_files or 'fiqa' in self.config.data.train_files:
+                    if 'scifact'in self.config.data.train_files or 'fiqa' in self.config.data.train_files or 'nfcorpus' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_ndcg(batch)
                     elif 'nq_serini' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_nq_serini(batch)
