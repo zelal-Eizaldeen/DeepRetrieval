@@ -38,7 +38,7 @@ python -m pyserini.index.lucene \
     --storeRaw
 ```
 
-* Dense: `sentence-transformers/all-mpnet-base-v2`, `sentence-transformers/all-MiniLM-L6-v2`
+* Dense: `sentence-transformers/all-mpnet-base-v2`: dimension 768, `sentence-transformers/all-MiniLM-L6-v2`: dimension 384
 
 ```bash
 export CUDA_VISIBLE_DEVICES=2
@@ -54,5 +54,6 @@ python -m pyserini.encode \
  encoder --encoder sentence-transformers/all-MiniLM-L6-v2 \
         --fields text \
         --batch 32 \
+        --dimension 384
         --fp16
 ```

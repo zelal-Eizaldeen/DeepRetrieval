@@ -1,3 +1,4 @@
+export HYDRA_FULL_ERROR=1
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 PROJECT_NAME=msmarco_search
