@@ -133,7 +133,10 @@ def retriver_items(query, top_k=3000, mode='sparse'):
     """Retrieve items from the search system."""
     searcher = get_searcher(mode=mode)
     hits = searcher.search(query, k=top_k)
-    doc_list = [json.loads(hit.lucene_document.get('raw'))['id'] for hit in hits]
+    if mode == 'sparse':
+        doc_list = [json.loads(hit.lucene_document.get('raw'))['id'] for hit in hits]
+    elif mode == 'dense':
+        doc_list = [hit.docid for hit in hits]
     return doc_list
     
 def calculate_answer_score(json_str, label, scores, top_k, test_k, mode='sparse', do_print=False):
