@@ -14,7 +14,9 @@ from pyserini.search.faiss import FaissSearcher
 from src.Lucene.utils import ndcg_at_k
 
 # REPLACE THIS WITH YOUR OWN INDEX PATH
-index_dir = "/shared/eng/pj20/lmr_model/raw_data/msmarco/indexes/lucene-index-msmarco-passage"
+# index_dir = "/shared/eng/pj20/lmr_model/raw_data/msmarco/indexes/lucene-index-msmarco-passage"
+index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/faiss-flat.msmarco-v1-passage.tct_colbert.20210112.be7119"
+dense_encoder_name = "castorini/tct_colbert-msmarco"
 _searcher = None
 
 def get_searcher(mode='sparse'):
@@ -29,7 +31,7 @@ def get_searcher(mode='sparse'):
         if not os.path.exists(index_dir):
             _searcher = FaissSearcher.from_prebuilt_index('msmarco-v1-passage.tct_colbert', None)
         else:
-            _searcher = FaissSearcher(index_dir, None)
+            _searcher = FaissSearcher(index_dir, dense_encoder_name)
     return _searcher
     
 
