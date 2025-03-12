@@ -43,8 +43,8 @@ def make_prefix(dp, retrieval_mode):
 </answer>. 
 """
     if retrieval_mode == 'sparse':
-        input_str += """Note: The query will be directly used in a sparse retrieval system, so do not include any irrelevant terms.
-"""
+        input_str += """Note: The query should use Boolean operators (AND, OR) and parentheses for grouping terms appropriately.
+    """
     elif retrieval_mode == 'dense':
         input_str += """Note: The query will be directly used in a dense retrieval system, so do not include any irrelevant terms.
 """
