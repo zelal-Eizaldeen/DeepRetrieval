@@ -10,6 +10,7 @@ import os
 sys.path.append('./')
 
 from pyserini.search.lucene import LuceneSearcher
+from pyserini.search.faiss import FaissSearcher
 from src.Lucene.utils import ndcg_at_k
 
 # REPLACE THIS WITH YOUR OWN INDEX PATH
@@ -25,7 +26,10 @@ def get_searcher(mode='sparse'):
         else:
             _searcher = LuceneSearcher(index_dir=index_dir)
     if _searcher is None and mode == 'dense':
-        pass
+        if not os.path.exists(index_dir):
+            _searcher = FaissSearcher.from_prebuilt_index('msmarco-v1-passage.tct_colbert', None)
+        else:
+            _searcher = FaissSearcher(index_dir=index_dir, None)
     return _searcher
     
 

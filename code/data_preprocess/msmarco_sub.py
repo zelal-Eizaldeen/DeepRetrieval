@@ -18,13 +18,18 @@ You are a query rewriting expert. Your task is to augment the user query to find
 """
 
 INSTRUCTION_DENSE = """
-You are a query rewriting expert. Your task is to augment the user query to find relevant literature in a corpus.
+You are a query rewriting expert. Your task is to augment the user query to find relevant literature in a corpus with dense retrieval.
 """
 
 
 def make_prefix(dp, retrieval_mode):
     
-    instruction = INSTRUCTION_SPARSE if retrieval_mode == 'sparse' else INSTRUCTION_DENSE
+    if retrieval_mode == 'sparse':
+        instruction = INSTRUCTION_SPARSE
+    elif retrieval_mode == 'dense':
+        instruction = INSTRUCTION_DENSE
+    else:
+        raise ValueError(f"Invalid retrieval mode: {retrieval_mode}")
 
     input_str = """<|im_start|>system\nYou are a helpful assistant. You first thinks about the reasoning process in the mind and then provides the user with the answer.<|im_end|>\n<|im_start|>user\n""" + instruction
     input_str += """\nShow your work in <think> </think> tags. Your final response must be in JSON format within <answer> </answer> tags. For example,
@@ -39,7 +44,10 @@ def make_prefix(dp, retrieval_mode):
 """
     if retrieval_mode == 'sparse':
         input_str += """Note: The query will be directly used in a sparse retrieval system, so do not include any irrelevant terms.
-    """
+"""
+    elif retrieval_mode == 'dense':
+        input_str += """Note: The query will be directly used in a dense retrieval system, so do not include any irrelevant terms.
+"""
 
     input_str += """
 Here's the user query:

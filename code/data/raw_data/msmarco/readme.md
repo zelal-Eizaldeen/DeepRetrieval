@@ -1,24 +1,58 @@
 # Data Processing Guide for MSMARCO
 
-Download the collection
+Reference:
+* https://github.com/castorini/pyserini/blob/master/docs/usage-index.md#building-a-dense-vector-index
+* https://sbert.net/docs/sentence_transformer/pretrained_models.html
+
+1. Download the collection
 ```bash
-mkdir collections/msmarco-passage
+mkdir -p collections/msmarco-passage
+mkdir indexes
 
 wget https://msmarco.z22.web.core.windows.net/msmarcoranking/collectionandqueries.tar.gz -P collections/msmarco-passage
 
 
-tar xvfz collections/msmarco-passage/collectionandqueries.tar.gz -C .
+tar xvfz collections/msmarco-passage/collectionandqueries.tar.gz -C collections/msmarco-passage
 ```
 
-Concert to Pyserini format
+2. Concert to Pyserini format
 ```bash
-python convert.py \
- --collection-path ./collection.tsv \
- --output-folder ./collection_jsonl
+python code/data/raw_data/msmarco/convert.py \
+ --collection-path ./collections/msmarco-passage/collection.tsv \
+ --output-folder ./collections/msmarco-passage/collection_jsonl
 ```
 
 
-Indexing with the processed collection
+3. Indexing with the processed collection
+
+* Sparse:
 ```bash
-python -m pyserini.index.lucene   --collection JsonCollection   --input collection_jsonl   --index indexes/lucene-index-msmarco-passage   --generator DefaultLuceneDocumentGenerator   --threads 9   --storePositions --storeDocvectors --storeRaw
+python -m pyserini.index.lucene \
+    --collection JsonCollection \
+    --input collections/msmarco-passage/collection_jsonl \
+    --index indexes/lucene-index-msmarco-passage \
+    --generator DefaultLuceneDocumentGenerator \
+    --threads 9 \
+    --storePositions \
+    --storeDocvectors \
+    --storeRaw
+```
+
+* Dense: `sentence-transformers/all-mpnet-base-v2`, `sentence-transformers/all-MiniLM-L6-v2`
+
+```bash
+export CUDA_VISIBLE_DEVICES=2
+
+python -m pyserini.encode \
+ input  --corpus collections/msmarco-passage/collection_jsonl \
+        --fields text \
+        --delimiter "\n" \
+        --shard-id 0 \
+        --shard-num 1 \
+ output --embeddings indexes/dense-index-msmarco-passage \
+        --to-faiss \
+ encoder --encoder sentence-transformers/all-MiniLM-L6-v2 \
+        --fields text \
+        --batch 32 \
+        --fp16
 ```
