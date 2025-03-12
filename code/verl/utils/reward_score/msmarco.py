@@ -206,7 +206,7 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
     if 'test' in data_source or 'val' in data_source:
         top_k = 10
     else:
-        top_k = 1000
+        top_k = 3000
         
     if 'sparse' in data_source:
         mode = 'sparse'

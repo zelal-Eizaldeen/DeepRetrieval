@@ -20,6 +20,7 @@ exp_logs
 corpus.jsonl
 jsonl_docs
 dense_index
+patches
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
