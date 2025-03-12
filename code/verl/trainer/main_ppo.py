@@ -27,6 +27,7 @@ import utils.java_init
 from verl import DataProto
 import torch
 from verl.utils.reward_score import pubmed, ctgov, screening, scifact, nq_serini, fiqa, nfcorpus, hotpotqa, fever
+from verl.utils.reward_score_dense import scifact as scifact_dense
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
 from verl.utils.apis.pubmed import PubmedAPI
 from verl.utils.apis.ctgov import CTGovAPI
@@ -41,7 +42,10 @@ def _select_rm_score_fn(data_source):
     elif "ctgov" in data_source:
         return ctgov.compute_score
     elif 'scifact' in data_source:
-        return scifact.compute_score
+        if 'dense' in data_source:
+            return scifact_dense.compute_score
+        else:
+            return scifact.compute_score
     elif 'fiqa' in data_source:
         return fiqa.compute_score
     elif 'nfcorpus' in data_source:
