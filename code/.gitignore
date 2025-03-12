@@ -19,6 +19,7 @@ exp_logs
 *pyserini_index
 corpus.jsonl
 jsonl_docs
+dense_index
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

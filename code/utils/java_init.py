@@ -31,8 +31,7 @@ try:
     os.environ['JAVA_HOME'] = get_jdk_path()
     os.environ['PATH'] = os.environ['PATH'] + ':' + os.path.join(os.environ['JAVA_HOME'], 'bin')
 except Exception as e:
-    print(f"Error setting up Java environment: {str(e)}", file=sys.stderr)
-    sys.exit(1)
+    print(f"[Warning] Fail to set up Java environment via our provided code: {str(e)}. You could use the java env in your own machine.", file=sys.stderr)
     
     
 if __name__ == "__main__":
