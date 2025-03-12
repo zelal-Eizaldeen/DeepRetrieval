@@ -14,11 +14,11 @@ import pdb
 
 
 INSTRUCTION_SPARSE = """
-You are a query rewriting expert. Your task is to create query terms for user query to find relevant literature in a Wikipedia corpus using BM25.
+You are a query rewriting expert. Your task is to augment the user query to find relevant literature in a corpus with sparse retrieval.
 """
 
 INSTRUCTION_DENSE = """
-You are a query rewriting expert. Your task is to augment the user query to find relevant literature in a Wikipedia corpus using dense retrieval.
+You are a query rewriting expert. Your task is to augment the user query to find relevant literature in a corpus.
 """
 
 
@@ -38,7 +38,7 @@ def make_prefix(dp, retrieval_mode):
 </answer>. 
 """
     if retrieval_mode == 'sparse':
-        input_str += """Note: The query should use Boolean operators (AND, OR) and parentheses for grouping terms appropriately.
+        input_str += """Note: The query will be directly used in a sparse retrieval system, so do not include any irrelevant terms.
     """
 
     input_str += """

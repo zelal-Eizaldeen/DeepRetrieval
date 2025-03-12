@@ -24,6 +24,8 @@ def get_searcher(mode='sparse'):
             _searcher = LuceneSearcher.from_prebuilt_index('msmarco-v1-passage')
         else:
             _searcher = LuceneSearcher(index_dir=index_dir)
+    if _searcher is None and mode == 'dense':
+        pass
     return _searcher
     
 

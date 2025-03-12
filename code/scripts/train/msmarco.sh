@@ -9,7 +9,7 @@ DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
 python3 -m verl.trainer.main_ppo \
     data.train_files=data/local_index_search/msmarco_${domain}/${retrieval_mode}/train.parquet \
-    data.val_files=data/local_index_search/msmarco_${domain}/${retrieval_mode}/val.parquet \
+    data.val_files=data/local_index_search/msmarco_${domain}/${retrieval_mode}/test.parquet \
     data.train_batch_size=64 \
     data.val_batch_size=64 \
     data.max_prompt_length=256 \
@@ -21,7 +21,7 @@ python3 -m verl.trainer.main_ppo \
     critic.ppo_micro_batch_size=4 \
     actor_rollout_ref.rollout.log_prob_micro_batch_size=4 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.2 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.4 \
     actor_rollout_ref.ref.log_prob_micro_batch_size=4 \
     actor_rollout_ref.rollout.temperature=0.6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
@@ -35,8 +35,8 @@ python3 -m verl.trainer.main_ppo \
     trainer.default_hdfs_dir=null \
     trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
-    trainer.save_freq=100 \
-    trainer.test_freq=200 \
+    trainer.save_freq=50 \
+    trainer.test_freq=100 \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXP_NAME \
     actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct \
