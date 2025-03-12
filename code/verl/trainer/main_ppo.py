@@ -26,36 +26,47 @@ import utils.java_init
 
 from verl import DataProto
 import torch
-from verl.utils.reward_score import pubmed, ctgov, screening, scifact, nq_serini, fiqa, nfcorpus, hotpotqa, fever
-from verl.utils.reward_score_dense import scifact as scifact_dense
+
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
 from verl.utils.apis.pubmed import PubmedAPI
 from verl.utils.apis.ctgov import CTGovAPI
-
-
+    
 def _select_rm_score_fn(data_source):
 
     if "screening" in data_source:
+        from verl.utils.reward_score import screening
         return screening.compute_score
     elif "pubmed" in data_source:
+        from verl.utils.reward_score import pubmed
         return pubmed.compute_score
     elif "ctgov" in data_source:
+        from verl.utils.reward_score import ctgov
         return ctgov.compute_score
     elif 'scifact' in data_source:
         if 'dense' in data_source:
-            return scifact_dense.compute_score
+            from verl.utils.reward_score_dense import scifact
+            return scifact.compute_score
         else:
+            from verl.utils.reward_score import scifact
             return scifact.compute_score
     elif 'fiqa' in data_source:
+        from verl.utils.reward_score import fiqa
         return fiqa.compute_score
     elif 'nfcorpus' in data_source:
+        from verl.utils.reward_score import nfcorpus
         return nfcorpus.compute_score
     elif 'nq_serini' in data_source:
+        from verl.utils.reward_score import nq_serini
         return nq_serini.compute_score
     elif 'hotpotqa' in data_source:
+        from verl.utils.reward_score import hotpotqa
         return hotpotqa.compute_score
     elif 'fever' in data_source:
+        from verl.utils.reward_score import fever
         return fever.compute_score
+    elif 'msmarco' in data_source:
+        from verl.utils.reward_score import msmarco
+        return msmarco.compute_score
     else:
         raise NotImplementedError
 
@@ -124,7 +135,7 @@ class RewardManager():
             if 'pubmed' in data_source or 'ctgov' in data_source:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, search_api=api, literature_type=literature_type, pub_date=pub_date)
             elif 'scifact' in data_source or 'fiqa' in data_source or 'nfcorpus' in data_source or 'hotpotqa' in data_source \
-                    or 'fever' in data_source:
+                    or 'fever' in data_source or 'msmarco' in data_source:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, data_source=data_source)
             else:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth)
