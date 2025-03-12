@@ -41,7 +41,7 @@ python -m pyserini.index.lucene \
 * Dense: `sentence-transformers/all-mpnet-base-v2`: dimension 768, `sentence-transformers/all-MiniLM-L6-v2`: dimension 384
 
 ```bash
-export CUDA_VISIBLE_DEVICES=2
+export CUDA_VISIBLE_DEVICES=3
 
 python -m pyserini.encode \
  input  --corpus collections/msmarco-passage/collection_jsonl \
@@ -51,9 +51,9 @@ python -m pyserini.encode \
         --shard-num 1 \
  output --embeddings indexes/dense-index-msmarco-passage \
         --to-faiss \
- encoder --encoder sentence-transformers/all-MiniLM-L6-v2 \
+ encoder --encoder sentence-transformers/all-mpnet-base-v2 \
         --fields text \
-        --batch 32 \
-        --dimension 384
+        --batch 16 \
+        --dimension 768
         --fp16
 ```

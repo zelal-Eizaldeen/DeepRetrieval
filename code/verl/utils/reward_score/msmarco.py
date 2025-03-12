@@ -27,7 +27,7 @@ def get_searcher(mode='sparse'):
             _searcher = LuceneSearcher(index_dir=index_dir)
     if _searcher is None and mode == 'dense':
         if not os.path.exists(index_dir):
-            _searcher = FaissSearcher.from_prebuilt_index('msmarco-v1-passage.cosdpr-distil', None)
+            _searcher = FaissSearcher.from_prebuilt_index('msmarco-v1-passage.tct_colbert', None)
         else:
             _searcher = FaissSearcher(index_dir, None)
     return _searcher
