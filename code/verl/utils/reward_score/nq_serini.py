@@ -6,6 +6,7 @@ try:
     import utils.java_init
 except:
     print("Failed to import java_init")
+    pass
 
 from pyserini.search.lucene import LuceneSearcher
 from pyserini.eval.evaluate_dpr_retrieval import has_answers, SimpleTokenizer

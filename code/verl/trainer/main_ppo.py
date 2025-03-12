@@ -26,7 +26,7 @@ import utils.java_init
 
 from verl import DataProto
 import torch
-from verl.utils.reward_score import pubmed, ctgov, screening, scifact, nq_serini, fiqa, nfcorpus
+from verl.utils.reward_score import pubmed, ctgov, screening, scifact, nq_serini, fiqa, nfcorpus, hotpotqa, fever
 from verl.trainer.ppo.ray_trainer import RayPPOTrainer
 from verl.utils.apis.pubmed import PubmedAPI
 from verl.utils.apis.ctgov import CTGovAPI
@@ -48,6 +48,10 @@ def _select_rm_score_fn(data_source):
         return nfcorpus.compute_score
     elif 'nq_serini' in data_source:
         return nq_serini.compute_score
+    elif 'hotpotqa' in data_source:
+        return hotpotqa.compute_score
+    elif 'fever' in data_source:
+        return fever.compute_score
     else:
         raise NotImplementedError
 
@@ -115,7 +119,8 @@ class RewardManager():
 
             if 'pubmed' in data_source or 'ctgov' in data_source:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, search_api=api, literature_type=literature_type, pub_date=pub_date)
-            elif 'scifact' in data_source or 'fiqa' in data_source or 'nfcorpus' in data_source:
+            elif 'scifact' in data_source or 'fiqa' in data_source or 'nfcorpus' in data_source or 'hotpotqa' in data_source \
+                    or 'fever' in data_source:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, data_source=data_source)
             else:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth)
