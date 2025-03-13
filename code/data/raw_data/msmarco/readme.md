@@ -26,6 +26,7 @@ python code/data/raw_data/msmarco/convert.py \
 3. Indexing with the processed collection
 
 * Sparse:
+
 ```bash
 python -m pyserini.index.lucene \
     --collection JsonCollection \
@@ -49,11 +50,30 @@ python -m pyserini.encode \
         --delimiter "\n" \
         --shard-id 0 \
         --shard-num 1 \
- output --embeddings indexes/dense-index-msmarco-passage \
+ output --embeddings indexes/mpnet_msmarco_passage_dense_index \
         --to-faiss \
  encoder --encoder sentence-transformers/all-mpnet-base-v2 \
         --fields text \
         --batch 16 \
         --dimension 768
+        --fp16
+```
+
+
+```bash
+export CUDA_VISIBLE_DEVICES=2
+
+python -m pyserini.encode \
+ input  --corpus collections/msmarco-passage/collection_jsonl \
+        --fields text \
+        --delimiter "\n" \
+        --shard-id 0 \
+        --shard-num 1 \
+ output --embeddings indexes/minilm_msmarco_passage_dense_index \
+        --to-faiss \
+ encoder --encoder sentence-transformers/all-MiniLM-L6-v2 \
+        --fields text \
+        --batch 16 \
+        --dimension 384
         --fp16
 ```
