@@ -134,16 +134,6 @@ def run_index_search_bm25(search_query, topk=50):
     # Rate limit checking
     hits = searcher.search(search_query, k=topk)
     
-    # The hits object is an array of io.anserini.search.ScoredDoc objects
-    # # The docid from the collection, type string.
-    # hits[0].docid
-    # # Lucene's internal docid, type int.
-    # hits[0].lucene_docid
-    # # Score, type float
-    # hits[0].score
-    # # Raw Lucene document, type org.apache.lucene.document.Document
-    # hits[0].lucene_document
-    
     doc_list = [json.loads(hit.lucene_document.get('raw'))['contents'] for hit in hits]
     
     return doc_list
@@ -154,28 +144,32 @@ def calculate_answer_score_scale(answer_text, label, do_print=False):
         data = json.loads(answer_text)
         pred_query = data["query"]
         
-        doc_list = run_index_search_bm25(pred_query, topk=1000)
+        doc_list = run_index_search_bm25(pred_query, topk=3000)
         
-        rank = 1001
+        rank = 3001
 
         for i in range(len(doc_list)):
-            if has_answers(doc_list[i], label, _tokenizer, regex=False):
-                rank = i + 1
-                break
+            assert isinstance(label, list)
+            for answer in label:
+                if has_answers(doc_list[i], answer, _tokenizer, regex=False):
+                    rank = i + 1
+                    break
             
         if do_print:
             print(f"Rank: {rank}")
         
         if rank <= 5:
             answer_score = 5
-        elif rank <= 10:
-            answer_score = 3
         elif rank <= 20:
-            answer_score = 2
+            answer_score = 4
         elif rank <= 50:
-            answer_score = 1
+            answer_score = 2
         elif rank <= 100:
+            answer_score = 1
+        elif rank <= 1000:
             answer_score = 0.5
+        elif rank <= 3000:
+            answer_score = 0.1
         else:
             answer_score = -3.5
 
@@ -185,49 +179,8 @@ def calculate_answer_score_scale(answer_text, label, do_print=False):
     
     return answer_score
 
-# Alternative implementation using pure NDCG without custom scaling
-def calculate_answer_score(answer_text, label, do_print=False):
-    """Calculate answer score based on answer span rank using pure NDCG.
-    
-    Args:
-        answer_text (str): JSON string containing query
-        label (str): The correct answer to find
-        do_print (bool): Whether to print debug information
-        
-    Returns:
-        float: NDCG-based answer score
-    """
-    try:
-        data = json.loads(answer_text)
-        pred_query = data["query"]
-        
-        doc_list = run_index_search_bm25(pred_query, topk=1000)
-        
-        # Default rank if no answer is found
-        rank = 1001  # Setting to k+1 to indicate "not found within k"
 
-        for i in range(len(doc_list)):
-            if has_answers(doc_list[i], label, _tokenizer, regex=False):
-                rank = i + 1  # Convert to 1-indexed rank
-                break
-            
-        if do_print:
-            print(f"Rank: {rank}")
-        
-        k = 1000  # Consider top 1000 documents
-        ndcg_score = ndcg_for_rank(rank, k)
-        
-        answer_score = ndcg_score
-        
-
-    except Exception as e:
-        print(f"[Error] Error in evaluation: {e}")
-        answer_score = -2
-    
-    return answer_score
-
-
-def compute_score(solution_str, ground_truth, format_reward=0.1, answer_reward=1.):
+def compute_score(solution_str, ground_truth):
     """The scoring function for countdown task.
     
     Args:

@@ -2,6 +2,9 @@ export CUDA_VISIBLE_DEVICES=1,2,3,6
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
+# The ctgov model is trained upon the pubmed 3b model, please train the pubmed 3b model first, 
+#and load the model with actor_rollout_ref.model.path and critic.model.path
+
 python3 -m verl.trainer.main_ppo \
     data.train_files=data/search_engine/ctgov/train.parquet \
     data.val_files=data/search_engine/ctgov/test.parquet \
