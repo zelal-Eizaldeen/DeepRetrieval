@@ -151,7 +151,7 @@ def calculate_answer_score_scale(answer_text, label, do_print=False):
         for i in range(len(doc_list)):
             assert isinstance(label, list)
             for answer in label:
-                if has_answers(doc_list[i], answer, _tokenizer, regex=False):
+                if has_answers(doc_list[i], answer, _tokenizer, regex=True):
                     rank = i + 1
                     break
             
@@ -173,8 +173,8 @@ def calculate_answer_score_scale(answer_text, label, do_print=False):
         else:
             answer_score = -3.5
 
-    except:
-        print("[Error] Error in evaluation")
+    except Exception as e:
+        print(f"[Error] Error in evaluation: {e}")
         answer_score = -4
     
     return answer_score
@@ -192,7 +192,7 @@ def compute_score(solution_str, ground_truth):
     """
 
     # label is a list of groundtruth pmids
-    label = ground_truth['target']
+    label = ground_truth['target'].tolist()
     
     answer_text, processed_str = extract_solution(solution_str)
     
