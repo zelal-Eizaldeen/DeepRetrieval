@@ -14,7 +14,7 @@ import pdb
 
 
 INSTRUCTION = """
-You are an expert in generating queries for dense retrieval. Given a scientific claim, your task is to generate a semantically rich and well-formed query to retrieve documents that support or refute the claim."""
+You are an expert in generating queries for dense retrieval. Given a scientific claim, your task is to retain the original query while expanding it with additional semantically relevant information. If no useful expansion is needed, return the original query as is."""
 
 
 def make_prefix(dp):

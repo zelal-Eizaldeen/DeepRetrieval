@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=0,3,5,6
+export CUDA_VISIBLE_DEVICES=4,5
 # export CUDA_VISIBLE_DEVICES=0,5,6,7
 
 PROJECT_NAME=scifact_search_dense
@@ -19,7 +19,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.ppo_micro_batch_size=4 \
     critic.ppo_micro_batch_size=4 \
     actor_rollout_ref.rollout.log_prob_micro_batch_size=4 \
-    actor_rollout_ref.rollout.tensor_model_parallel_size=2 \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.2 \
     actor_rollout_ref.ref.log_prob_micro_batch_size=4 \
     actor_rollout_ref.rollout.temperature=0.6 \
@@ -32,12 +32,12 @@ python3 -m verl.trainer.main_ppo \
     trainer.logger=['wandb'] \
     +trainer.val_before_train=False \
     trainer.default_hdfs_dir=null \
-    trainer.n_gpus_per_node=4 \
+    trainer.n_gpus_per_node=2 \
     trainer.nnodes=1 \
-    trainer.save_freq=20 \
+    trainer.save_freq=100 \
     trainer.test_freq=10 \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXP_NAME \
     actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct \
     critic.model.path=Qwen/Qwen2.5-3B-Instruct \
-    trainer.total_epochs=10 2>&1 | tee exp_log/$PROJECT_NAME-3b-ppo-verl_demo_$DATE.log 
+    trainer.total_epochs=20 2>&1 | tee exp_log/$PROJECT_NAME-3b-ppo-verl_demo_$DATE.log 
