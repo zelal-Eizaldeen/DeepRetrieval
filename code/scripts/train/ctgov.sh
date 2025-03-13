@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=6,7
+export CUDA_VISIBLE_DEVICES=1,2
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
@@ -33,7 +33,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.test_freq=200 \
     trainer.project_name=ctgov_search \
     trainer.experiment_name=ctgov_search_3b_transfer \
-    actor_rollout_ref.model.path=/shared/eng/pj20/lmr_model/ctgov_3b_transfer/actor/global_step_50 \
-    critic.model.path=/shared/eng/pj20/lmr_model/ctgov_3b_transfer/critic/global_step_50 \
+    actor_rollout_ref.model.path=/shared/eng/pj20/lmr_model/pubmed_search/pubmed_search_3b/actor/global_step_1250 \
+    critic.model.path=/shared/eng/pj20/lmr_model/pubmed_search/pubmed_search_3b/critic/global_step_1250 \
     trainer.default_local_dir=/shared/eng/pj20/lmr_model/ctgov_3b_transfer_1 \
     trainer.total_epochs=5 2>&1 | tee exp_log/3b-ppo-verl_demo_$DATE.log 

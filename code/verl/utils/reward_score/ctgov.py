@@ -128,7 +128,7 @@ def run_search_ctgov(search_query, search_api):
         # Record this request
         _request_times.append(current_time)
         
-    nctid_list = search_api.search_with_keywords(search_query, topk=-1)
+    nctid_list = search_api.search_with_keywords(search_query, topk=3000)
     return nctid_list
 
     

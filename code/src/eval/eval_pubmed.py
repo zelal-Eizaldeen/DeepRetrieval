@@ -99,7 +99,7 @@ def run_search_pubmed(search_query, search_api, pub_date):
     
     print('Query:', search_query)
     # search
-    pmid_list = search_api.search_with_keywords(search_query, topk=-1)
+    pmid_list = search_api.search_with_keywords(search_query, topk=3000)
     
     return pmid_list
 
