@@ -4,6 +4,10 @@ Reference:
 * https://github.com/castorini/pyserini/blob/master/docs/usage-index.md#building-a-dense-vector-index
 * https://sbert.net/docs/sentence_transformer/pretrained_models.html
 
+
+* DeepRetrieval Prebuild index: https://huggingface.co/windszzlang/DeepRetrieval-Dense-Index/tree/main
+
+
 1. Download the collection
 ```bash
 mkdir -p collections/msmarco-passage

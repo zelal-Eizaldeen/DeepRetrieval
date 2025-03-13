@@ -5,7 +5,9 @@ PROJECT_NAME=msmarco_search
 train_domain=all
 val_domain=health
 retrieval_mode=dense
-EXP_NAME=msmarco_search_3b_${train_domain}_${retrieval_mode}
+# encoder=minilm
+encoder=mpnet
+EXP_NAME=msmarco_search_3b_${train_domain}_${retrieval_mode}_${encoder}
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
