@@ -50,7 +50,7 @@ python -m pyserini.encode \
         --delimiter "\n" \
         --shard-id 0 \
         --shard-num 1 \
- output --embeddings indexes/mpnet_msmarco_passage_dense_index \
+ output --embeddings indexes/mpnet-msmarco-passage-dense-index \
         --to-faiss \
  encoder --encoder sentence-transformers/all-mpnet-base-v2 \
         --fields text \
@@ -69,7 +69,7 @@ python -m pyserini.encode \
         --delimiter "\n" \
         --shard-id 0 \
         --shard-num 1 \
- output --embeddings indexes/minilm_msmarco_passage_dense_index \
+ output --embeddings indexes/minilm-msmarco-passage-dense-index \
         --to-faiss \
  encoder --encoder sentence-transformers/all-MiniLM-L6-v2 \
         --fields text \
