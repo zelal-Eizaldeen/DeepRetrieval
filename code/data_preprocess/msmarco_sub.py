@@ -14,7 +14,7 @@ import pdb
 
 
 INSTRUCTION_SPARSE = """
-You are a query rewriting expert. Your task is to augment the user query to find relevant literature in a corpus with sparse retrieval.
+You are a query rewriting expert. Your task is to augment the user query to find relevant literature in a corpus with sparse retrieval (BM25). BM25 works by matching exact keywords from the query with documents, without understanding meaning. Successful queries use specific keywords, synonyms with OR operators, and logical grouping with parentheses.
 """
 
 INSTRUCTION_DENSE = """
@@ -43,8 +43,17 @@ def make_prefix(dp, retrieval_mode):
 </answer>. 
 """
     if retrieval_mode == 'sparse':
-        input_str += """Note: The query should use Boolean operators (AND, OR) and parentheses for grouping terms appropriately.
-    """
+        input_str += """Note: For sparse retrieval:
+1. Include important synonyms with OR (e.g., (cancer OR tumor OR neoplasm))
+2. Group related concepts with parentheses
+3. Connect different aspects with AND
+4. Use specific terms over general ones
+5. Preserve all important concepts from the original query
+
+Example of good rewriting:
+Original: "cancer treatment"
+Rewritten: "(cancer OR tumor OR malignancy) AND (treatment OR therapy OR intervention)"
+"""
     elif retrieval_mode == 'dense':
         input_str += """Note: The query will be directly used in a dense retrieval system, so do not include any irrelevant terms.
 """
