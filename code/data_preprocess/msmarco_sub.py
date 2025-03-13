@@ -95,7 +95,7 @@ if __name__ == '__main__':
     parser.add_argument('--local_dir', default='data/local_index_search')
     parser.add_argument('--hdfs_dir', default=None)
     parser.add_argument('--dataset', type=str, default='msmarco')
-    parser.add_argument('--domains', type=list, default=['health', 'science', 'tech'])
+    parser.add_argument('--domains', type=list, default=['all', 'health', 'science', 'tech'])
     parser.add_argument('--output_dir', type=str, default='data/local_index_search')
 
     args = parser.parse_args()

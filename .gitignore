@@ -6,3 +6,6 @@ collections
 test.py
 code/outputs
 outputs
+code/data/local_index_search/msmarco_all
+code/data/raw_data/msmarco/msmarco_all/queries.train.tsv
+code/data/raw_data/msmarco/msmarco_all/queries.dev.tsv

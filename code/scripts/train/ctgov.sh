@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=1,2
+export CUDA_VISIBLE_DEVICES=1,2,3,6
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
@@ -14,10 +14,10 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.ppo_mini_batch_size=16 \
     actor_rollout_ref.actor.ppo_micro_batch_size=8 \
     critic.ppo_micro_batch_size=8 \
-    actor_rollout_ref.rollout.log_prob_micro_batch_size=2 \
-    actor_rollout_ref.rollout.tensor_model_parallel_size=2 \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.2 \
-    actor_rollout_ref.ref.log_prob_micro_batch_size=2 \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size=4 \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=4 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.4 \
+    actor_rollout_ref.ref.log_prob_micro_batch_size=4 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     critic.model.enable_gradient_checkpointing=True \
@@ -27,13 +27,13 @@ python3 -m verl.trainer.main_ppo \
     trainer.logger=['wandb'] \
     +trainer.val_before_train=False \
     trainer.default_hdfs_dir=null \
-    trainer.n_gpus_per_node=2 \
+    trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
     trainer.save_freq=50 \
     trainer.test_freq=200 \
     trainer.project_name=ctgov_search \
-    trainer.experiment_name=ctgov_search_3b_transfer \
-    actor_rollout_ref.model.path=/shared/eng/pj20/lmr_model/pubmed_search/pubmed_search_3b/actor/global_step_1250 \
-    critic.model.path=/shared/eng/pj20/lmr_model/pubmed_search/pubmed_search_3b/critic/global_step_1250 \
+    trainer.experiment_name=ctgov_search_3b \
+    actor_rollout_ref.model.path=/shared/eng/pj20/lmr_model/pubmed_3b_/actor/global_step_400 \
+    critic.model.path=/shared/eng/pj20/lmr_model/pubmed_3b_/critic/global_step_400 \
     trainer.default_local_dir=/shared/eng/pj20/lmr_model/ctgov_3b_transfer_1 \
     trainer.total_epochs=5 2>&1 | tee exp_log/3b-ppo-verl_demo_$DATE.log 

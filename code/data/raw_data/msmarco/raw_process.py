@@ -63,8 +63,8 @@ def main():
     parser = argparse.ArgumentParser(description='Process queries files to keep only those with doc mappings')
     parser.add_argument('--qrels_train', type=str, default='qrels.train.tsv', help='Path to qrels.train.tsv')
     parser.add_argument('--qrels_dev', type=str, default='qrels.dev.tsv', help='Path to qrels.dev.tsv')
-    parser.add_argument('--domains', type=str, nargs='+', default=['health', 'science', 'tech'], 
-                        help='List of domains to process (e.g., health science tech)')
+    parser.add_argument('--domains', type=str, nargs='+', default=['all', 'health', 'science', 'tech'], 
+                        help='List of domains to process (e.g., all health science tech)')
     parser.add_argument('--output_dir', type=str, default=None, 
                         help='Output directory for processed files (default: same as input)')
     
@@ -101,6 +101,13 @@ def main():
             print(f"Domain {domain}: Kept {kept_train}/{os.path.getsize(train_path)/1024:.1f}KB train queries and {kept_dev}/{os.path.getsize(dev_path)/1024:.1f}KB dev queries")
         else:
             print(f"Domain {domain}: Kept {kept_train}/{os.path.getsize(train_path)/1024:.1f}KB train queries (dev file not found)")
+            
+        # Process eval queries
+        eval_path = os.path.join(domain_dir, "queries.eval.tsv")
+        if os.path.exists(eval_path):
+            eval_output = os.path.join(output_dir, "eval.jsonl")
+            kept_eval = process_queries(eval_path, train_query_to_docs, eval_output)
+            print(f"Domain {domain}: Kept {kept_eval}/{os.path.getsize(eval_path)/1024:.1f}KB eval queries")
     
     print("Processing complete!")
 
