@@ -7,57 +7,77 @@ sys.path.append('./')
 
 from pyserini.search.faiss import FaissSearcher
 from src.Lucene.utils import ndcg_at_k
-from src.eval.BM25.utils import parse_qrel
 
-
-index_path = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/faiss-flat.msmarco-v1-passage.tct_colbert.20210112.be7119"
+index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/faiss-flat.msmarco-v1-passage.tct_colbert.20210112.be7119"
 dense_encoder_name = "castorini/tct_colbert-msmarco"
-topic = "health"
-# topic = "science"
-# topic = "technology"
+_searcher = None
 
 
-if not os.path.exists(index_path):
-    print("[Warning] Pyserini index not found for fever")
-    search_system = None
-else:
-    search_system = FaissSearcher(index_path, dense_encoder_name)
+
+def get_searcher(mode='sparse'):
+    global _searcher
+    if _searcher is None and mode == 'sparse':
+        if not os.path.exists(index_dir):
+            # print("[Warning] Pyserini index not found for scifact")
+            _searcher = FaissSearcher.from_prebuilt_index('msmarco-v1-passage', None)
+        else:
+            _searcher = FaissSearcher(index_dir, dense_encoder_name)
+    return _searcher
+
+
+def load_matching_dataset(domain):
+    
+    data_train = []
+    data_test = []
+    data_val = []
+    
+    with open(f'data/raw_data/msmarco/msmarco_{domain}/train.jsonl', 'r') as f:
+        for line in f:
+            data_train.append(json.loads(line))
+
+    with open(f'data/raw_data/msmarco/msmarco_{domain}/dev.jsonl', 'r') as f:
+        for line in f:
+            data_test.append(json.loads(line))
+            
+    with open(f'data/raw_data/msmarco/msmarco_{domain}/dev.jsonl', 'r') as f:
+        cnt = 0
+        for line in f:
+            data_val.append(json.loads(line))
+            cnt += 1
+            if cnt > 100:
+                break
+    
+    train_data = [{'input': x['question'], 'label': x['docs_id']} for x in data_train]
+    test_data = [{'input': x['question'], 'label': x['docs_id']} for x in data_test]
+    val_data = [{'input': x['question'], 'label': x['docs_id']} for x in data_val]
+    
+    return train_data, test_data, val_data
+
+def retriver_items(query, top_k=3000, mode='sparse'):
+    """Retrieve items from the search system."""
+    searcher = get_searcher(mode=mode)
+    hits = searcher.search(query, k=top_k)
+    if mode == 'sparse':
+        doc_list = [json.loads(hit.lucene_document.get('raw'))['id'] for hit in hits]
+    elif mode == 'dense':
+        doc_list = [hit.docid for hit in hits]
+    return doc_list
 
 
 if __name__ == '__main__':
-    with open("data/raw_data/msmarco/qrels.dev.tsv", "r", encoding="utf-8") as file:
-        qrel_test = [line.strip().split("\t") for line in file]
+    searcher = get_searcher()
+    for domain in ['health', 'science', 'tech']:
+        print(f"Evaluating {domain} domain")
+        ndcg = []
+        train_data, test_data, val_data = load_matching_dataset(domain)
 
-    qrel_test = qrel_test[1:]  # remove the header
+        for i in tqdm(range(0, len(test_data))):
+            query = test_data[i]['input']
+            label = test_data[i]['label']
+            targets = [str(l) for l in label]
+            scores = [1 for _ in range(len(targets))]
 
-    qrel_test = parse_qrel(qrel_test)
-
-    with open("data/raw_data/msmarco/msmarco_health/dev.jsonl", "r", encoding="utf-8") as file:
-        queries = [json.loads(line) for line in file]
-    queries_dict = {q['_id']: q['text'] for q in queries}
-    
-    test_data = []
-    for qid, value in qrel_test.items():
-        test_data.append({
-            "qid": qid,
-            'query': queries_dict[qid],
-            "target": value['targets'],
-            "score": value['scores']
-        })
-
-    ndcg = []
-    batch_size = 100
-
-    for i in tqdm(range(0, len(test_data), batch_size)):
-        batch = test_data[i:i+batch_size]
-        queries = [item['query'] for item in batch]
-        targets = {item['query']: item['target'] for item in batch} 
-        scores = {item['query']: item['score'] for item in batch}
+            retrieved = retriver_items(query, top_k=10, mode='dense')
+            ndcg.append(ndcg_at_k(retrieved, targets, 10, rel_scores=scores))
         
-        results = search_system.batch_search(queries, top_k=10, threads=16)
-        
-        for query in queries:
-            retrieved = [result[0] for result in results.get(query, [])]
-            ndcg.append(ndcg_at_k(retrieved, targets[query], 10, rel_scores=scores[query]))
-    
-    print(f"Average NDCG@10: {sum(ndcg) / len(ndcg)}")
+        print(f"Average NDCG@10: {sum(ndcg) / len(ndcg)}")
