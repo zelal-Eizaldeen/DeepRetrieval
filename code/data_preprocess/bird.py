@@ -183,6 +183,7 @@ if __name__ == '__main__':
                 "extra_info": {
                     'split': split,
                     'index': idx,
+                    'db_path': f'data/raw_data/bird/{split}_databases/{example["db_id"]}/{example["db_id"]}.sqlite'
                 }
             }
             return data

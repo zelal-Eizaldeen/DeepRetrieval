@@ -9,35 +9,16 @@ import sys
 import os
 sys.path.append('./')
 
-from pyserini.search.lucene import LuceneSearcher
-from pyserini.search.faiss import FaissSearcher
-from src.Lucene.utils import ndcg_at_k
+from src.sql.bird import BirdDatabaseSearcher
 
-# REPLACE THIS WITH YOUR OWN INDEX PATH
-# index_dir = "/shared/eng/pj20/lmr_model/raw_data/msmarco/indexes/lucene-index-msmarco-passage"
 
-index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/minilm-msmarco-passage-dense-index"
-query_encoder = "sentence-transformers/all-MiniLM-L6-v2"
-
-# index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/mpnet-msmarco-passage-dense-index"
-# query_encoder = "sentence-transformers/all-mpnet-base-v2"
 
 _searcher = None
 
 
-def get_searcher(mode='sparse'):
+def get_searcher():
     global _searcher
-    if _searcher is None and mode == 'sparse':
-        if not os.path.exists(index_dir):
-            # print("[Warning] Pyserini index not found for scifact")
-            _searcher = LuceneSearcher.from_prebuilt_index('msmarco-v1-passage')
-        else:
-            _searcher = LuceneSearcher(index_dir=index_dir)
-    if _searcher is None and mode == 'dense':
-        if not os.path.exists(index_dir):
-            _searcher = FaissSearcher.from_prebuilt_index('msmarco-v1-passage.tct_colbert', None)
-        else:
-            _searcher = FaissSearcher(index_dir=index_dir, query_encoder=query_encoder)
+    _searcher = BirdDatabaseSearcher()
     return _searcher
     
 
@@ -135,43 +116,36 @@ def check_json_format(json_str, do_print=False):
             print("[Error] JSON decoding failed")
         return False
 
-def retriver_items(query, top_k=3000, mode='sparse'):
+def execute_sql(sql_query, db_path):
     """Retrieve items from the search system."""
-    searcher = get_searcher(mode=mode)
-    hits = searcher.search(query, k=top_k)
-    if mode == 'sparse':
-        doc_list = [json.loads(hit.lucene_document.get('raw'))['id'] for hit in hits]
-    elif mode == 'dense':
-        doc_list = [hit.docid for hit in hits]
-    return doc_list
+    searcher = get_searcher()
+    results = searcher.execute_sql(sql_query, db_path)
+    return results
     
-def calculate_answer_score(json_str, label, scores, top_k, test_k, mode='sparse', do_print=False):
+def calculate_answer_score(pred_sql, gold_sql, do_print=False):
     """Calculate answer score based on final_prediction idx."""
     try:
-        data = json.loads(json_str)
-        query = data['query']
-        targets = [str(l) for l in label]
-        results = retriver_items(query, top_k=top_k, mode=mode)
-        hit_count = len(set(results) & set(targets))
-        recall = hit_count / len(targets)
+        pred_results = execute_sql(pred_sql, db_path)
+        gold_results = execute_sql(gold_sql, db_path)
         
-        
+        hit_count = len(set(pred_results) & set(gold_results))
+        recall = hit_count / len(gold_results)
+
         if recall > 0:
-            recall_score = 0.2
+            recall_score = recall
         else:
             recall_score = 0
+
+        acc_score = 1 if set(pred_results) == set(gold_results) else 0        
         
-        ndcg_score = ndcg_at_k(results, targets, top_k, rel_scores=scores)
-        # ndcg_test_score = ndcg_at_k(results, targets, test_k, rel_scores=scores)
-        
-        answer_score = recall_score + ndcg_score
+        answer_score = acc_score + recall_score
         
         
         if do_print:
-            print(f"Retrieved results: {results}")
-            print(f"Target: {label} ")
-            print(f"NDCG score: {ndcg_score}")
+            print(f"Retrieved results: {pred_results}")
+            print(f"Target: {gold_results} ")
             print(f"Recall: {recall}")
+            print(f"Acc: {acc_score}")
             
             
     except Exception as e:
@@ -181,7 +155,7 @@ def calculate_answer_score(json_str, label, scores, top_k, test_k, mode='sparse'
     
     return answer_score
 
-def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, answer_reward=1.):
+def compute_score(solution_str, ground_truth, data_source, db_path, format_reward=0.1, answer_reward=1.):
     """The scoring function for countdown task.
     
     Args:
@@ -192,8 +166,7 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
         score: the score for the correct answer
     """
 
-    label = ground_truth['target']
-    scores = [1 for _ in range(len(label))]
+    gold_sql = ground_truth['target']
     
     answer_text, processed_str = extract_solution(solution_str)
     
@@ -214,19 +187,10 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
         print(f"Solution string: {solution_str}")
     
     answer_score = 0
-    if 'test' in data_source or 'val' in data_source:
-        top_k = 10
-    else:
-        top_k = 3000
-        
-    if 'sparse' in data_source:
-        mode = 'sparse'
-    elif 'dense' in data_source:
-        mode = 'dense'
-    
-    test_k = 10
+
     if format_correct and answer_text:
-        answer_score = calculate_answer_score(answer_text, label, scores, top_k, test_k, mode, do_print)
+        pred_sql = answer_text['query']
+        answer_score = calculate_answer_score(pred_sql, gold_sql, do_print)
 
     if answer_score > 0:
         total_score = format_score + answer_score

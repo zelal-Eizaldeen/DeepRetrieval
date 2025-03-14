@@ -146,6 +146,9 @@ class RewardManager():
             elif 'scifact' in data_source or 'fiqa' in data_source or 'nfcorpus' in data_source or 'hotpotqa' in data_source \
                     or 'fever' in data_source or 'msmarco' in data_source:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, data_source=data_source)
+            elif 'bird' in data_source or 'spider' in data_source:
+                db_path = data_item.non_tensor_batch['extra_info']['db_path']
+                score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, data_source=data_source, db_path=db_path)
             else:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth)
             
