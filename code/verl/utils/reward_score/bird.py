@@ -119,10 +119,10 @@ def check_json_format(json_str, do_print=False):
 def execute_sql(sql_query, db_path):
     """Retrieve items from the search system."""
     searcher = get_searcher()
-    results = searcher.execute_sql(sql_query, db_path)
+    results = searcher.search(sql_query, db_path)
     return results
     
-def calculate_answer_score(pred_sql, gold_sql, do_print=False):
+def calculate_answer_score(pred_sql, gold_sql, db_path, do_print=False):
     """Calculate answer score based on final_prediction idx."""
     try:
         pred_results = execute_sql(pred_sql, db_path)
@@ -189,8 +189,8 @@ def compute_score(solution_str, ground_truth, data_source, db_path, format_rewar
     answer_score = 0
 
     if format_correct and answer_text:
-        pred_sql = answer_text['query']
-        answer_score = calculate_answer_score(pred_sql, gold_sql, do_print)
+        pred_sql = answer_text
+        answer_score = calculate_answer_score(pred_sql, gold_sql, db_path, do_print)
 
     if answer_score > 0:
         total_score = format_score + answer_score

@@ -93,7 +93,7 @@ def make_prefix(dp, split):
 </think>
 <answer>
 {
-    "sql": "SELECT ..."
+    "sql": "SELECT ... (in one line)"
 } 
 </answer>. 
 """
@@ -113,6 +113,16 @@ def make_prefix(dp, split):
 """
 
     input_str += """Note: Using valid SQLite and understading External Knowledge, answer the following questions for the tables provided above.
+Show your work in <think> </think> tags. Your final response must be in JSON format within <answer> </answer>. For example,
+<think>
+[thinking process]
+</think>
+<answer>
+{
+    "sql": "SELECT ... (in one line)"
+} 
+</answer>. 
+You should only provide one <answer> </answer> tag at the end of your response.
 """
 
     input_str += """
