@@ -370,7 +370,7 @@ def compute_reward_metrics_recall_ndcg(batch):
     return reward_metrics
 
 
-def compute_reward_metrics_recall_sql(batch):
+def compute_reward_metrics_sql(batch):
     reward_tensor = batch.batch['token_level_scores'].sum(-1)
 
     format_score = 0.1

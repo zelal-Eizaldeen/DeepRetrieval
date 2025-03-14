@@ -104,7 +104,7 @@ def check_json_format(json_str, do_print=False):
         data = json.loads(json_str)
         
         # Required keys
-        required_keys = {"query"}
+        required_keys = {"sql"}
         if not all(key in data for key in required_keys):
             if do_print:
                 print("[Error] Missing required keys in JSON")
