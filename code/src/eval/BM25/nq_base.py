@@ -2,6 +2,7 @@ import re
 import random
 import os
 import json
+import argparse
 try:
     import utils.java_init
 except:
@@ -36,7 +37,6 @@ def run_index_search_bm25(search_query, topk=50):
     
 
 def main():
-        
     test_path = "data/raw_data/nq_serini/test.jsonl"
     test_data = []
     with open(test_path, 'r') as f:
@@ -82,7 +82,7 @@ def main():
             print(f"Recall@100: {sum(recall_at_100) / len(recall_at_100)}")
         except:
             continue
-        
+    
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
     main()
