@@ -7,12 +7,12 @@ collections
 test.py
 code/outputs
 outputs
-code/data/local_index_search/msmarco_all
-code/data/raw_data/msmarco/msmarco_all/queries.train.tsv
-code/data/raw_data/msmarco/msmarco_all/queries.dev.tsv
 training_outputs
 
 
 # large files
+code/data/local_index_search/msmarco_all
+code/data/raw_data/msmarco/msmarco_all/queries.train.tsv
+code/data/raw_data/msmarco/msmarco_all/queries.dev.tsv
 code/data/raw_data/bird
-code/data/sql/bird/train.parquet
+code/data/sql/bird/
