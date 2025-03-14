@@ -1,3 +1,4 @@
+# cache files
 indexes
 results
 old
@@ -10,3 +11,8 @@ code/data/local_index_search/msmarco_all
 code/data/raw_data/msmarco/msmarco_all/queries.train.tsv
 code/data/raw_data/msmarco/msmarco_all/queries.dev.tsv
 training_outputs
+
+
+# large files
+code/data/raw_data/bird
+code/data/sql/bird/train.parquet
