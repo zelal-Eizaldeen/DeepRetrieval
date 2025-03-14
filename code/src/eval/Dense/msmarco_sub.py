@@ -8,15 +8,21 @@ sys.path.append('./')
 from pyserini.search.faiss import FaissSearcher
 from src.Lucene.utils import ndcg_at_k
 
-index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/minilm_msmarco_passage_dense_index"
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+
+index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/minilm-msmarco-passage-dense-index"
 query_encoder = "sentence-transformers/all-MiniLM-L6-v2"
+
+# index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/mpnet-msmarco-passage-dense-index"
+# query_encoder = "sentence-transformers/all-mpnet-base-v2"
+
 _searcher = None
 
 
-
-def get_searcher(mode='sparse'):
+def get_searcher(mode='dense'):
     global _searcher
-    if _searcher is None and mode == 'sparse':
+    if _searcher is None and mode == 'dense':
         if not os.path.exists(index_dir):
             # print("[Warning] Pyserini index not found for scifact")
             _searcher = FaissSearcher.from_prebuilt_index('msmarco-v1-passage', None)
