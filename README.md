@@ -18,7 +18,7 @@
 
 **General Installation (for all retrieval methods):**
 ```
-conda create -n dpr python=3.9
+conda create -n zero python=3.9
 # install torch [or you can skip this step and let vllm to install the correct version for you]
 pip install torch==2.4.0 --index-url https://download.pytorch.org/whl/cu121
 # install vllm
@@ -59,7 +59,7 @@ cd code
 
 For example, for PubMed:
 ```
-conda activate dpr
+conda activate zero
 python data_preprocess/pubmed.py
 ```
 
