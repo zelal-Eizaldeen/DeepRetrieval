@@ -870,7 +870,7 @@ class RayPPOTrainer(object):
                         reward_metrics = compute_reward_metrics_ndcg(batch)
                     elif 'msmarco' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_recall_ndcg(batch)
-                    elif 'nq_serini' in self.config.data.train_files:
+                    elif 'nq_serini' in self.config.data.train_files or 'triviaqa' in self.config.data.train_files or 'squad' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_nq_serini(batch)
                     else:
                         reward_metrics = compute_reward_metrics(batch)

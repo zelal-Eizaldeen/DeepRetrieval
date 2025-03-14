@@ -58,6 +58,12 @@ def _select_rm_score_fn(data_source):
     elif 'nq_serini' in data_source:
         from verl.utils.reward_score import nq_serini
         return nq_serini.compute_score
+    elif 'triviaqa' in data_source:
+        from verl.utils.reward_score import triviaqa
+        return triviaqa.compute_score
+    elif 'squad' in data_source:
+        from verl.utils.reward_score import squad
+        return squad.compute_score
     elif 'hotpotqa' in data_source:
         from verl.utils.reward_score import hotpotqa
         return hotpotqa.compute_score
