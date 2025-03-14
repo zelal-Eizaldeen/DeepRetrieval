@@ -62,8 +62,6 @@ def validate_response_structure(processed_str: str, do_print: bool) -> bool:
 
     # Check required tags
     tags = {
-        'think_start': ('<think>', 1),
-        'think_end': ('</think>', 1),
         'answer_start': ('<answer>', 1),
         'answer_end': ('</answer>', 1)
     }
@@ -82,11 +80,9 @@ def validate_response_structure(processed_str: str, do_print: bool) -> bool:
             validation_passed = False
 
     # Verify tag order
-    if (positions['think_start'] > positions['think_end'] or
-        positions['think_end'] > positions['answer_start'] or
-        positions['answer_start'] > positions['answer_end']):
+    if (positions['answer_start'] > positions['answer_end']):
         if do_print:
-            print("  [Error] Incorrect tag order: Expected <think>...</think><answer>...</answer>")
+            print("  [Error] Incorrect tag order: Expected <answer>...</answer>")
         validation_passed = False
     else:
         if do_print:
@@ -144,9 +140,9 @@ def calculate_answer_score_scale(answer_text, label, do_print=False):
         data = json.loads(answer_text)
         pred_query = data["query"]
         
-        doc_list = run_index_search_bm25(pred_query, topk=3000)
+        doc_list = run_index_search_bm25(pred_query, topk=1000)
         
-        rank = 3001
+        rank = 1001
 
         # Only need to check up to rank 100 since that's the last meaningful score threshold
         for i in range(len(doc_list)):
@@ -162,14 +158,10 @@ def calculate_answer_score_scale(answer_text, label, do_print=False):
             answer_score = 5
         elif rank <= 20:
             answer_score = 4
-        elif rank <= 50:
-            answer_score = 2
         elif rank <= 100:
             answer_score = 1
         elif rank <= 1000:
             answer_score = 0.5
-        elif rank <= 3000:
-            answer_score = 0.1
         else:
             answer_score = -3.5
 

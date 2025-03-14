@@ -651,7 +651,7 @@ class RayPPOTrainer(object):
                 total_count = len(rewards)
                 metric_dict[f'val/test_score/{data_source}'] = count_ndcg / total_count if total_count > 0 else 0
                 
-            elif 'nq_serini' in data_source:
+            elif 'nq_serini' in data_source or 'squad' in data_source or 'triviaqa' in data_source:
                 count_hit_5 = 0
                 count_hit_20 = 0
                 count_hit_50 = 0
@@ -659,10 +659,16 @@ class RayPPOTrainer(object):
                 for reward in rewards:
                     if reward == 6:
                         count_hit_5 += 1
+                        count_hit_20 += 1
+                        count_hit_50 += 1
+                        count_hit_100 += 1
                     elif reward == 5:
                         count_hit_20 += 1
+                        count_hit_50 += 1
+                        count_hit_100 += 1
                     elif reward == 3:
                         count_hit_50 += 1
+                        count_hit_100 += 1
                     elif reward == 2:
                         count_hit_100 += 1
                 

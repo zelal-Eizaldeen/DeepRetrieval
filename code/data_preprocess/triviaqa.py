@@ -14,17 +14,14 @@ import pdb
 
 
 INSTRUCTION = """
-You are a query rewriting expert. Your task is to create query terms for user query to find relevant literature in a Wikipedia corpus using BM25.
+You are a query rewriting expert. Your task is to create query terms for user query to find relevant literature in a corpus using sparse retrieval.
 """
 
 
 def make_prefix(dp):
 
-    input_str = """<|im_start|>system\nYou are a helpful assistant. You first thinks about the reasoning process in the mind and then provides the user with the answer.<|im_end|>\n<|im_start|>user\n""" + INSTRUCTION
-    input_str += """\nShow your work in <think> </think> tags. Your final response must be in JSON format within <answer> </answer> tags. For example,
-<think>
-[thinking process]
-</think>
+    input_str = """<|im_start|>system\nYou are a helpful assistant. You provides the user with the answer.<|im_end|>\n<|im_start|>user\n""" + INSTRUCTION
+    input_str += """Your response must be in JSON format within <answer> </answer> tags. For example,
 <answer>
 {
     "query": "...."
@@ -36,8 +33,8 @@ Here's the user query:
 """
 
     input_str +=  dp['input'] + """
-Assistant: Let me rewrite the query with reasoning. 
-<think>
+Assistant: Here is the query terms for the user query. 
+<answer>
 """
 
     return input_str
