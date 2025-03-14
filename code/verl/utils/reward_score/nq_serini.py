@@ -147,17 +147,12 @@ def calculate_answer_score_scale(answer_text, label, do_print=False):
         doc_list = run_index_search_bm25(pred_query, topk=3000)
         
         rank = 3001
-        found_answer = False
 
         # Only need to check up to rank 100 since that's the last meaningful score threshold
         for i in range(len(doc_list)):
             assert isinstance(label, list)
-            for answer in label:
-                if has_answers(doc_list[i], answer, _tokenizer, regex=False):
-                    rank = i + 1
-                    found_answer = True
-                    break
-            if found_answer:
+            if has_answers(doc_list[i], label, _tokenizer, regex=False):
+                rank = i + 1
                 break
             
         if do_print:
