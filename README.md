@@ -47,6 +47,9 @@ pip install faiss-gpu==1.7.2    # the version we used is 1.7.2
 
 # if you don't have java installed, install it with:
 pip install install-jdk && python -c "import jdk; jdk.install('11')"
+
+# support sql execution
+pip install func_timeout
 ```
 
 ## Get Started

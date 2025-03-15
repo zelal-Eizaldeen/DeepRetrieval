@@ -1,13 +1,23 @@
-
 import sqlite3
+from func_timeout import func_timeout, FunctionTimedOut
 
 
 
 class BirdDatabaseSearcher:
     def __init__(self):
-        pass
+        self.timeout = 30
 
     def search(self, sql_query: str, db_path: str):
+        try:
+            results = func_timeout(self.timeout, self._search, args=(sql_query, db_path))
+
+        except FunctionTimedOut:
+            # print("Function timed out!")
+            results = []
+
+        return results
+
+    def _search(self, sql_query: str, db_path: str):
         conn = sqlite3.connect(db_path)
         # Connect to the database
         cursor = conn.cursor()

@@ -373,23 +373,38 @@ def compute_reward_metrics_recall_ndcg(batch):
 def compute_reward_metrics_sql(batch):
     reward_tensor = batch.batch['token_level_scores'].sum(-1)
 
+    wrong_format_score = -2
     format_score = 0.1
+    sql_syntax_score = 0.1
+    execution_score = 0.5
+    accuracy_score = 2
 
     reward_metrics = {}
+
+    # sql syntax
+    sql_syntax = torch.sum(reward_tensor == format_score + sql_syntax_score).float() / reward_tensor.numel()
+    reward_metrics["reward/sql_syntax"] = sql_syntax.detach().item()
+
+    # execution
+    execution = torch.sum(reward_tensor == format_score + execution_score).float() / reward_tensor.numel()
+    reward_metrics["reward/execution"] = execution.detach().item()
+
+    # accuracy
+    accuracy = torch.sum(reward_tensor == format_score + accuracy_score).float() / reward_tensor.numel()
+    reward_metrics["reward/accuracy"] = accuracy.detach().item()
+
+    # normal
     reward_metrics["reward/mean"] = torch.mean(reward_tensor).detach().item()
-    # Calculate all_correct ratio (value == 1.1)
-    all_correct = torch.sum(reward_tensor > format_score).float() / reward_tensor.numel()
+    # Calculate all_correct ratio (value == 2.1)
+    all_correct = torch.sum(reward_tensor == accuracy_score + format_score).float() / reward_tensor.numel()
     reward_metrics["reward/all_correct_ratio"] = all_correct.detach().item()
-    # Calculate format_error ratio (value == -1)
+    # Calculate format_error ratio (value == -2)
     format_error = torch.sum(reward_tensor < 0).float() / reward_tensor.numel()
     reward_metrics["reward/format_error_ratio"] = format_error.detach().item()
     # Calculate wrong answer ratio (value == format_score)
     all_wrong = torch.sum(reward_tensor == format_score).float() / reward_tensor.numel()
     reward_metrics["reward/wrong_answer_ratio"] = all_wrong.detach().item()
     
-    # accuracy
-    accuracy = torch.sum(reward_tensor == format_score + 1).float() / reward_tensor.numel()
-    reward_metrics["reward/accuracy"] = accuracy.detach().item()
 
     return reward_metrics
 
