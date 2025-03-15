@@ -111,7 +111,8 @@ def check_json_format(json_str, do_print=False):
             return False
 
         return True
-    except json.JSONDecodeError:
+    # except json.JSONDecodeError:
+    except Exception as e:
         if do_print:
             print("[Error] JSON decoding failed")
         return False
@@ -128,17 +129,7 @@ def calculate_answer_score(pred_sql, gold_sql, db_path, do_print=False):
         pred_results = execute_sql(pred_sql, db_path)
         gold_results = execute_sql(gold_sql, db_path)
         
-        hit_count = len(set(pred_results) & set(gold_results))
-        recall = hit_count / len(gold_results)
-
-        if recall > 0:
-            recall_score = recall
-        else:
-            recall_score = 0
-
-        acc_score = 1 if set(pred_results) == set(gold_results) else 0        
-        
-        answer_score = acc_score + recall_score
+        answer_score = 1 if set(pred_results) == set(gold_results) else 0        
         
         
         if do_print:
@@ -150,8 +141,8 @@ def calculate_answer_score(pred_sql, gold_sql, db_path, do_print=False):
             
     except Exception as e:
         if do_print:
-            print(f"[Error] Error in evaluation: {e}")
-        answer_score = -2
+            print(f"[Error] Error in executing SQL: {e}")
+        answer_score = 0
     
     return answer_score
 
@@ -189,7 +180,7 @@ def compute_score(solution_str, ground_truth, data_source, db_path, format_rewar
     answer_score = 0
 
     if format_correct and answer_text:
-        pred_sql = answer_text
+        pred_sql = json.loads(answer_text)['sql']
         answer_score = calculate_answer_score(pred_sql, gold_sql, db_path, do_print)
 
     if answer_score > 0:

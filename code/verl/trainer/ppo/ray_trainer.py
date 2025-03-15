@@ -377,24 +377,18 @@ def compute_reward_metrics_sql(batch):
 
     reward_metrics = {}
     reward_metrics["reward/mean"] = torch.mean(reward_tensor).detach().item()
-    # Calculate all_correct ratio (value == 3)
+    # Calculate all_correct ratio (value == 1.1)
     all_correct = torch.sum(reward_tensor > format_score).float() / reward_tensor.numel()
     reward_metrics["reward/all_correct_ratio"] = all_correct.detach().item()
     # Calculate format_error ratio (value == -1)
     format_error = torch.sum(reward_tensor < 0).float() / reward_tensor.numel()
     reward_metrics["reward/format_error_ratio"] = format_error.detach().item()
-    # Calculate wrong answer ratio (value == -1)
-    all_wrong = torch.sum(reward_tensor == 0).float() / reward_tensor.numel()
+    # Calculate wrong answer ratio (value == format_score)
+    all_wrong = torch.sum(reward_tensor == format_score).float() / reward_tensor.numel()
     reward_metrics["reward/wrong_answer_ratio"] = all_wrong.detach().item()
     
-    # avg value of reward > format_score
-    recall_tensor = reward_tensor[reward_tensor > format_score] - format_score
-    recall_tensor[recall_tensor == 2] = 1
-    recall = torch.sum(recall_tensor).float() / reward_tensor.numel()
-    reward_metrics["reward/recall"] = recall.detach().item()
-    
     # accuracy
-    accuracy = torch.sum(reward_tensor == format_score + 2).float() / reward_tensor.numel()
+    accuracy = torch.sum(reward_tensor == format_score + 1).float() / reward_tensor.numel()
     reward_metrics["reward/accuracy"] = accuracy.detach().item()
 
     return reward_metrics

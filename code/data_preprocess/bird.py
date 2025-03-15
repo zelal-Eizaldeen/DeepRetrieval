@@ -99,8 +99,8 @@ def make_prefix(dp, split):
 """
 
     # row example
-    # row_num = None
-    row_num = 3
+    row_num = None
+    # row_num = 3
 
     # table schema prompt
     schema_prompt = generate_schema_prompt(dp['db_id'], split, row_num)
@@ -133,7 +133,9 @@ Here's the user query:
 Assistant: Let me write the SQL query with reasoning. 
 <think>
 """
-
+    print('--------------------------------')
+    print(input_str)
+    print('--------------------------------')
     return input_str
 
 
@@ -179,6 +181,13 @@ if __name__ == '__main__':
             solution = {
                 "target": example['sql'],
             }
+
+            db_id = example['db_id']
+            if split == 'train':
+                db_path = f'data/raw_data/bird/train/train_databases/{db_id}/{db_id}.sqlite'
+            elif split == 'val' or split == 'test':
+                db_path = f'data/raw_data/bird/dev/dev_databases/{db_id}/{db_id}.sqlite'
+
             data = {
                 "data_source": f"{data_source}_{split}",
                 "prompt": [{
@@ -193,7 +202,7 @@ if __name__ == '__main__':
                 "extra_info": {
                     'split': split,
                     'index': idx,
-                    'db_path': f'data/raw_data/bird/{split}_databases/{example["db_id"]}/{example["db_id"]}.sqlite'
+                    'db_path': db_path
                 }
             }
             return data
