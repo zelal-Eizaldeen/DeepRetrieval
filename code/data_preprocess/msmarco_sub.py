@@ -32,7 +32,10 @@ def make_prefix(dp, retrieval_mode):
         raise ValueError(f"Invalid retrieval mode: {retrieval_mode}")
 
     input_str = """<|im_start|>system\nYou are a helpful assistant. You first thinks about the reasoning process in the mind and then provides the user with the answer.<|im_end|>\n<|im_start|>user\n""" + instruction
-    input_str += """Your response must be in JSON format within <answer> </answer> tags. For example,
+    input_str += """\nShow your work in <think> </think> tags. Your final response must be in JSON format within <answer> </answer> tags. For example,
+<think>
+[thinking process]
+</think>
 <answer>
 {
     "query": "...."
@@ -51,8 +54,8 @@ Here's the user query:
 """
 
     input_str +=  dp['input'] + """
-Assistant: Here is the query terms for the user query. 
-<answer>
+Assistant: Let me rewrite the query with reasoning. 
+<think>
 """
 
     return input_str

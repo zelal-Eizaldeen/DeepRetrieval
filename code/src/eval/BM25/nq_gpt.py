@@ -15,18 +15,22 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from tqdm import tqdm
 import json
 import re
-from collections import deque
-from threading import Lock
-import time
-
-from verl.utils.apis.pubmed import PubmedAPI
-from verl.utils.apis.ctgov import CTGovAPI
 
 # Add these at the top with other global variables
-_request_times = deque(maxlen=20)  # Track last 20 requests
-_request_lock = Lock()  # Thread-safe lock for request tracking
+from pyserini.search.lucene import LuceneSearcher
+from pyserini.eval.evaluate_dpr_retrieval import has_answers, SimpleTokenizer
+from tqdm import tqdm
 
-# CACHE_DIR = "/srv/local/data/linjc/hub"
+
+_searcher = None
+_tokenizer = SimpleTokenizer()
+
+def get_searcher():
+    """Lazily initialize and return the searcher instance."""
+    global _searcher
+    if _searcher is None:
+        _searcher = LuceneSearcher.from_prebuilt_index('wikipedia-dpr-100w')
+    return _searcher
 
 def load_model(model_path):
     tokenizer = AutoTokenizer.from_pretrained(model_path, padding_side='left')
@@ -75,33 +79,16 @@ def extract_json_from_llm_output(text):
         else:
             raise ValueError('No JSON structure found.')
         
-def run_search_ctgov(search_query, search_api):
-    pass
-
-def run_search_pubmed(search_query, search_api, pub_date):
+def run_index_search_bm25(search_query, topk=50):
+    
+    searcher = get_searcher()
+    
     # Rate limit checking
-    current_time = time.time()
-    with _request_lock:
-        # Remove requests older than 1 second
-        while _request_times and current_time - _request_times[0] > 1.0:
-            _request_times.popleft()
-        
-        # Check if we're exceeding rate limit (10 requests per second)
-        if len(_request_times) >= 10:
-            print("\033[93m[Warning] PubMed rate limit (10 req/s) reached! Consider reducing batch size.\033[0m")
-        
-        # Record this request
-        _request_times.append(current_time)
+    hits = searcher.search(search_query, k=topk)
     
-    # add date
-    date_query_part = f'&datetype=pdat&mindate=1970/01/01&maxdate={pub_date}'
-    search_query += date_query_part
+    doc_list = [json.loads(hit.lucene_document.get('raw'))['contents'] for hit in hits]
     
-    print('Query:', search_query)
-    # search
-    pmid_list = search_api.search_with_keywords(search_query, topk=3000)
-    
-    return pmid_list
+    return doc_list
 
 
 def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, batch_size=8, search_api=None):
@@ -109,12 +96,16 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
     
     inputs = [item[0]['content'] for item in df['prompt'].tolist()]
     targets = df['label'].tolist()
-    pub_dates = df['pub_date'].tolist()
     
     model = model.to(device)
-    generated_texts = {}
     error_count = 0
-    recalls = []
+    
+    recall_at_1 = []
+    recall_at_5 = []
+    recall_at_10 = []
+    recall_at_20 = []
+    recall_at_50 = []
+    recall_at_100 = []
     
     for batch_start in tqdm(range(0, len(inputs), batch_size), desc="Evaluating"):
         batch_end = min(batch_start + batch_size, len(inputs))
@@ -123,10 +114,7 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
         tokenized_inputs = tokenizer(batch_inputs, return_tensors="pt", padding=True, truncation=True).to(device)
         
         with torch.no_grad():
-            # try:
-                output_ids = model.generate(**tokenized_inputs, max_new_tokens=512)
-            # except:
-                # continue
+            output_ids = model.generate(**tokenized_inputs, max_new_tokens=512)
         
         for i, output in enumerate(output_ids):
             try:
@@ -137,67 +125,58 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
                 extracted_solution, processed_str = extract_solution(generated_text)
                 query = json.loads(extracted_solution)['query']
                 
-                
+                rank = 1001
                 target = targets[idx].tolist()
-                pub_date = pub_dates[idx]
-                searched_pmids = run_search_pubmed(query, search_api, pub_date)
+                searched_doc_list = run_index_search_bm25(query, topk=100)
                 
-                hit_pmids = set(searched_pmids) & set(target)
-                recall = len(hit_pmids) / len(target)          
-                recalls.append(recall)
+                for i in range(len(searched_doc_list)):
+                    if has_answers(searched_doc_list[i], target, _tokenizer, regex=False):
+                        rank = i + 1
+                        break
+                    
+                recall_at_1.append(1) if rank <= 1 else recall_at_1.append(0)
+                recall_at_5.append(1) if rank <= 5 else recall_at_5.append(0)
+                recall_at_10.append(1) if rank <= 10 else recall_at_10.append(0)
+                recall_at_20.append(1) if rank <= 20 else recall_at_20.append(0)
+                recall_at_50.append(1) if rank <= 50 else recall_at_50.append(0)
+                recall_at_100.append(1) if rank <= 100 else recall_at_100.append(0)
                 
-                generated_texts[idx] = {
-                    "reasoning": processed_str,
-                    "generated_query": query,
-                    "pmid_list": searched_pmids,
-                    "target": target,
-                    "recall": recall
-                }
-                
-                # print("Query: ", query)
-                print("Recall: ", recall)
             except:
-                print("Error: ", generated_text)
-                recalls.append(0)
+                recall_at_1.append(0)
+                recall_at_5.append(0)
+                recall_at_10.append(0)
+                recall_at_20.append(0)
+                recall_at_50.append(0)
+                recall_at_100.append(0)
                 error_count += 1
+                print(f"Error: {generated_text}, Error count: {error_count}")
                 continue
             
-        time.sleep(1)
-        
-        print("Error count: ", error_count)
-        print("Average recall: ", sum(recalls) / len(recalls))
-        
-        
-        with open(os.path.join(save_dir, f"eval_results_{model_name}.json"), "w") as f:
-            json.dump(generated_texts, f, indent=4)
-    
-    with open(os.path.join(save_dir, f"eval_results_{model_name}.json"), "w") as f:
-        json.dump(generated_texts, f, indent=4)
+            
+        try:
+            print(f"Recall@1: {sum(recall_at_1) / len(recall_at_1)}")
+            print(f"Recall@5: {sum(recall_at_5) / len(recall_at_5)}")
+            print(f"Recall@20: {sum(recall_at_20) / len(recall_at_20)}")
+            print(f"Recall@100: {sum(recall_at_100) / len(recall_at_100)}")
+        except:
+            continue
+
     
     print("Error count: ", error_count)
     
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_path", type=str, default="/shared/eng/pj20/lmr_model/literature_search_3b/actor/global_step_1200")
-    parser.add_argument("--data_path", type=str, default="data/search_engine/pubmed/test_full.parquet")
-    parser.add_argument("--model_name", type=str, default="matching-qwen2.5-3b-inst-ppo-2gpus")
+    parser.add_argument("--model_path", type=str, default="/shared/eng/pj20/lmr_model/nq_serini_3b/actor/global_step_400")
+    parser.add_argument("--data_path", type=str, default="data/local_index_search/nq_serini/test.parquet")
+    parser.add_argument("--model_name", type=str, default="nq-3b-step-400")
     parser.add_argument("--save_dir", type=str, default="results")
     parser.add_argument("--batch_size", type=int, default=8)
-    parser.add_argument("--api", type=str, default="pubmed")
     args = parser.parse_args()
 
-    if args.api == "pubmed":
-        if os.path.exists('verl/utils/reward_score/apis/pubmed_api.key'):
-            api_key = open('verl/utils/reward_score/apis/pubmed_api.key', 'r').read().strip()
-            search_api = PubmedAPI(api_key=api_key)
-    elif args.api == "ctgov":
-        search_api = CTGovAPI()
-    else:
-        raise ValueError(f"Invalid API: {args.api}")
     
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tokenizer, model = load_model(args.model_path)
-    evaluate_model(model, tokenizer, args.data_path, device, args.model_name, args.save_dir, args.batch_size, search_api)
+    evaluate_model(model, tokenizer, args.data_path, device, args.model_name, args.save_dir, args.batch_size)
 
 if __name__ == "__main__":
     main()
