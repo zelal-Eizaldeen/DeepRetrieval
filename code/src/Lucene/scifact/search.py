@@ -20,7 +20,7 @@ class PyseriniMultiFieldSearch:
 
         # contents
         field_queries = [
-            f"(contents:{query})"
+            f"contents:{query}"
             for query in queries
         ]
         

@@ -49,12 +49,13 @@ def _select_rm_score_fn(data_source):
         else:
             from verl.utils.reward_score import scifact
             return scifact.compute_score
-    elif 'fiqa' in data_source:
-        from verl.utils.reward_score import fiqa
-        return fiqa.compute_score
     elif 'nfcorpus' in data_source:
-        from verl.utils.reward_score import nfcorpus
-        return nfcorpus.compute_score
+        if 'dense' in data_source:
+            from verl.utils.reward_score_dense import nfcorpus
+            return nfcorpus.compute_score
+        else:
+            from verl.utils.reward_score import nfcorpus
+            return nfcorpus.compute_score
     elif 'nq_serini' in data_source:
         from verl.utils.reward_score import nq_serini
         return nq_serini.compute_score
@@ -68,8 +69,12 @@ def _select_rm_score_fn(data_source):
         from verl.utils.reward_score import hotpotqa
         return hotpotqa.compute_score
     elif 'fever' in data_source:
-        from verl.utils.reward_score import fever
-        return fever.compute_score
+        if 'dense' in data_source:
+            from verl.utils.reward_score_dense import fever
+            return fever.compute_score
+        else:
+            from verl.utils.reward_score import fever
+            return fever.compute_score
     elif 'msmarco' in data_source:
         from verl.utils.reward_score import msmarco
         return msmarco.compute_score

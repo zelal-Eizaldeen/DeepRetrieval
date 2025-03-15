@@ -10,6 +10,7 @@ import os
 sys.path.append('./')
 
 from src.Lucene.nfcorpus.search import PyseriniMultiFieldSearch
+from pyserini.search.faiss import FaissSearcher
 from src.Lucene.utils import ndcg_at_k
 
 if not os.path.exists("data/local_index_search/nfcorpus/pyserini_index"):

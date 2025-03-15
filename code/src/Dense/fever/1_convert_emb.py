@@ -10,7 +10,7 @@ import os
 
 from src.Dense.utils import average_pool
 
-MODEL_NAME = "intfloat/multilingual-e5-large-instruct"
+MODEL_NAME = "BAAI/bge-base-en-v1.5"
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 model = AutoModel.from_pretrained(MODEL_NAME, device_map='auto')
