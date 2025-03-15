@@ -114,7 +114,8 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
         tokenized_inputs = tokenizer(batch_inputs, return_tensors="pt", padding=True, truncation=True).to(device)
         
         with torch.no_grad():
-            output_ids = model.generate(**tokenized_inputs, max_new_tokens=350, temperature=0.6)
+            output_ids = model.generate(**tokenized_inputs, max_new_tokens=350)
+            # output_ids = model.generate_sequences(**tokenized_inputs, max_new_tokens=350, temperature=0.6, do_sample=False)
         
         for i, output in enumerate(output_ids):
             try:

@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=4,5,6,7
 
 PROJECT_NAME=triviaqa_search
 EXP_NAME=triviaqa_search_3b
@@ -8,13 +8,13 @@ DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 python3 -m verl.trainer.main_ppo \
     data.train_files=data/local_index_search/triviaqa/train.parquet \
     data.val_files=data/local_index_search/triviaqa/val.parquet \
-    data.train_batch_size=64 \
-    data.val_batch_size=64 \
+    data.train_batch_size=32 \
+    data.val_batch_size=32 \
     data.max_prompt_length=256 \
     data.max_response_length=350 \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.actor.strategy=fsdp \
-    actor_rollout_ref.actor.ppo_mini_batch_size=16 \
+    actor_rollout_ref.actor.ppo_mini_batch_size=8 \
     actor_rollout_ref.actor.ppo_micro_batch_size=4 \
     critic.ppo_micro_batch_size=4 \
     actor_rollout_ref.rollout.log_prob_micro_batch_size=4 \
