@@ -133,9 +133,9 @@ sh scripts/eval/pubmed.sh
 
 $^{*}$ *LEADS: a state-of-the-art literature mining LLM trained on 20K reviews and 400K publications [https://arxiv.org/pdf/2501.16255]*
 
-## Acknowledge
+## Acknowledgement
 
-This implementation is mainly based on [verl](https://github.com/volcengine/verl). The base model during the experiment is [Qwen2.5-3B](https://huggingface.co/Qwen/Qwen2.5-3B). We sincerely appreciate their contributions to the open-source community.
+This implementation is mainly based on [verl](https://github.com/volcengine/verl) and [PySerini](https://github.com/castorini/pySerini). The base model during the experiment is [Qwen2.5-3B](https://huggingface.co/Qwen/Qwen2.5-3B). We sincerely appreciate their contributions to the open-source community.
 
 ## Cite DeepRetrieval
 Current version (will update the author list upon project completion):
