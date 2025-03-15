@@ -18,7 +18,8 @@ else:
 
 
 if __name__ == '__main__':
-    res_dir = '../results/Qwen-inst-nfcorpus.json'
+    # res_dir = '../results/gpt-4o_post_nfcorpus.json'
+    res_dir = '../results/claude-3.5_post_nfcorpus.json'
     with open(res_dir, "r", encoding="utf-8") as file:
         res = json.load(file)
 
@@ -45,14 +46,14 @@ if __name__ == '__main__':
     
     ndcg = []
     batch_size = 100
-
+    
     for i in tqdm(range(0, len(test_data), batch_size)):
         batch = test_data[i:i+batch_size]
         queries = [res[item['qid']]['generated_text'] for item in batch]
         targets = {res[item['qid']]['generated_text']: item['target'] for item in batch} 
         scores = {res[item['qid']]['generated_text']: item['score'] for item in batch}
         
-        results = search_system.batch_search(queries, top_k=10, threads=16)
+        results = search_system.batch_search(queries, top_k=10, threads=8)
         
         for query in queries:
             retrieved = [result[0] for result in results.get(query, [])]

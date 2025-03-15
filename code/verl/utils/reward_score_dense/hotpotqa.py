@@ -10,14 +10,14 @@ import os
 sys.path.append('./')
 
 
-from src.Dense.nfcorpus.search import PyseriniFaissSearcher
+from src.Dense.hotpotqa.search import PyseriniFaissSearcher
 from src.Lucene.utils import ndcg_at_k
 
-index_dir = 'data/local_index_search/nfcorpus/dense_index/faiss-flat.beir-v1.0.0-nfcorpus.bge-base-en-v1.5.20240107'
+index_dir = 'data/local_index_search/hotpotqa/dense_index/faiss-flat.beir-v1.0.0-hotpotqa.bge-base-en-v1.5.20240107'
 model_path = "BAAI/bge-base-en-v1.5"
 
 if not os.path.exists(index_dir):
-    print("[Warning] Pyserini index not found for nfcorpus")
+    print("[Warning] Pyserini index not found for hotpotqa")
     search_system = None
 else:
     search_system = PyseriniFaissSearcher(index_dir, model_path)
@@ -176,7 +176,7 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
     if 'test' in data_source or 'val' in data_source:
         top_k = 10
     else:
-        top_k = 100
+        top_k = 1000
     
     if format_correct and answer_text:
         answer_score = calculate_answer_score(answer_text, label, scores, top_k, do_print)
