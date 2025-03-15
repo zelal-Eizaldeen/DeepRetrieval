@@ -16,8 +16,11 @@ from src.Lucene.utils import ndcg_at_k
 # REPLACE THIS WITH YOUR OWN INDEX PATH
 # index_dir = "/shared/eng/pj20/lmr_model/raw_data/msmarco/indexes/lucene-index-msmarco-passage"
 
-index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/minilm-msmarco-passage-dense-index"
-query_encoder = "sentence-transformers/all-MiniLM-L6-v2"
+index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/bertdf-msmarco-passage-dense-index"
+query_encoder = "google-bert/bert-base-uncased"
+
+# index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/minilm-msmarco-passage-dense-index"
+# query_encoder = "sentence-transformers/all-MiniLM-L6-v2"
 
 # index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/mpnet-msmarco-passage-dense-index"
 # query_encoder = "sentence-transformers/all-mpnet-base-v2"
