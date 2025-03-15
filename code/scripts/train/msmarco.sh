@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=4,5,6,7
+export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 PROJECT_NAME=msmarco_search
 train_domain=health
@@ -18,12 +18,12 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.actor.strategy=fsdp \
     actor_rollout_ref.actor.ppo_mini_batch_size=16 \
-    actor_rollout_ref.actor.ppo_micro_batch_size=4 \
-    critic.ppo_micro_batch_size=4 \
-    actor_rollout_ref.rollout.log_prob_micro_batch_size=4 \
+    actor_rollout_ref.actor.ppo_micro_batch_size=2 \
+    critic.ppo_micro_batch_size=2 \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size=2 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.2 \
-    actor_rollout_ref.ref.log_prob_micro_batch_size=4 \
+    actor_rollout_ref.ref.log_prob_micro_batch_size=2 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     critic.model.enable_gradient_checkpointing=True \
