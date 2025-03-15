@@ -132,9 +132,9 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
                 target = targets[idx].tolist()
                 searched_doc_list = run_index_search_bm25(query, topk=100)
                 
-                for i in range(len(searched_doc_list)):
-                    if has_answers(searched_doc_list[i], target, _tokenizer, regex=False):
-                        rank = i + 1
+                for j in range(len(searched_doc_list)):
+                    if has_answers(searched_doc_list[j], target, _tokenizer, regex=False):
+                        rank = j + 1
                         break
                     
                 recall_at_1.append(1) if rank <= 1 else recall_at_1.append(0)

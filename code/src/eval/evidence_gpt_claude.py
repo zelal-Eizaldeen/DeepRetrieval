@@ -7,11 +7,8 @@ project_root = os.path.dirname(os.path.dirname(current_dir))  # Remove one dirna
 # Add the project root to Python path
 sys.path.insert(0, project_root)  # This will now add Panacea-R1 to the path
 
-
 import argparse
 import pandas as pd
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
 from tqdm import tqdm
 import json
 import re
@@ -20,8 +17,8 @@ import re
 from pyserini.search.lucene import LuceneSearcher
 from pyserini.eval.evaluate_dpr_retrieval import has_answers, SimpleTokenizer
 from tqdm import tqdm
-from gpt_api import gpt_chat_4o
-from claude_api import get_claude_response
+from src.utils.gpt_azure import gpt_chat_4o
+from src.utils.claude_api import get_claude_response
 
 
 _searcher = None
@@ -35,26 +32,16 @@ def get_searcher():
     return _searcher
 
 
-def extract_solution(solution_str):
-    """Extract the equation from the solution string."""
-    # Remove everything before the first "Assistant:"
-    if "Assistant:" in solution_str:
-        processed_str = solution_str.split("Assistant:", 1)[1].strip()
-    elif "<|im_start|>assistant" in solution_str:
-        processed_str = solution_str.split("<|im_start|>assistant", 1)[1].strip()
-    else:
-        print("[Error] Failed to locate model response header")
-        return None, processed_str
-
+def extract_solution(response):
     # Regular expression to find the last occurrence of <answer>...</answer>
     answer_pattern = r'<answer>(.*?)</answer>'
-    matches = re.findall(answer_pattern, processed_str, re.DOTALL)  # Use re.DOTALL to match multiline content
+    matches = re.findall(answer_pattern, response, re.DOTALL)  # Use re.DOTALL to match multiline content
 
     if matches:
-        return matches[-1].strip(), processed_str  # Return the last matched answer
+        return matches[-1].strip() # Return the last matched answer
     else:
         print("[Error] No valid answer tags found")
-        return None, processed_str
+        return None
     
     
 def extract_json_from_llm_output(text):
@@ -86,14 +73,20 @@ def run_index_search_bm25(search_query, topk=50):
     
     return doc_list
 
+def process_prompt(prompt):
+    prompt = prompt.replace("""<|im_start|>system\nYou are a helpful assistant. You first thinks about the reasoning process in the mind and then provides the user with the answer.<|im_end|>\n<|im_start|>user\n""", "")
+    prompt = prompt.replace("Note: ", "Note: Do not inject your own knowledge into the query. You should assume you don't know the answer and just use the query itself to find the answer. The content between <answer> and </answer> should be a valid JSON object.")
+    return prompt
 
-def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, batch_size=8, search_api=None):
+
+def evaluate_model(data_path, model_name, batch_size=8):
     df = pd.read_parquet(data_path)
     
-    inputs = [item[0]['content'] for item in df['prompt'].tolist()]
+    all_responses = []
+    
+    inputs = [process_prompt(item[0]['content']) for item in df['prompt'].tolist()]
     targets = df['label'].tolist()
     
-    model = model.to(device)
     error_count = 0
     
     recall_at_1 = []
@@ -107,25 +100,29 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
         batch_end = min(batch_start + batch_size, len(inputs))
         batch_inputs = inputs[batch_start:batch_end]
         
-        with torch.no_grad():
-            output_ids = model.generate(**tokenized_inputs, max_new_tokens=512)
+        if 'gpt' in model_name:
+            responses = [gpt_chat_4o(prompt=prompt) for prompt in batch_inputs]
+        elif 'claude' in model_name:
+            responses = [get_claude_response(llm="sonnet", prompt=prompt) for prompt in batch_inputs]
+            
+        all_responses.extend(responses)
         
-        for i, output in enumerate(output_ids):
+        for i, response in enumerate(responses):
             try:
-                generated_text = tokenizer.decode(output, skip_special_tokens=True)
+                generated_text = response
                 idx = batch_start + i
                 # convert target from ndarray to list
                 
-                extracted_solution, processed_str = extract_solution(generated_text)
+                extracted_solution = extract_solution(generated_text)
                 query = json.loads(extracted_solution)['query']
                 
                 rank = 1001
                 target = targets[idx].tolist()
                 searched_doc_list = run_index_search_bm25(query, topk=100)
                 
-                for i in range(len(searched_doc_list)):
-                    if has_answers(searched_doc_list[i], target, _tokenizer, regex=False):
-                        rank = i + 1
+                for j in range(len(searched_doc_list)):
+                    if has_answers(searched_doc_list[j], target, _tokenizer, regex=False):
+                        rank = j + 1
                         break
                     
                 recall_at_1.append(1) if rank <= 1 else recall_at_1.append(0)
@@ -155,22 +152,19 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
         except:
             continue
 
+    with open(f"results/{model_name}_responses.json", "w") as f:
+        json.dump(all_responses, f)
     
     print("Error count: ", error_count)
     
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_path", type=str, default="/shared/eng/pj20/lmr_model/nq_serini_3b/actor/global_step_400")
     parser.add_argument("--data_path", type=str, default="data/local_index_search/nq_serini/test.parquet")
-    parser.add_argument("--model_name", type=str, default="gpt")
-    parser.add_argument("--save_dir", type=str, default="results")
+    parser.add_argument("--model_name", type=str, default="nq-gpt")
     parser.add_argument("--batch_size", type=int, default=8)
     args = parser.parse_args()
 
-    
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    tokenizer, model = load_model(args.model_path)
-    evaluate_model(model, tokenizer, args.data_path, device, args.model_name, args.save_dir, args.batch_size)
+    evaluate_model(args.data_path, args.model_name, args.batch_size)
 
 if __name__ == "__main__":
     main()
