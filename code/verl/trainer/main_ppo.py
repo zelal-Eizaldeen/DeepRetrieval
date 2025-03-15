@@ -66,8 +66,12 @@ def _select_rm_score_fn(data_source):
         from verl.utils.reward_score import squad
         return squad.compute_score
     elif 'hotpotqa' in data_source:
-        from verl.utils.reward_score import hotpotqa
-        return hotpotqa.compute_score
+        if 'dense' in data_source:
+            from verl.utils.reward_score_dense import hotpotqa
+            return hotpotqa.compute_score
+        else:
+            from verl.utils.reward_score import hotpotqa
+            return hotpotqa.compute_score
     elif 'fever' in data_source:
         if 'dense' in data_source:
             from verl.utils.reward_score_dense import fever
