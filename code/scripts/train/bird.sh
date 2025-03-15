@@ -2,7 +2,7 @@ export HYDRA_FULL_ERROR=1
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 PROJECT_NAME=bird
-EXP_NAME=bird_3b
+EXP_NAME=bird_3b_cont
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 

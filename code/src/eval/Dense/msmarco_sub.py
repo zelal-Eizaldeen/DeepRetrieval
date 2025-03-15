@@ -11,8 +11,8 @@ from src.Lucene.utils import ndcg_at_k
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
-index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/bert-msmarco-passage-dense-index"
-query_encoder = "google-bert/bert-base-uncased"
+index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/contriever-msmarco-passage-dense-index"
+query_encoder = "facebook/contriever"
 
 # index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/minilm-msmarco-passage-dense-index"
 # query_encoder = "sentence-transformers/all-MiniLM-L6-v2"
