@@ -43,7 +43,7 @@ python -m pyserini.index.lucene \
     --storeRaw
 ```
 
-* Dense: `google-bert/bert-base-uncased`: 768, `sentence-transformers/all-mpnet-base-v2`: dimension 768, `sentence-transformers/all-MiniLM-L6-v2`: dimension 384
+* Dense: `facebook/contriever`: 768, `sentence-transformers/all-mpnet-base-v2`: dimension 768, `sentence-transformers/all-MiniLM-L6-v2`: dimension 384
 
 ```bash
 export CUDA_VISIBLE_DEVICES=1
@@ -54,9 +54,9 @@ python -m pyserini.encode \
         --delimiter "\n" \
         --shard-id 0 \
         --shard-num 1 \
- output --embeddings indexes/bert-msmarco-passage-dense-index \
+ output --embeddings indexes/contriever-msmarco-passage-dense-index \
         --to-faiss \
- encoder --encoder google-bert/bert-base-uncased \
+ encoder --encoder facebook/contriever \
         --fields text \
         --batch 16 \
         --dimension 768

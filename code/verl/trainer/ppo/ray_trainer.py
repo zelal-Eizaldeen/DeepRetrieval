@@ -685,7 +685,15 @@ class RayPPOTrainer(object):
                 metric_dict[f'val/recall@20'] = count_hit_20 / len(rewards)
                 metric_dict[f'val/recall@50'] = count_hit_50 / len(rewards)
                 metric_dict[f'val/recall@100'] = count_hit_100 / len(rewards)
-                
+            
+            elif 'bird' in data_source or 'spider' in data_source:
+                count_acc = 0
+                for reward in rewards:
+                    if reward == 2.1:
+                        count_acc += 1
+                total_count = len(rewards)
+                metric_dict[f'val/test_score/{data_source}'] = count_acc / total_count if total_count > 0 else 0
+
             else:
                 count_equal_3 = sum(1 for reward in rewards if reward == 3)
                 total_count = len(rewards)
