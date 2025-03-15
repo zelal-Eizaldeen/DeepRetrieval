@@ -20,9 +20,13 @@ class PyseriniMultiFieldSearch:
 
         # contents
         field_queries = [
-            f"(contents:{query})"
+            f"contents:{query}"
             for query in queries
         ]
+        
+        # field_queries = [
+        #     f"(contents:'educational system') AND (contents:'marketable skills') AND (contents:'Microsoft')"
+        # ]
         
         # Perform batch search in parallel
         results_dict = self.searcher.batch_search(
@@ -45,14 +49,14 @@ class PyseriniMultiFieldSearch:
 
 # Example Usage
 if __name__ == "__main__":
-    search_system = PyseriniMultiFieldSearch(index_dir='code/data/local_index_search/scifact/pyserini_index')
+    search_system = PyseriniMultiFieldSearch(index_dir='code/data/local_index_search/fiqa/pyserini_index')
     
     queries = [
-        "Organic Skin Care",
+        "The idea of education has never been to make stupid people smarter, but",
     ]
     
     tic = time.time()
-    search_results = search_system.batch_search(queries, top_k=10, threads=32)
+    search_results = search_system.batch_search(queries, top_k=2, threads=32)
     print(f"Search time: {time.time() - tic:.2f}s")
     # Print results
     for query, results in search_results.items():
