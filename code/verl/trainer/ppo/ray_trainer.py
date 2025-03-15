@@ -296,26 +296,28 @@ def compute_reward_metrics_nq_serini(batch):
     reward_metrics = {}
     reward_metrics["reward/mean"] = torch.mean(reward_tensor).detach().item()
     # Calculate all_correct ratio (value == 3)
-    seventy_recall = torch.sum(reward_tensor == 6).float() / reward_tensor.numel()
-    reward_metrics["reward/hit@5"] = seventy_recall.detach().item()
+    five_recall = torch.sum(reward_tensor == 6).float() / reward_tensor.numel()
+    reward_metrics["reward/hit@5"] = five_recall.detach().item()
+    
+    twenty_recall = torch.sum(reward_tensor >= 5).float() / reward_tensor.numel()
+    reward_metrics["reward/hit@20"] = twenty_recall.detach().item()
     
     fifty_recall = torch.sum(reward_tensor >= 4).float() / reward_tensor.numel()
-    reward_metrics["reward/hit@10"] = fifty_recall.detach().item()
+    reward_metrics["reward/hit@50"] = fifty_recall.detach().item()
     
-    forty_recall = torch.sum(reward_tensor >= 3).float() / reward_tensor.numel()
-    reward_metrics["reward/hit@20"] = forty_recall.detach().item()
+    hundred_recall = torch.sum(reward_tensor >= 2).float() / reward_tensor.numel()
+    reward_metrics["reward/hit@100"] = hundred_recall.detach().item()
     
-    thirty_recall = torch.sum(reward_tensor >= 2).float() / reward_tensor.numel()
-    reward_metrics["reward/hit@50"] = thirty_recall.detach().item()
+    thousand_recall = torch.sum(reward_tensor >= 1.5).float() / reward_tensor.numel()
+    reward_metrics["reward/hit@1000"] = thousand_recall.detach().item()
     
-    ten_recall = torch.sum(reward_tensor >= 1.5).float() / reward_tensor.numel()
-    reward_metrics["reward/hit@100"] = ten_recall.detach().item()
-    
-    # Calculate format_error ratio (value == -1)
+    three_thousand_recall = torch.sum(reward_tensor >= 1.1).float() / reward_tensor.numel()
+    reward_metrics["reward/hit@3000"] = three_thousand_recall.detach().item()
+
     format_error = torch.sum(reward_tensor == -4).float() / reward_tensor.numel()
     reward_metrics["reward/format_error_ratio"] = format_error.detach().item()
-    # Calculate wrong answer ratio (value == -1)
-    format_error = torch.sum(reward_tensor == -2.5).float() / reward_tensor.numel()
+
+    format_error = torch.sum(reward_tensor <= -1.5).float() / reward_tensor.numel()
     reward_metrics["reward/wrong_answer_ratio"] = format_error.detach().item()
 
     return reward_metrics
@@ -366,6 +368,37 @@ def compute_reward_metrics_recall_ndcg(batch):
     reward_metrics["reward/ndcg"] = ndcg
     
     return reward_metrics
+
+
+def compute_reward_metrics_sql(batch):
+    reward_tensor = batch.batch['token_level_scores'].sum(-1)
+
+    format_score = 0.1
+
+    reward_metrics = {}
+    reward_metrics["reward/mean"] = torch.mean(reward_tensor).detach().item()
+    # Calculate all_correct ratio (value == 3)
+    all_correct = torch.sum(reward_tensor > format_score).float() / reward_tensor.numel()
+    reward_metrics["reward/all_correct_ratio"] = all_correct.detach().item()
+    # Calculate format_error ratio (value == -1)
+    format_error = torch.sum(reward_tensor < 0).float() / reward_tensor.numel()
+    reward_metrics["reward/format_error_ratio"] = format_error.detach().item()
+    # Calculate wrong answer ratio (value == -1)
+    all_wrong = torch.sum(reward_tensor == 0).float() / reward_tensor.numel()
+    reward_metrics["reward/wrong_answer_ratio"] = all_wrong.detach().item()
+    
+    # avg value of reward > format_score
+    recall_tensor = reward_tensor[reward_tensor > format_score] - format_score
+    recall_tensor[recall_tensor == 2] = 1
+    recall = torch.sum(recall_tensor).float() / reward_tensor.numel()
+    reward_metrics["reward/recall"] = recall.detach().item()
+    
+    # accuracy
+    accuracy = torch.sum(reward_tensor == format_score + 2).float() / reward_tensor.numel()
+    reward_metrics["reward/accuracy"] = accuracy.detach().item()
+
+    return reward_metrics
+
 
 
 def compute_reward_metrics_(batch):
@@ -603,6 +636,47 @@ class RayPPOTrainer(object):
                 count_ndcg = sum(reward - format_score for reward in rewards if reward > format_score)
                 total_count = len(rewards)
                 metric_dict[f'val/test_score/{data_source}'] = count_ndcg / total_count if total_count > 0 else 0
+                
+            elif 'msmarco' in data_source:
+                format_score = 0.1
+                recall_score = 0.2
+                count_ndcg = 0
+                for reward in rewards:
+                    if reward > recall_score:
+                        count_ndcg += reward - format_score - recall_score
+                    elif reward > format_score:
+                        count_ndcg += reward - format_score
+                    else:
+                        count_ndcg += 0
+                total_count = len(rewards)
+                metric_dict[f'val/test_score/{data_source}'] = count_ndcg / total_count if total_count > 0 else 0
+                
+            elif 'nq_serini' in data_source or 'squad' in data_source or 'triviaqa' in data_source:
+                count_hit_5 = 0
+                count_hit_20 = 0
+                count_hit_50 = 0
+                count_hit_100 = 0
+                for reward in rewards:
+                    if reward == 6:
+                        count_hit_5 += 1
+                        count_hit_20 += 1
+                        count_hit_50 += 1
+                        count_hit_100 += 1
+                    elif reward == 5:
+                        count_hit_20 += 1
+                        count_hit_50 += 1
+                        count_hit_100 += 1
+                    elif reward == 3:
+                        count_hit_50 += 1
+                        count_hit_100 += 1
+                    elif reward == 2:
+                        count_hit_100 += 1
+                
+                metric_dict[f'val/recall@5'] = count_hit_5 / len(rewards)
+                metric_dict[f'val/recall@20'] = count_hit_20 / len(rewards)
+                metric_dict[f'val/recall@50'] = count_hit_50 / len(rewards)
+                metric_dict[f'val/recall@100'] = count_hit_100 / len(rewards)
+                
             else:
                 count_equal_3 = sum(1 for reward in rewards if reward == 3)
                 total_count = len(rewards)
@@ -833,8 +907,10 @@ class RayPPOTrainer(object):
                         reward_metrics = compute_reward_metrics_ndcg(batch)
                     elif 'msmarco' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_recall_ndcg(batch)
-                    elif 'nq_serini' in self.config.data.train_files:
+                    elif 'nq_serini' in self.config.data.train_files or 'triviaqa' in self.config.data.train_files or 'squad' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_nq_serini(batch)
+                    elif 'bird' in self.config.data.train_files or 'spider' in self.config.data.train_files:
+                        reward_metrics = compute_reward_metrics_sql(batch)
                     else:
                         reward_metrics = compute_reward_metrics(batch)
                     metrics.update(reward_metrics)

@@ -32,10 +32,7 @@ def make_prefix(dp, retrieval_mode):
         raise ValueError(f"Invalid retrieval mode: {retrieval_mode}")
 
     input_str = """<|im_start|>system\nYou are a helpful assistant. You first thinks about the reasoning process in the mind and then provides the user with the answer.<|im_end|>\n<|im_start|>user\n""" + instruction
-    input_str += """\nShow your work in <think> </think> tags. Your final response must be in JSON format within <answer> </answer> tags. For example,
-<think>
-[thinking process]
-</think>
+    input_str += """Your response must be in JSON format within <answer> </answer> tags. For example,
 <answer>
 {
     "query": "...."
@@ -43,7 +40,7 @@ def make_prefix(dp, retrieval_mode):
 </answer>. 
 """
     if retrieval_mode == 'sparse':
-        input_str += """Note: The query will be directly used in a sparse retrieval system, so do not include any irrelevant terms.
+        input_str += """Note: The query should use Boolean operators (AND, OR) and parentheses for grouping terms appropriately."
 """
     elif retrieval_mode == 'dense':
         input_str += """Note: The query will be directly used in a dense retrieval system, so do not include any irrelevant terms.
@@ -54,8 +51,8 @@ Here's the user query:
 """
 
     input_str +=  dp['input'] + """
-Assistant: Let me rewrite the query with reasoning. 
-<think>
+Assistant: Here is the query terms for the user query. 
+<answer>
 """
 
     return input_str
@@ -95,7 +92,7 @@ if __name__ == '__main__':
     parser.add_argument('--local_dir', default='data/local_index_search')
     parser.add_argument('--hdfs_dir', default=None)
     parser.add_argument('--dataset', type=str, default='msmarco')
-    parser.add_argument('--domains', type=list, default=['health', 'science', 'tech'])
+    parser.add_argument('--domains', type=list, default=['all', 'health', 'science', 'tech'])
     parser.add_argument('--output_dir', type=str, default='data/local_index_search')
 
     args = parser.parse_args()

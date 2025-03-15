@@ -1,5 +1,5 @@
-CUDA_VISIBLE_DEVICES=5
+export CUDA_VISIBLE_DEVICES=7
 
-python src/eval/eval_ctgov.py \
-    --model_path /home/pj20/server-04/LMR/code/checkpoints/pubmed_search/pubmed_search_3b/actor/global_step_1250 \
+python src/eval/SearchEngine/eval_ctgov.py \
+    --model_path /shared/eng/pj20/lmr_model/ctgov_3b_transfer_1/actor/global_step_100 \
     --data_path data/search_engine/ctgov/test_full.parquet

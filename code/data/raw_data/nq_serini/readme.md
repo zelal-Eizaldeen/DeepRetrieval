@@ -6,6 +6,8 @@ Dataset download:
 python download_nq.py
 ```
 
+See https://github.com/castorini/pyserini/discussions/1515 for score computation logic.
+
 Prebuilt indexes:
 ```bash
 python -c "from pyserini.search.lucene import LuceneSearcher; LuceneSearcher.from_prebuilt_index('wikipedia-dpr-100w')"
@@ -36,14 +38,5 @@ scores:
     Top500: 90.91
     Top1000: 91.83
 ```
-
-
-Test data (with groundtruth documents):
-```bash
-wget https://public.ukp.informatik.tu-darmstadt.de/thakur/BEIR/datasets/nq.zip
-unzip nq.zip
-```
-
-
 
 

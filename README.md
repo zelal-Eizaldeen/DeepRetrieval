@@ -43,7 +43,7 @@ If using sparse retrieval (e.g., BM25) or dense retrieval (e.g., DPR), please al
 pip install pyserini    # the version we used is 0.22.1
 
 # if you don't have faiss installed, install it with:
-pip install faiss-gpu    # the version we used is 1.7.2
+pip install faiss-gpu==1.7.2    # the version we used is 1.7.2
 
 # if you don't have java installed, install it with:
 pip install install-jdk && python -c "import jdk; jdk.install('11')"

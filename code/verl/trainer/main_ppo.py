@@ -59,6 +59,12 @@ def _select_rm_score_fn(data_source):
     elif 'nq_serini' in data_source:
         from verl.utils.reward_score import nq_serini
         return nq_serini.compute_score
+    elif 'triviaqa' in data_source:
+        from verl.utils.reward_score import triviaqa
+        return triviaqa.compute_score
+    elif 'squad' in data_source:
+        from verl.utils.reward_score import squad
+        return squad.compute_score
     elif 'hotpotqa' in data_source:
         from verl.utils.reward_score import hotpotqa
         return hotpotqa.compute_score
@@ -72,6 +78,9 @@ def _select_rm_score_fn(data_source):
     elif 'msmarco' in data_source:
         from verl.utils.reward_score import msmarco
         return msmarco.compute_score
+    elif 'bird' in data_source:
+        from verl.utils.reward_score import bird
+        return bird.compute_score
     else:
         raise NotImplementedError
 
@@ -142,6 +151,9 @@ class RewardManager():
             elif 'scifact' in data_source or 'fiqa' in data_source or 'nfcorpus' in data_source or 'hotpotqa' in data_source \
                     or 'fever' in data_source or 'msmarco' in data_source:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, data_source=data_source)
+            elif 'bird' in data_source or 'spider' in data_source:
+                db_path = data_item.non_tensor_batch['extra_info']['db_path']
+                score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, data_source=data_source, db_path=db_path)
             else:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth)
             

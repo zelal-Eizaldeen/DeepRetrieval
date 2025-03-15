@@ -9,7 +9,7 @@
 {"question": "what is njstart", "docs_id": ["7185644"]}
 {"question": "what is mypcbackup", "docs_id": ["7185082"]}
 {"question": "what is my pc xendar", "docs_id": ["925798"]}
-{"question": "what is msascuil.exe", "docs_id": ["7184771", "7184770"]}
+{"question": "what is msascuil.exe", "docs_id": ["7184770", "7184771"]}
 {"question": "what is printer epl", "docs_id": ["7879675"]}
 {"question": "what is ms and how do you get it", "docs_id": ["7184761"]}
 {"question": "what is purpose of sim card", "docs_id": ["7963717"]}
@@ -59,7 +59,7 @@
 {"question": "what is final logic pro x for mac", "docs_id": ["7176438"]}
 {"question": "what is samsung defreeze code", "docs_id": ["7769865"]}
 {"question": "what is scangear (scanner driver)?", "docs_id": ["7941197"]}
-{"question": "what is dpi on a mouse", "docs_id": ["426316", "7174641"]}
+{"question": "what is dpi on a mouse", "docs_id": ["7174641", "426316"]}
 {"question": "what is dockpanel used for", "docs_id": ["7174389"]}
 {"question": "what is screen spline", "docs_id": ["7834319"]}
 {"question": "what is dld service ?", "docs_id": ["7174334"]}
@@ -98,7 +98,7 @@
 {"question": "what is audio grabber", "docs_id": ["7167950"]}
 {"question": "what is atfwd service android", "docs_id": ["7167848"]}
 {"question": "what is async await", "docs_id": ["7167831"]}
-{"question": "view file as hex", "docs_id": ["7687481", "7687476", "7687483"]}
+{"question": "view file as hex", "docs_id": ["7687483", "7687476", "7687481"]}
 {"question": "why can't i open a .docx file", "docs_id": ["1197017"]}
 {"question": "virus reproduce name", "docs_id": ["7572898"]}
 {"question": "why cant i sign in to travelex cash passport", "docs_id": ["7979173"]}
@@ -110,9 +110,9 @@
 {"question": "what is study island login", "docs_id": ["7730098"]}
 {"question": "what is an itron utility", "docs_id": ["7166284"]}
 {"question": "vpn router dead peer detection values", "docs_id": ["7486881"]}
-{"question": "vpn.ac important privacy", "docs_id": ["7608272", "7608273"]}
+{"question": "vpn.ac important privacy", "docs_id": ["7608273", "7608272"]}
 {"question": "what is an ide, ie. ides of march", "docs_id": ["7166057"]}
-{"question": "types of cable and specs", "docs_id": ["7403530", "805209"]}
+{"question": "types of cable and specs", "docs_id": ["805209", "7403530"]}
 {"question": "what is surface ergonomic keyboard ?", "docs_id": ["7879614"]}
 {"question": "what is an authentication method for duo mobile", "docs_id": ["7165296"]}
 {"question": "what is alteryx tool", "docs_id": ["7164450"]}
@@ -200,12 +200,12 @@
 {"question": "what are .aspx files", "docs_id": ["7316766"]}
 {"question": "what are afterpains", "docs_id": ["7675320"]}
 {"question": "what is the difference between adobe creative suite and creative cloud", "docs_id": ["7815649"]}
-{"question": "word cannot complete the save due to a file permission error", "docs_id": ["7918660", "7918665"]}
+{"question": "word cannot complete the save due to a file permission error", "docs_id": ["7918665", "7918660"]}
 {"question": "what are alz files", "docs_id": ["7488325"]}
 {"question": "types of printer", "docs_id": ["7599597"]}
 {"question": "what is the difference between fire tv stick and amazon fire tv", "docs_id": ["7961615"]}
 {"question": "how do i share music on family sharing", "docs_id": ["4127267"]}
-{"question": "what are boot devices?", "docs_id": ["7665868", "7665867"]}
+{"question": "what are boot devices?", "docs_id": ["7665867", "7665868"]}
 {"question": "what fuse feeds the data link connector", "docs_id": ["7149377"]}
 {"question": "what is the difference between udp and tcp", "docs_id": ["7795399", "7795398"]}
 {"question": "what is fn key on mac", "docs_id": ["44252"]}
@@ -278,7 +278,7 @@
 {"question": "usb host controller functions", "docs_id": ["7088254"]}
 {"question": "unb logical address", "docs_id": ["7087214"]}
 {"question": "tracfone is owned by what company", "docs_id": ["7084504"]}
-{"question": "what are some operating systems for computers", "docs_id": ["7434268", "5097336", "7434272", "7434273"]}
+{"question": "what are some operating systems for computers", "docs_id": ["5097336", "7434272", "7434268", "7434273"]}
 {"question": "taskhostw.exe what is it", "docs_id": ["7078208"]}
 {"question": "> what is powershell", "docs_id": ["3168763"]}
 {"question": "shtctky.exe what is it", "docs_id": ["7973950"]}
@@ -287,10 +287,10 @@
 {"question": "what are the ascc commands?", "docs_id": ["7612968"]}
 {"question": "how do i know what an emoji means", "docs_id": ["7257137"]}
 {"question": "how do i cancel my amazon prime monthly membership fee?", "docs_id": ["7256123"]}
-{"question": "what are the benefits of winrar", "docs_id": ["7611994", "7611997"]}
+{"question": "what are the benefits of winrar", "docs_id": ["7611997", "7611994"]}
 {"question": "operation did not complete successfully because the file contains", "docs_id": ["7869800"]}
 {"question": "mysql what encoding should i use for import from excel", "docs_id": ["7837132"]}
-{"question": "most used browsers", "docs_id": ["7831065", "7831058", "7831066"]}
+{"question": "most used browsers", "docs_id": ["7831058", "7831066", "7831065"]}
 {"question": "most secure iphone browser", "docs_id": ["7829977"]}
 {"question": "most popular browsers", "docs_id": ["7826732"]}
 {"question": "is wechat a web application", "docs_id": ["7717035"]}
@@ -335,7 +335,7 @@
 {"question": "which network type allows a vnic to access", "docs_id": ["7939456"]}
 {"question": "what bluetooth speakers work with echo", "docs_id": ["7467282"]}
 {"question": "what books are free for kindle prime membership", "docs_id": ["4850833", "7642393"]}
-{"question": "what is secure boot", "docs_id": ["7806182", "7806184"]}
+{"question": "what is secure boot", "docs_id": ["7806184", "7806182"]}
 {"question": "what cable connects pcs to printers", "docs_id": ["7438306"]}
 {"question": "what is the purpose of the bcc option in an email?", "docs_id": ["7958321"]}
 {"question": "what can be sent media mail", "docs_id": ["6025075"]}
@@ -499,7 +499,7 @@
 {"question": "how to delete messages off of discord?", "docs_id": ["7568761"]}
 {"question": "what must do to play a disk movie?", "docs_id": ["7796878"]}
 {"question": "what device cools", "docs_id": ["7672149"]}
-{"question": "how to downgrade ios to 8.1.2", "docs_id": ["7938500", "7938498"]}
+{"question": "how to downgrade ios to 8.1.2", "docs_id": ["7938498", "7938500"]}
 {"question": "what devices support amazon mayday", "docs_id": ["7615999"]}
 {"question": "what devices use firewire", "docs_id": ["7534867"]}
 {"question": "combine supported files in acrobat free download", "docs_id": ["8005217"]}
@@ -560,7 +560,7 @@
 {"question": "what size is the lens on my nikon dx", "docs_id": ["7965838"]}
 {"question": "what size monitor do i have", "docs_id": ["3760"]}
 {"question": "what size usb", "docs_id": ["7777952"]}
-{"question": "what smart watch works for windows phone", "docs_id": ["7969994", "7969993", "7969992"]}
+{"question": "what smart watch works for windows phone", "docs_id": ["7969993", "7969992", "7969994"]}
 {"question": "what software comes with a laguna iq", "docs_id": ["7879852"]}
 {"question": "what software is in the ms office suite", "docs_id": ["5431930"]}
 {"question": "what software would they need to open the iges format", "docs_id": ["7898048"]}
@@ -609,7 +609,7 @@
 {"question": "how tp setup a wireless printer without cd", "docs_id": ["7578003"]}
 {"question": "how useful is bno passport", "docs_id": ["7437329"]}
 {"question": "define prefigure", "docs_id": ["8000286"]}
-{"question": "how we check hp laptop warranty", "docs_id": ["7619473", "7619470"]}
+{"question": "how we check hp laptop warranty", "docs_id": ["7619470", "7619473"]}
 {"question": "what does the fn button do", "docs_id": ["7677782"]}
 {"question": "what is ready to print format", "docs_id": ["7809956"]}
 {"question": "what does the level ball do in pixelmon", "docs_id": ["7624203"]}
@@ -686,14 +686,14 @@
 {"question": "what internet explorer am", "docs_id": ["162221"]}
 {"question": "what ip are comcast routers", "docs_id": ["7603190"]}
 {"question": "what ir format does helix use?", "docs_id": ["7600926"]}
-{"question": "difference between intel and amd", "docs_id": ["7450429", "7450423", "7450427"]}
+{"question": "difference between intel and amd", "docs_id": ["7450423", "7450427", "7450429"]}
 {"question": "what is  single step recording and multi reg avaya", "docs_id": ["7519693"]}
-{"question": "what's your favorite web browser?", "docs_id": ["7787051", "7787049"]}
+{"question": "what's your favorite web browser?", "docs_id": ["7787049", "7787051"]}
 {"question": "what is .dbc file", "docs_id": ["7461065"]}
 {"question": "what is .img format", "docs_id": ["7629448"]}
 {"question": "what is .ttf file", "docs_id": ["7467475"]}
 {"question": "what is 4dx movie", "docs_id": ["7449195"]}
-{"question": "difference between protime and inr", "docs_id": ["1192808", "6519900", "7579416"]}
+{"question": "difference between protime and inr", "docs_id": ["7579416", "6519900", "1192808"]}
 {"question": "difference between router and firewall", "docs_id": ["7725498"]}
 {"question": "difference between sign to unsigned binary", "docs_id": ["7763999"]}
 {"question": "is gb bigger than a mb?", "docs_id": ["7502937"]}
@@ -704,7 +704,7 @@
 {"question": "is google chrome up to date", "docs_id": ["6975413"]}
 {"question": "is google drive a cloud based system", "docs_id": ["7491308"]}
 {"question": "what is a banking ucc file", "docs_id": ["7691469"]}
-{"question": "different types of memory of a computer", "docs_id": ["1412923", "7067601"]}
+{"question": "different types of memory of a computer", "docs_id": ["7067601", "1412923"]}
 {"question": "is icloud itunes", "docs_id": ["7499214"]}
 {"question": "what is a bluetooth beacon", "docs_id": ["7418587"]}
 {"question": "what is a bluetooth virual adapter", "docs_id": ["7512018"]}
@@ -756,7 +756,7 @@
 {"question": "what is a gog cd key", "docs_id": ["7461891"]}
 {"question": "do you need an operating phone number for skype", "docs_id": ["7354825"]}
 {"question": "what is a good fan speed for gpu", "docs_id": ["7576849"]}
-{"question": "do you need ps plus to save games", "docs_id": ["7301488", "7301489"]}
+{"question": "do you need ps plus to save games", "docs_id": ["7301489", "7301488"]}
 {"question": "what is trackview", "docs_id": ["7968995"]}
 {"question": "do you need wifi for a fire stick", "docs_id": ["7320729"]}
 {"question": "what is a google protobuf", "docs_id": ["7514325"]}
@@ -907,7 +907,7 @@
 {"question": "what is mymacupdater on mac", "docs_id": ["7921039"]}
 {"question": "what is an unlocked cell phone", "docs_id": ["4422025"]}
 {"question": "what is an unlocked phone", "docs_id": ["7666204"]}
-{"question": "what is an xqd memory card", "docs_id": ["7407653", "7407647"]}
+{"question": "what is an xqd memory card", "docs_id": ["7407647", "7407653"]}
 {"question": "where is chip and pin being used", "docs_id": ["7802868"]}
 {"question": "open eject disk file", "docs_id": ["7507962"]}
 {"question": "when is cinemax free preview", "docs_id": ["7815903"]}
@@ -915,14 +915,14 @@
 {"question": "where is dell based out of", "docs_id": ["7726952"]}
 {"question": "what is apple pay", "docs_id": ["7521937"]}
 {"question": "where is discord.exe", "docs_id": ["7907370"]}
-{"question": "what's the difference between screensaver, wallpaper, background?", "docs_id": ["7893227", "7893232"]}
+{"question": "what's the difference between screensaver, wallpaper, background?", "docs_id": ["7893232", "7893227"]}
 {"question": "what is nat setting on router", "docs_id": ["7966029"]}
 {"question": "google chrome start", "docs_id": ["7854332", "7854333"]}
 {"question": "google voice what is", "docs_id": ["7992209"]}
 {"question": "what is asus fliplock", "docs_id": ["7602847"]}
 {"question": "what is at modem", "docs_id": ["7632653"]}
 {"question": "where is gpedit.exe located", "docs_id": ["7741441"]}
-{"question": "what file are the quick access network files located", "docs_id": ["7148141", "7148140"]}
+{"question": "what file are the quick access network files located", "docs_id": ["7148140", "7148141"]}
 {"question": "what is backupify", "docs_id": ["7544349"]}
 {"question": "move sql data to tape", "docs_id": ["7457886"]}
 {"question": "where is hosts file in windows 10", "docs_id": ["7867833"]}
@@ -964,7 +964,7 @@
 {"question": "what is the file wisecustomcall", "docs_id": ["7796179"]}
 {"question": "where is the graphic card located in the cpu", "docs_id": ["7845838"]}
 {"question": "where is the key button", "docs_id": ["2337792"]}
-{"question": "how can I take a screenshot on my pc windows 10", "docs_id": ["7343567", "7343562"]}
+{"question": "how can I take a screenshot on my pc windows 10", "docs_id": ["7343562", "7343567"]}
 {"question": "what does it mean when i send someone money on paypal and it is pending", "docs_id": ["7136285"]}
 {"question": "where to find rubedo warframe", "docs_id": ["7271746"]}
 {"question": "where to find a service tag dell", "docs_id": ["7271685"]}
@@ -1081,7 +1081,7 @@
 {"question": "which mp3 player should i buy", "docs_id": ["7855203"]}
 {"question": "which music streaming apps allow you to play local files", "docs_id": ["7795466"]}
 {"question": "what type of security do routers have by default", "docs_id": ["7241170"]}
-{"question": "how does the ancestry free trial work?", "docs_id": ["7336242", "7336244", "7336246"]}
+{"question": "how does the ancestry free trial work?", "docs_id": ["7336246", "7336244", "7336242"]}
 {"question": "what type of projects can be done using togaf", "docs_id": ["7241028"]}
 {"question": "what is google's autocomplete feature", "docs_id": ["7664256"]}
 {"question": "what is gpk file", "docs_id": ["7562611"]}
@@ -1114,7 +1114,7 @@
 {"question": "what is icloud?", "docs_id": ["7622596"]}
 {"question": "what is idc", "docs_id": ["7577608"]}
 {"question": "which software used to open inpage documents", "docs_id": ["7874048"]}
-{"question": "setting static ip address", "docs_id": ["7286334", "7419135"]}
+{"question": "setting static ip address", "docs_id": ["7419135", "7286334"]}
 {"question": "how fast do you need to type for data entry", "docs_id": ["7374193"]}
 {"question": "should enums be public? - java", "docs_id": ["7609090"]}
 {"question": "how fast is fast ethernet", "docs_id": ["4238847"]}
@@ -1197,7 +1197,7 @@
 {"question": "what is theremin", "docs_id": ["7218636"]}
 {"question": "what is macsec", "docs_id": ["7851289"]}
 {"question": "what is the website brainhoney", "docs_id": ["7218061"]}
-{"question": "switch for two monitors two computers", "docs_id": ["7655319", "7655318"]}
+{"question": "switch for two monitors two computers", "docs_id": ["7655318", "7655319"]}
 {"question": "what is mastercam.exe", "docs_id": ["7730004"]}
 {"question": "what is mbam.exe", "docs_id": ["7961774"]}
 {"question": "what is the technology behind spoofing apps", "docs_id": ["7215668"]}
@@ -1248,7 +1248,7 @@
 {"question": "how big is one gb?", "docs_id": ["7415841"]}
 {"question": "reasons why internet is bad", "docs_id": ["7940324"]}
 {"question": "what is dtupdate.exe", "docs_id": ["7527916"]}
-{"question": "who is the system administrator", "docs_id": ["7929869", "7929863"]}
+{"question": "who is the system administrator", "docs_id": ["7929863", "7929869"]}
 {"question": "what is the default username password for phpmyadmin", "docs_id": ["7199090"]}
 {"question": "causes of engine overheating pdf", "docs_id": ["7549283"]}
 {"question": "what is oracle sql called", "docs_id": ["7741588"]}

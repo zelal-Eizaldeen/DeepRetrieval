@@ -4,6 +4,10 @@ Reference:
 * https://github.com/castorini/pyserini/blob/master/docs/usage-index.md#building-a-dense-vector-index
 * https://sbert.net/docs/sentence_transformer/pretrained_models.html
 
+
+* DeepRetrieval Prebuild index: https://huggingface.co/windszzlang/DeepRetrieval-Dense-Index/tree/main
+
+
 1. Download the collection
 ```bash
 mkdir -p collections/msmarco-passage
@@ -26,6 +30,7 @@ python code/data/raw_data/msmarco/convert.py \
 3. Indexing with the processed collection
 
 * Sparse:
+
 ```bash
 python -m pyserini.index.lucene \
     --collection JsonCollection \
@@ -38,7 +43,26 @@ python -m pyserini.index.lucene \
     --storeRaw
 ```
 
-* Dense: `sentence-transformers/all-mpnet-base-v2`, `sentence-transformers/all-MiniLM-L6-v2`
+* Dense: `sentence-transformers/all-mpnet-base-v2`: dimension 768, `sentence-transformers/all-MiniLM-L6-v2`: dimension 384
+
+```bash
+export CUDA_VISIBLE_DEVICES=3
+
+python -m pyserini.encode \
+ input  --corpus collections/msmarco-passage/collection_jsonl \
+        --fields text \
+        --delimiter "\n" \
+        --shard-id 0 \
+        --shard-num 1 \
+ output --embeddings indexes/mpnet-msmarco-passage-dense-index \
+        --to-faiss \
+ encoder --encoder sentence-transformers/all-mpnet-base-v2 \
+        --fields text \
+        --batch 16 \
+        --dimension 768
+        --fp16
+```
+
 
 ```bash
 export CUDA_VISIBLE_DEVICES=2
@@ -49,10 +73,11 @@ python -m pyserini.encode \
         --delimiter "\n" \
         --shard-id 0 \
         --shard-num 1 \
- output --embeddings indexes/dense-index-msmarco-passage \
+ output --embeddings indexes/minilm-msmarco-passage-dense-index \
         --to-faiss \
  encoder --encoder sentence-transformers/all-MiniLM-L6-v2 \
         --fields text \
-        --batch 32 \
+        --batch 16 \
+        --dimension 384
         --fp16
 ```

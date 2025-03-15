@@ -14,8 +14,16 @@ from pyserini.search.faiss import FaissSearcher
 from src.Lucene.utils import ndcg_at_k
 
 # REPLACE THIS WITH YOUR OWN INDEX PATH
-index_dir = "/shared/eng/pj20/lmr_model/raw_data/msmarco/indexes/lucene-index-msmarco-passage"
+# index_dir = "/shared/eng/pj20/lmr_model/raw_data/msmarco/indexes/lucene-index-msmarco-passage"
+
+index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/minilm-msmarco-passage-dense-index"
+query_encoder = "sentence-transformers/all-MiniLM-L6-v2"
+
+# index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/mpnet-msmarco-passage-dense-index"
+# query_encoder = "sentence-transformers/all-mpnet-base-v2"
+
 _searcher = None
+
 
 def get_searcher(mode='sparse'):
     global _searcher
@@ -29,7 +37,7 @@ def get_searcher(mode='sparse'):
         if not os.path.exists(index_dir):
             _searcher = FaissSearcher.from_prebuilt_index('msmarco-v1-passage.tct_colbert', None)
         else:
-            _searcher = FaissSearcher(index_dir=index_dir, None)
+            _searcher = FaissSearcher(index_dir=index_dir, query_encoder=query_encoder)
     return _searcher
     
 
@@ -67,13 +75,9 @@ def validate_response_structure(processed_str: str, do_print: bool) -> bool:
     if do_print:
         print("\n[Structure Validation]")
     validation_passed = True
-
-    # processed_str = '<think> </think>' + processed_str
     
     # Check required tags
     tags = {
-        'think_start': ('<think>', 1),
-        'think_end': ('</think>', 1),
         'answer_start': ('<answer>', 1),
         'answer_end': ('</answer>', 1)
     }
@@ -92,11 +96,9 @@ def validate_response_structure(processed_str: str, do_print: bool) -> bool:
             validation_passed = False
 
     # Verify tag order
-    if (positions['think_start'] > positions['think_end'] or
-        positions['think_end'] > positions['answer_start'] or
-        positions['answer_start'] > positions['answer_end']):
+    if (positions['answer_start'] > positions['answer_end']):
         if do_print:
-            print("  [Error] Incorrect tag order: Expected <think>...</think><answer>...</answer>")
+            print("  [Error] Incorrect tag order: Expected <answer>...</answer>")
         validation_passed = False
     else:
         if do_print:
@@ -131,7 +133,10 @@ def retriver_items(query, top_k=3000, mode='sparse'):
     """Retrieve items from the search system."""
     searcher = get_searcher(mode=mode)
     hits = searcher.search(query, k=top_k)
-    doc_list = [json.loads(hit.lucene_document.get('raw'))['id'] for hit in hits]
+    if mode == 'sparse':
+        doc_list = [json.loads(hit.lucene_document.get('raw'))['id'] for hit in hits]
+    elif mode == 'dense':
+        doc_list = [hit.docid for hit in hits]
     return doc_list
     
 def calculate_answer_score(json_str, label, scores, top_k, test_k, mode='sparse', do_print=False):
@@ -206,7 +211,7 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
     if 'test' in data_source or 'val' in data_source:
         top_k = 10
     else:
-        top_k = 1000
+        top_k = 3000
         
     if 'sparse' in data_source:
         mode = 'sparse'
