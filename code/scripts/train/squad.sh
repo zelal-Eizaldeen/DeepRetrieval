@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=1,2,3,5
+export CUDA_VISIBLE_DEVICES=4,5,6,7
 
 PROJECT_NAME=squad_search
 EXP_NAME=squad_search_3b
@@ -11,7 +11,7 @@ python3 -m verl.trainer.main_ppo \
     data.train_batch_size=64 \
     data.val_batch_size=64 \
     data.max_prompt_length=256 \
-    data.max_response_length=512 \
+    data.max_response_length=350 \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.actor.strategy=fsdp \
     actor_rollout_ref.actor.ppo_mini_batch_size=16 \

@@ -14,7 +14,7 @@ import pdb
 
 
 INSTRUCTION = """
-You are a query rewriting expert. Your task is to create query terms for user query to find relevant literature in a Wikipedia corpus using BM25.
+You are a query rewriting expert. Your task is to create query terms for user query to find relevant literature in a massive corpus.
 """
 
 
@@ -30,7 +30,7 @@ def make_prefix(dp):
     "query": "...."
 } 
 </answer>. 
-Note: The query should use Boolean operators (AND, OR) and parentheses for grouping terms appropriately.
+Note: The query should use Boolean operators (AND, OR) and parentheses for grouping terms appropriately. You don't need to rewrite the query when the query is already good.
 
 Here's the user query:
 """

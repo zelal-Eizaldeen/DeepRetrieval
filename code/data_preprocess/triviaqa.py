@@ -12,29 +12,31 @@ import random
 import pdb
 
 
-
 INSTRUCTION = """
-You are a query rewriting expert. Your task is to create query terms for user query to find relevant literature in a corpus using sparse retrieval.
+You are a query rewriting expert. Your task is to create query terms for user query to find relevant literature in a massive corpus.
 """
 
 
 def make_prefix(dp):
 
-    input_str = """<|im_start|>system\nYou are a helpful assistant. You provides the user with the answer.<|im_end|>\n<|im_start|>user\n""" + INSTRUCTION
-    input_str += """Your response must be in JSON format within <answer> </answer> tags. For example,
+    input_str = """<|im_start|>system\nYou are a helpful assistant. You first thinks about the reasoning process in the mind and then provides the user with the answer.<|im_end|>\n<|im_start|>user\n""" + INSTRUCTION
+    input_str += """\nShow your work in <think> </think> tags. Your final response must be in JSON format within <answer> </answer> tags. For example,
+<think>
+[thinking process]
+</think>
 <answer>
 {
     "query": "...."
 } 
 </answer>. 
-Note: The query should use Boolean operators (AND, OR) and parentheses for grouping terms appropriately.
+Note: The query should use Boolean operators (AND, OR) and parentheses for grouping terms appropriately. You don't need to rewrite the query when the query is already good.
 
 Here's the user query:
 """
 
     input_str +=  dp['input'] + """
-Assistant: Here is the query terms for the user query. 
-<answer>
+Assistant: Let me rewrite the query with reasoning. 
+<think>
 """
 
     return input_str

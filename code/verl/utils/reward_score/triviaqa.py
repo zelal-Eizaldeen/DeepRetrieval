@@ -62,6 +62,8 @@ def validate_response_structure(processed_str: str, do_print: bool) -> bool:
 
     # Check required tags
     tags = {
+        'think_start': ('<think>', 1),
+        'think_end': ('</think>', 1),
         'answer_start': ('<answer>', 1),
         'answer_end': ('</answer>', 1)
     }
@@ -80,9 +82,11 @@ def validate_response_structure(processed_str: str, do_print: bool) -> bool:
             validation_passed = False
 
     # Verify tag order
-    if (positions['answer_start'] > positions['answer_end']):
+    if (positions['think_start'] > positions['think_end'] or
+        positions['think_end'] > positions['answer_start'] or
+        positions['answer_start'] > positions['answer_end']):
         if do_print:
-            print("  [Error] Incorrect tag order: Expected <answer>...</answer>")
+            print("  [Error] Incorrect tag order: Expected <think>...</think><answer>...</answer>")
         validation_passed = False
     else:
         if do_print:
@@ -158,16 +162,18 @@ def calculate_answer_score_scale(answer_text, label, do_print=False):
             answer_score = 5
         elif rank <= 20:
             answer_score = 4
+        elif rank <= 50:
+            answer_score = 2
         elif rank <= 100:
             answer_score = 1
         elif rank <= 1000:
             answer_score = 0.5
         else:
-            answer_score = -3.5
+            answer_score = -2.5
 
     except Exception as e:
         print(f"[Error] Error in evaluation: {e}")
-        answer_score = -4
+        answer_score = -3
     
     return answer_score
 

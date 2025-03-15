@@ -13,8 +13,8 @@ python3 -m verl.trainer.main_ppo \
     data.val_files=data/local_index_search/msmarco_${eval_domain}/${retrieval_mode}/test.parquet \
     data.train_batch_size=64 \
     data.val_batch_size=64 \
-    data.max_prompt_length=512 \
-    data.max_response_length=512 \
+    data.max_prompt_length=256 \
+    data.max_response_length=256 \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.actor.strategy=fsdp \
     actor_rollout_ref.actor.ppo_mini_batch_size=16 \
@@ -37,10 +37,10 @@ python3 -m verl.trainer.main_ppo \
     trainer.n_gpus_per_node=2 \
     trainer.nnodes=1 \
     trainer.save_freq=50 \
-    trainer.test_freq=51 \
+    trainer.test_freq=50 \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXP_NAME \
     actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct \
     critic.model.path=Qwen/Qwen2.5-3B-Instruct \
-    trainer.default_local_dir=/shared/eng/pj20/lmr_model/msmarco_${train_domain}_${retrieval_mode}_3b \
+    trainer.default_local_dir=/shared/eng/pj20/lmr_model/msmarco_${train_domain}_${retrieval_mode}_3b_ans_only \
     trainer.total_epochs=5 2>&1 | tee exp_log/$PROJECT_NAME-3b-ppo-verl_demo_$DATE.log 

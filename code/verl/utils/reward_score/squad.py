@@ -144,9 +144,9 @@ def calculate_answer_score_scale(answer_text, label, do_print=False):
         data = json.loads(answer_text)
         pred_query = data["query"]
         
-        doc_list = run_index_search_bm25(pred_query, topk=3000)
+        doc_list = run_index_search_bm25(pred_query, topk=1000)
         
-        rank = 3001
+        rank = 1001
 
         # Only need to check up to rank 100 since that's the last meaningful score threshold
         for i in range(len(doc_list)):
@@ -168,14 +168,12 @@ def calculate_answer_score_scale(answer_text, label, do_print=False):
             answer_score = 1
         elif rank <= 1000:
             answer_score = 0.5
-        elif rank <= 3000:
-            answer_score = 0.1
         else:
-            answer_score = -3.5
+            answer_score = -2.5
 
     except Exception as e:
         print(f"[Error] Error in evaluation: {e}")
-        answer_score = -4
+        answer_score = -3
     
     return answer_score
 

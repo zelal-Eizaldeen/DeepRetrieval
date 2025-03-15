@@ -317,7 +317,7 @@ def compute_reward_metrics_nq_serini(batch):
     format_error = torch.sum(reward_tensor == -4).float() / reward_tensor.numel()
     reward_metrics["reward/format_error_ratio"] = format_error.detach().item()
 
-    format_error = torch.sum(reward_tensor == -2.5).float() / reward_tensor.numel()
+    format_error = torch.sum(reward_tensor <= -1.5).float() / reward_tensor.numel()
     reward_metrics["reward/wrong_answer_ratio"] = format_error.detach().item()
 
     return reward_metrics
