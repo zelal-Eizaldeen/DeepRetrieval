@@ -20,6 +20,8 @@ import re
 from pyserini.search.lucene import LuceneSearcher
 from pyserini.eval.evaluate_dpr_retrieval import has_answers, SimpleTokenizer
 from tqdm import tqdm
+from gpt_api import gpt_chat_4o
+from claude_api import get_claude_response
 
 
 _searcher = None
@@ -31,12 +33,6 @@ def get_searcher():
     if _searcher is None:
         _searcher = LuceneSearcher.from_prebuilt_index('wikipedia-dpr-100w')
     return _searcher
-
-def load_model(model_path):
-    tokenizer = AutoTokenizer.from_pretrained(model_path, padding_side='left')
-    model = AutoModelForCausalLM.from_pretrained(model_path, attn_implementation="flash_attention_2", torch_dtype=torch.bfloat16)
-    model.eval()
-    return tokenizer, model
 
 
 def extract_solution(solution_str):
@@ -111,8 +107,6 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
         batch_end = min(batch_start + batch_size, len(inputs))
         batch_inputs = inputs[batch_start:batch_end]
         
-        tokenized_inputs = tokenizer(batch_inputs, return_tensors="pt", padding=True, truncation=True).to(device)
-        
         with torch.no_grad():
             output_ids = model.generate(**tokenized_inputs, max_new_tokens=512)
         
@@ -168,7 +162,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_path", type=str, default="/shared/eng/pj20/lmr_model/nq_serini_3b/actor/global_step_400")
     parser.add_argument("--data_path", type=str, default="data/local_index_search/nq_serini/test.parquet")
-    parser.add_argument("--model_name", type=str, default="nq-3b-step-400")
+    parser.add_argument("--model_name", type=str, default="gpt")
     parser.add_argument("--save_dir", type=str, default="results")
     parser.add_argument("--batch_size", type=int, default=8)
     args = parser.parse_args()
