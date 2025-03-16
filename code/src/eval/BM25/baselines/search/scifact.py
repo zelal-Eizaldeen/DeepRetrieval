@@ -15,12 +15,14 @@ import argparse
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", type=str, default="scifact", help="Dataset to evaluate")
-    parser.add_argument('--res_path', type=str, default="../results/claude-3.5_post_scifact.json", help="Path to the qrels file")
     args = parser.parse_args()
+
+    # res_path = '../results/claude-3.5_post_scifact.json'
+    res_path = '../results/no_reason/Qwen-inst-scifact.json'
 
     search_system = PyseriniMultiFieldSearch(index_dir=f"data/local_index_search/{args.dataset}/pyserini_index")
 
-    with open(args.res_path, "r", encoding="utf-8") as file:
+    with open(res_path, "r", encoding="utf-8") as file:
         qrel_test = json.load(file)
     
     # transform qrel_test_dict to list
