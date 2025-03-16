@@ -96,6 +96,7 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
     
     inputs = [item[0]['content'] for item in df['prompt'].tolist()]
     targets = df['label'].tolist()
+    all_generated_query = []
     
     model = model.to(device)
     error_count = 0
@@ -133,6 +134,8 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
                     if has_answers(searched_doc_list[j], target, _tokenizer, regex=False):
                         rank = j + 1
                         break
+                
+                all_generated_query.append({'generated_query': query, 'rank': rank, 'target': target})
                     
                 recall_at_1.append(1) if rank <= 1 else recall_at_1.append(0)
                 recall_at_5.append(1) if rank <= 5 else recall_at_5.append(0)
@@ -160,6 +163,9 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
             print(f"Recall@100: {sum(recall_at_100) / len(recall_at_100)}")
         except:
             continue
+    
+    with open(os.path.join(save_dir, f"{model_name}_generations.json"), 'w') as f:
+        json.dump(all_generated_query, f, indent=2)
 
     
     print("Error count: ", error_count)
