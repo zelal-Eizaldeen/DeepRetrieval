@@ -18,7 +18,8 @@ else:
 
 
 if __name__ == '__main__':
-    res_dir = '../results/Qwen-inst-hotpotqa.json'
+    # res_dir = '../results/gpt-4o_post_hotpotqa.json'
+    res_dir = '../results/claude-3.5_post_hotpotqa.json'
     with open(res_dir, "r", encoding="utf-8") as file:
         res = json.load(file)
 
