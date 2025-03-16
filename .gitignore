@@ -1,6 +1,7 @@
 # cache files
 indexes
 results
+results_dense
 old
 tmp
 collections

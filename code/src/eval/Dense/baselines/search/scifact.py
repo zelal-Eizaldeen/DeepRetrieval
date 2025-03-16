@@ -5,7 +5,7 @@ from tqdm import tqdm
 import pdb
 sys.path.append('./')
 
-from src.Lucene.scifact.search import PyseriniMultiFieldSearch
+from src.Dense.scifact.search import FaissHNSWSearcher
 from src.Lucene.utils import ndcg_at_k
 
 import argparse
@@ -15,10 +15,17 @@ import argparse
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", type=str, default="scifact", help="Dataset to evaluate")
-    parser.add_argument('--res_path', type=str, default="../results/claude-3.5_post_scifact.json", help="Path to the qrels file")
+    parser.add_argument('--res_path', type=str, default="../results_dense/Qwen-inst-scifact.json", help="Path to the qrels file")
     args = parser.parse_args()
 
-    search_system = PyseriniMultiFieldSearch(index_dir=f"data/local_index_search/{args.dataset}/pyserini_index")
+    model_path = "intfloat/multilingual-e5-large-instruct"
+    output_dir = "data/local_index_search/scifact/dense_index"
+    index_path = f"{output_dir}/faiss_hnsw_index.bin"
+    doc_ids_path = f"{output_dir}/doc_ids.npy"
+    
+    search_system = FaissHNSWSearcher(model_name=model_path, 
+                                 index_path=index_path, 
+                                 doc_ids_path=doc_ids_path)
 
     with open(args.res_path, "r", encoding="utf-8") as file:
         qrel_test = json.load(file)
@@ -27,9 +34,9 @@ if __name__ == '__main__':
     test_data = []
     for qid, value in qrel_test.items():
         test_data.append(value)
-
+    
     ndcg = []
-    batch_size = 100
+    batch_size = 32
 
     for i in tqdm(range(0, len(test_data), batch_size)):
         batch = test_data[i:i+batch_size]
@@ -37,9 +44,8 @@ if __name__ == '__main__':
         targets = {item['generated_text']: item['target'] for item in batch} 
         
         results = search_system.batch_search(queries, top_k=10, threads=16)
-        
-        for query in queries:
-            retrieved = [result[0] for result in results.get(query, [])]
+        for idx, query in enumerate(queries):
+            retrieved = [result[0] for result in results[idx]]
             ndcg.append(ndcg_at_k(retrieved, targets[query], 10))
     
     print(f"Average NDCG@10: {sum(ndcg) / len(ndcg)}")

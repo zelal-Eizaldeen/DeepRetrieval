@@ -1,7 +1,7 @@
 import json
 import re
 
-dataset_name = 'fever'
+dataset_name = 'hotpotqa'
 
 file_path = f'../results/gpt-4o_{dataset_name}.json'
 with open(file_path, 'r') as file:

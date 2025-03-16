@@ -5,33 +5,34 @@ from tqdm import tqdm
 import pdb
 sys.path.append('./')
 
-from src.Lucene.hotpotqa.search import PyseriniMultiFieldSearch
+from src.Dense.fever.search import PyseriniFaissSearcher
 from src.Lucene.utils import ndcg_at_k
 from src.eval.BM25.utils import parse_qrel
 
 
-if not os.path.exists("data/local_index_search/hotpotqa/pyserini_index"):
-    print("[Warning] Pyserini index not found for hotpotqa")
+index_path = 'data/local_index_search/fever/dense_index/faiss-flat.beir-v1.0.0-fever.bge-base-en-v1.5.20240107'
+model_name = 'BAAI/bge-base-en-v1.5'
+
+if not os.path.exists(index_path):
+    print("[Warning] Faiss index not found for fever")
     search_system = None
 else:
-    search_system = PyseriniMultiFieldSearch(index_dir="data/local_index_search/hotpotqa/pyserini_index")
-
+    search_system = PyseriniFaissSearcher(index_path, model_name)
 
 if __name__ == '__main__':
-    # res_dir = '../results/gpt-4o_post_hotpotqa.json'
-    res_dir = '../results/claude-3.5_post_hotpotqa.json'
+    res_dir = '../results_dense/Qwen-inst-fever.json'
     with open(res_dir, "r", encoding="utf-8") as file:
         res = json.load(file)
-
-    with open("data/raw_data/hotpotqa/qrels/test.tsv", "r", encoding="utf-8") as file:
+    
+    with open("data/raw_data/fever/qrels/test.tsv", "r", encoding="utf-8") as file:
         qrel_test = [line.strip().split("\t") for line in file]
 
     qrel_test = qrel_test[1:]  # remove the header
 
     qrel_test = parse_qrel(qrel_test)
 
-    # read code/data/raw_data/hotpotqa/queries.jsonl
-    with open("data/raw_data/hotpotqa/queries.jsonl", "r", encoding="utf-8") as file:
+    # read code/data/raw_data/fever/queries.jsonl
+    with open("data/raw_data/fever/queries.jsonl", "r", encoding="utf-8") as file:
         queries = [json.loads(line) for line in file]
     queries_dict = {q['_id']: q['text'] for q in queries}
     
@@ -45,7 +46,7 @@ if __name__ == '__main__':
         })
     
     ndcg = []
-    batch_size = 100
+    batch_size = 1
 
     for i in tqdm(range(0, len(test_data), batch_size)):
         batch = test_data[i:i+batch_size]
