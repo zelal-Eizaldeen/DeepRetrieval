@@ -43,7 +43,27 @@ python -m pyserini.index.lucene \
     --storeRaw
 ```
 
-* Dense: `sentence-transformers/all-mpnet-base-v2`: dimension 768, `sentence-transformers/all-MiniLM-L6-v2`: dimension 384
+* Dense: `facebook/contriever`: 768, `sentence-transformers/all-mpnet-base-v2`: dimension 768, `sentence-transformers/all-MiniLM-L6-v2`: dimension 384
+
+```bash
+export CUDA_VISIBLE_DEVICES=1
+
+python -m pyserini.encode \
+ input  --corpus collections/msmarco-passage/collection_jsonl \
+        --fields text \
+        --delimiter "\n" \
+        --shard-id 0 \
+        --shard-num 1 \
+ output --embeddings indexes/contriever-msmarco-passage-dense-index \
+        --to-faiss \
+ encoder --encoder facebook/contriever \
+        --fields text \
+        --batch 16 \
+        --pooling mean \
+        --dimension 768
+        --fp16
+```
+
 
 ```bash
 export CUDA_VISIBLE_DEVICES=3

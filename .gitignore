@@ -15,5 +15,9 @@ training_outputs
 code/data/local_index_search/msmarco_all
 code/data/raw_data/msmarco/msmarco_all/queries.train.tsv
 code/data/raw_data/msmarco/msmarco_all/queries.dev.tsv
-code/data/raw_data/bird
+code/data/raw_data/bird/train
+code/data/raw_data/bird/dev
 code/data/sql/bird/
+
+# other
+LLaMA-Factory

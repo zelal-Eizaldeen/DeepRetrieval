@@ -22,6 +22,13 @@ def get_searcher():
     return _searcher
     
 
+def extract_database_schema(solution_str):
+    """Extract the database schema from the solution string."""
+    processed_str = solution_str.split("Database Schema:", 1)[1].strip()
+    processed_str = processed_str.split("External Knowledge:", 1)[0].strip()
+    
+    return processed_str
+
 def extract_solution(solution_str):
     """Extract the equation from the solution string."""
     # Remove everything before the first "Assistant:"
@@ -111,7 +118,8 @@ def check_json_format(json_str, do_print=False):
             return False
 
         return True
-    except json.JSONDecodeError:
+    # except json.JSONDecodeError:
+    except Exception as e:
         if do_print:
             print("[Error] JSON decoding failed")
         return False
@@ -128,30 +136,24 @@ def calculate_answer_score(pred_sql, gold_sql, db_path, do_print=False):
         pred_results = execute_sql(pred_sql, db_path)
         gold_results = execute_sql(gold_sql, db_path)
         
-        hit_count = len(set(pred_results) & set(gold_results))
-        recall = hit_count / len(gold_results)
-
-        if recall > 0:
-            recall_score = recall
-        else:
-            recall_score = 0
-
-        acc_score = 1 if set(pred_results) == set(gold_results) else 0        
+        answer_score = 2 if set(pred_results) == set(gold_results) else 0.5
         
-        answer_score = acc_score + recall_score
-        
-        
-        if do_print:
-            print(f"Retrieved results: {pred_results}")
-            print(f"Target: {gold_results} ")
-            print(f"Recall: {recall}")
-            print(f"Acc: {acc_score}")
-            
-            
     except Exception as e:
         if do_print:
-            print(f"[Error] Error in evaluation: {e}")
-        answer_score = -2
+            print(f"[Error] Error in executing SQL: {e}")
+        pred_results = []
+        gold_results = []
+
+        if 'syntax' in str(e):
+            answer_score = 0
+        else:
+            answer_score = 0.1
+
+    if do_print:
+        print(f"Retrieved results: {pred_results}")
+        print(f"Target: {gold_results} ")
+        print(f"Answer score: {answer_score}")
+
     
     return answer_score
 
@@ -184,12 +186,14 @@ def compute_score(solution_str, ground_truth, data_source, db_path, format_rewar
     
     if do_print:
         print(f"--------------------------------")
+        # schema = extract_database_schema(solution_str)
+        # print(f"Database Schema: {schema}")
         print(f"Solution string: {solution_str}")
     
     answer_score = 0
 
     if format_correct and answer_text:
-        pred_sql = answer_text
+        pred_sql = json.loads(answer_text)['sql']
         answer_score = calculate_answer_score(pred_sql, gold_sql, db_path, do_print)
 
     if answer_score > 0:

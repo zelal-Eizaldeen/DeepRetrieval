@@ -61,9 +61,9 @@ def main():
         # print(len(doc_list))
         rank = 1001  # Initialize rank to a value higher than our search range
         
-        for i in range(len(doc_list)):
-            if has_answers(doc_list[i], ground_truth, _tokenizer, regex=False):
-                rank = i + 1
+        for j in range(len(doc_list)):
+            if has_answers(doc_list[j], ground_truth, _tokenizer, regex=False):
+                rank = j + 1
                 break
 
         # print(rank)

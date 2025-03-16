@@ -5,17 +5,21 @@ from tqdm import tqdm
 import pdb
 sys.path.append('./')
 
-from pyserini.search.faiss import FaissSearcher
+import torch
+from pyserini.search.faiss import FaissSearcher, AutoQueryEncoder
 from src.Lucene.utils import ndcg_at_k
 
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
-index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/minilm-msmarco-passage-dense-index"
-query_encoder = "sentence-transformers/all-MiniLM-L6-v2"
+index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/contriever-msmarco-passage-dense-index"
+query_encoder_name = "facebook/contriever"
+
+# index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/minilm-msmarco-passage-dense-index"
+# query_encoder_name = "sentence-transformers/all-MiniLM-L6-v2"
 
 # index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/mpnet-msmarco-passage-dense-index"
-# query_encoder = "sentence-transformers/all-mpnet-base-v2"
+# query_encoder_name = "sentence-transformers/all-mpnet-base-v2"
 
 _searcher = None
 
@@ -24,9 +28,14 @@ def get_searcher(mode='dense'):
     global _searcher
     if _searcher is None and mode == 'dense':
         if not os.path.exists(index_dir):
-            # print("[Warning] Pyserini index not found for scifact")
+            print("[Warning] Pyserini index not found")
             _searcher = FaissSearcher.from_prebuilt_index('msmarco-v1-passage', None)
         else:
+            device = 'cuda' if torch.cuda.is_available() else 'cpu'
+            if 'contriever' in query_encoder_name:
+                query_encoder = AutoQueryEncoder(query_encoder_name, pooling='mean', device=device)
+            else:
+                query_encoder = AutoQueryEncoder(query_encoder_name, pooling='cls', device=device)
             _searcher = FaissSearcher(index_dir=index_dir, query_encoder=query_encoder)
     return _searcher
 

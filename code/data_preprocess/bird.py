@@ -86,21 +86,11 @@ def make_prefix(dp, split):
     
     instruction = INSTRUCTION_SQL
 
-    input_str = """<|im_start|>system\nYou are a helpful assistant. You first thinks about the reasoning process in the mind and then provides the user with the answer.<|im_end|>\n<|im_start|>user\n""" + instruction
-    input_str += """\nShow your work in <think> </think> tags. Your final response must be in JSON format within <answer> </answer> tags. For example,
-<think>
-[thinking process]
-</think>
-<answer>
-{
-    "sql": "SELECT ... (in one line)"
-} 
-</answer>. 
-"""
+    input_str = """<|im_start|>system\nYou are a helpful assistant. You first think about the reasoning process in the mind and then provides the user with the answer.<|im_end|>\n<|im_start|>user\n""" + instruction
 
     # row example
-    # row_num = None
-    row_num = 3
+    row_num = None
+    # row_num = 3
 
     # table schema prompt
     schema_prompt = generate_schema_prompt(dp['db_id'], split, row_num)
@@ -113,6 +103,7 @@ def make_prefix(dp, split):
 """
 
     input_str += """Note: Using valid SQLite and understading External Knowledge, answer the following questions for the tables provided above.
+
 Show your work in <think> </think> tags. Your final response must be in JSON format within <answer> </answer>. For example,
 <think>
 [thinking process]
@@ -122,8 +113,14 @@ Show your work in <think> </think> tags. Your final response must be in JSON for
     "sql": "SELECT ... (in one line)"
 } 
 </answer>. 
-You should only provide one <answer> </answer> tag at the end of your response.
 """
+
+#     input_str += """
+# Important rules:  
+# - You should only think once and answer once.
+# - You should only include one <think> </think> block and one <answer> </answer> block.  
+# - End your response immediately after the <answer> </answer> tag — no extra text.  
+# """
 
     input_str += """
 Here's the user query:
@@ -133,7 +130,9 @@ Here's the user query:
 Assistant: Let me write the SQL query with reasoning. 
 <think>
 """
-
+    # print('--------------------------------')
+    # print(input_str)
+    # print('--------------------------------')
     return input_str
 
 
@@ -179,13 +178,20 @@ if __name__ == '__main__':
             solution = {
                 "target": example['sql'],
             }
+
+            db_id = example['db_id']
+            if split == 'train':
+                db_path = f'data/raw_data/bird/train/train_databases/{db_id}/{db_id}.sqlite'
+            elif split == 'val' or split == 'test':
+                db_path = f'data/raw_data/bird/dev/dev_databases/{db_id}/{db_id}.sqlite'
+
             data = {
                 "data_source": f"{data_source}_{split}",
                 "prompt": [{
                     "role": "user",
                     "content": question,
                 }],
-                "ability": "literature_mining",
+                "ability": "sql_generation",
                 "reward_model": {
                     "style": "rule",
                     "ground_truth": solution
@@ -193,7 +199,7 @@ if __name__ == '__main__':
                 "extra_info": {
                     'split': split,
                     'index': idx,
-                    'db_path': f'data/raw_data/bird/{split}_databases/{example["db_id"]}/{example["db_id"]}.sqlite'
+                    'db_path': db_path
                 }
             }
             return data
@@ -207,6 +213,13 @@ if __name__ == '__main__':
     test_dataset = test_dataset.shuffle(seed=42)
     val_dataset = val_dataset.shuffle(seed=42)
     
+
+    print(f"Train dataset size before filtering: {train_dataset.num_rows}")
+    train_dataset = train_dataset.filter(
+        lambda example: len(example['prompt'][0]['content'].split()) <= 1000
+    )
+    print(f"Train dataset size after filtering: {train_dataset.num_rows}")
+
     lengths_list = []
     for d in train_dataset:
         lengths_list.append(len(d['prompt'][0]['content'].split()))
@@ -223,6 +236,10 @@ if __name__ == '__main__':
     print(f"Average length of test dataset: {sum(lengths_list_test) / len(lengths_list_test)}")
     print(f"Average length of val dataset: {sum(lengths_list_val) / len(lengths_list_val)}")
     
+    print(f"Max length of train dataset: {max(lengths_list)}")
+    print(f"Max length of test dataset: {max(lengths_list_test)}")
+    print(f"Max length of val dataset: {max(lengths_list_val)}")
+
     local_dir = os.path.join(args.local_dir, f"{args.dataset}")
     hdfs_dir = os.path.join(args.hdfs_dir, f"{args.dataset}") if args.hdfs_dir is not None else None
     

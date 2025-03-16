@@ -91,7 +91,7 @@ def run_index_search_bm25(search_query, topk=50):
     return doc_list
 
 
-def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, batch_size=8, search_api=None):
+def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, batch_size=1, search_api=None):
     df = pd.read_parquet(data_path)
     
     inputs = [item[0]['content'] for item in df['prompt'].tolist()]
@@ -115,39 +115,42 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
         
         with torch.no_grad():
             output_ids = model.generate(**tokenized_inputs, max_new_tokens=350)
+            # output_ids = model.generate_sequences(**tokenized_inputs, max_new_tokens=350, temperature=0.6, do_sample=False)
         
         for i, output in enumerate(output_ids):
             try:
-                generated_text = tokenizer.decode(output, skip_special_tokens=True)
+                generated_text = tokenizer.decode(output)
                 idx = batch_start + i
                 # convert target from ndarray to list
                 
                 extracted_solution, processed_str = extract_solution(generated_text)
                 query = json.loads(extracted_solution)['query']
+                # query = query.lower()
+                print(query)
                 
-                rank = 1001
+                rank = 101
                 target = targets[idx].tolist()
-                searched_doc_list = run_index_search_bm25(query, topk=30)
+                searched_doc_list = run_index_search_bm25(query, topk=100)
                 
-                for i in range(len(searched_doc_list)):
-                    if has_answers(searched_doc_list[i], target, _tokenizer, regex=False):
-                        rank = i + 1
+                for j in range(len(searched_doc_list)):
+                    if has_answers(searched_doc_list[j], target, _tokenizer, regex=False):
+                        rank = j + 1
                         break
                     
                 recall_at_1.append(1) if rank <= 1 else recall_at_1.append(0)
                 recall_at_5.append(1) if rank <= 5 else recall_at_5.append(0)
                 recall_at_10.append(1) if rank <= 10 else recall_at_10.append(0)
                 recall_at_20.append(1) if rank <= 20 else recall_at_20.append(0)
-                # recall_at_50.append(1) if rank <= 50 else recall_at_50.append(0)
-                # recall_at_100.append(1) if rank <= 100 else recall_at_100.append(0)
+                recall_at_50.append(1) if rank <= 50 else recall_at_50.append(0)
+                recall_at_100.append(1) if rank <= 100 else recall_at_100.append(0)
                 
             except:
                 recall_at_1.append(0)
                 recall_at_5.append(0)
                 recall_at_10.append(0)
                 recall_at_20.append(0)
-                # recall_at_50.append(0)
-                # recall_at_100.append(0)
+                recall_at_50.append(0)
+                recall_at_100.append(0)
                 error_count += 1
                 print(f"Error: {generated_text}, Error count: {error_count}")
                 continue
@@ -170,7 +173,7 @@ def main():
     parser.add_argument("--data_path", type=str, default="data/local_index_search/squad/test.parquet")
     parser.add_argument("--model_name", type=str, default="squad-3b-step-400")
     parser.add_argument("--save_dir", type=str, default="results")
-    parser.add_argument("--batch_size", type=int, default=8)
+    parser.add_argument("--batch_size", type=int, default=32)
     args = parser.parse_args()
 
     

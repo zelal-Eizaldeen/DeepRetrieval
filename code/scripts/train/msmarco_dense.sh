@@ -5,7 +5,8 @@ PROJECT_NAME=msmarco_search
 train_domain=all
 val_domain=health
 retrieval_mode=dense
-encoder=minilm
+encoder=contriever
+# encoder=minilm
 # encoder=mpnet
 EXP_NAME=msmarco_search_3b_${train_domain}_${retrieval_mode}_${encoder}
 
@@ -40,7 +41,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
     trainer.save_freq=50 \
-    trainer.test_freq=100 \
+    trainer.test_freq=200 \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXP_NAME \
     actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct \

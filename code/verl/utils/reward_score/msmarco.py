@@ -9,18 +9,23 @@ import sys
 import os
 sys.path.append('./')
 
+import torch
 from pyserini.search.lucene import LuceneSearcher
-from pyserini.search.faiss import FaissSearcher
+from pyserini.search.faiss import FaissSearcher, AutoQueryEncoder
 from src.Lucene.utils import ndcg_at_k
 
 # REPLACE THIS WITH YOUR OWN INDEX PATH
 # index_dir = "/shared/eng/pj20/lmr_model/raw_data/msmarco/indexes/lucene-index-msmarco-passage"
 
-index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/minilm-msmarco-passage-dense-index"
-query_encoder = "sentence-transformers/all-MiniLM-L6-v2"
+
+index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/contriever-msmarco-passage-dense-index"
+query_encoder_name = "facebook/contriever"
+
+# index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/minilm-msmarco-passage-dense-index"
+# query_encoder_name = "sentence-transformers/all-MiniLM-L6-v2"
 
 # index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/mpnet-msmarco-passage-dense-index"
-# query_encoder = "sentence-transformers/all-mpnet-base-v2"
+# query_encoder_name = "sentence-transformers/all-mpnet-base-v2"
 
 _searcher = None
 
@@ -37,6 +42,11 @@ def get_searcher(mode='sparse'):
         if not os.path.exists(index_dir):
             _searcher = FaissSearcher.from_prebuilt_index('msmarco-v1-passage.tct_colbert', None)
         else:
+            device = 'cuda' if torch.cuda.is_available() else 'cpu'
+            if 'contriever' in query_encoder_name:
+                query_encoder = AutoQueryEncoder(query_encoder_name, pooling='mean', device=device)
+            else:
+                query_encoder = AutoQueryEncoder(query_encoder_name, pooling='cls', device=device)
             _searcher = FaissSearcher(index_dir=index_dir, query_encoder=query_encoder)
     return _searcher
     
@@ -75,9 +85,11 @@ def validate_response_structure(processed_str: str, do_print: bool) -> bool:
     if do_print:
         print("\n[Structure Validation]")
     validation_passed = True
-    
+
     # Check required tags
     tags = {
+        'think_start': ('<think>', 1),
+        'think_end': ('</think>', 1),
         'answer_start': ('<answer>', 1),
         'answer_end': ('</answer>', 1)
     }
@@ -96,9 +108,11 @@ def validate_response_structure(processed_str: str, do_print: bool) -> bool:
             validation_passed = False
 
     # Verify tag order
-    if (positions['answer_start'] > positions['answer_end']):
+    if (positions['think_start'] > positions['think_end'] or
+        positions['think_end'] > positions['answer_start'] or
+        positions['answer_start'] > positions['answer_end']):
         if do_print:
-            print("  [Error] Incorrect tag order: Expected <answer>...</answer>")
+            print("  [Error] Incorrect tag order: Expected <think>...</think><answer>...</answer>")
         validation_passed = False
     else:
         if do_print:

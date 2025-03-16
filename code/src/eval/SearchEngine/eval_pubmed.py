@@ -158,6 +158,7 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
                 print("Recall: ", recall)
             except:
                 print("Error: ", generated_text)
+                recalls.append(0)
                 error_count += 1
                 continue
             
