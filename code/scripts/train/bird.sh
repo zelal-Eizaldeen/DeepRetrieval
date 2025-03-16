@@ -2,7 +2,7 @@ export HYDRA_FULL_ERROR=1
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 PROJECT_NAME=bird
-EXP_NAME=bird_3b_cont
+EXP_NAME=bird_3b
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
@@ -11,7 +11,7 @@ python3 -m verl.trainer.main_ppo \
     data.val_files=data/sql/bird/test.parquet \
     data.train_batch_size=64 \
     data.val_batch_size=64 \
-    data.max_prompt_length=4096 \
+    data.max_prompt_length=2048 \
     data.max_response_length=512 \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.actor.strategy=fsdp \
@@ -35,7 +35,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
     trainer.save_freq=50 \
-    trainer.test_freq=100 \
+    trainer.test_freq=200 \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXP_NAME \
     actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct \

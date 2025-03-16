@@ -213,6 +213,13 @@ if __name__ == '__main__':
     test_dataset = test_dataset.shuffle(seed=42)
     val_dataset = val_dataset.shuffle(seed=42)
     
+
+    print(f"Train dataset size before filtering: {train_dataset.num_rows}")
+    train_dataset = train_dataset.filter(
+        lambda example: len(example['prompt'][0]['content'].split()) <= 1000
+    )
+    print(f"Train dataset size after filtering: {train_dataset.num_rows}")
+
     lengths_list = []
     for d in train_dataset:
         lengths_list.append(len(d['prompt'][0]['content'].split()))
