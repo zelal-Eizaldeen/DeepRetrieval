@@ -19,7 +19,7 @@ import utils.java_init
 from pyserini.search.lucene import LuceneSearcher
 from pyserini.eval.evaluate_dpr_retrieval import has_answers, SimpleTokenizer
 from tqdm import tqdm
-from src.utils.gpt_azure import gpt_chat_4o
+from src.utils.gpt_azure import gpt_chat_4o, gpt_chat_35_msg
 from src.utils.claude_api import get_claude_response
 
 
@@ -52,17 +52,22 @@ def extract_json_from_llm_output(text):
     
     if matched_jsons:
         extracted_json = matched_jsons[-1]  # get the final one
-        return json.loads(extracted_json)
+        return json.loads(extracted_json)['query']
     else:
-        # backup plan
-        pattern = r"\{.*?\}"
-        matched_jsons = re.findall(pattern, text, re.DOTALL)
-        
-        if matched_jsons:
-            extracted_json = matched_jsons[-1]  # get the final one
-            return json.loads(extracted_json)
-        else:
-            raise ValueError('No JSON structure found.')
+        try:
+            pattern = r"\{.*?\}"
+            matched_jsons = re.findall(pattern, text, re.DOTALL)
+            
+            if matched_jsons:
+                extracted_json = matched_jsons[-1]  # get the final one
+                try:
+                    return json.loads(extracted_json)['query']
+                except:
+                    return extracted_json.split(": ")[1].strip()
+            else:
+                raise ValueError('No JSON structure found.')
+        except:
+            return text
         
 def run_index_search_bm25(search_query, topk=50):
     
@@ -75,9 +80,10 @@ def run_index_search_bm25(search_query, topk=50):
     
     return doc_list
 
+# Do not inject your own knowledge into the query. You should assume you don't know the answer and just use the query itself to find the answer.
 def process_prompt(prompt):
     prompt = prompt.replace("""<|im_start|>system\nYou are a helpful assistant. You first thinks about the reasoning process in the mind and then provides the user with the answer.<|im_end|>\n<|im_start|>user\n""", "")
-    prompt = prompt.replace("Note: ", "Note: Do not inject your own knowledge into the query. You should assume you don't know the answer and just use the query itself to find the answer. The content between <answer> and </answer> should be a valid JSON object.")
+    prompt = prompt.replace("Note: ", "Note: The content between <answer> and </answer> should be a valid JSON object.")
     return prompt
 
 def compute_filtered_recall(recall_list, error_count, total_queries):
@@ -122,10 +128,14 @@ def evaluate_model(data_path, model_name, batch_size=8):
         batch_end = min(batch_start + batch_size, len(inputs))
         batch_inputs = inputs[batch_start:batch_end]
         
-        if 'gpt' in model_name:
+        if 'gpt4o' in model_name:
             responses = [gpt_chat_4o(prompt=prompt) for prompt in batch_inputs]
-        elif 'claude' in model_name:
+        elif 'gpt35' in model_name:
+            responses = [gpt_chat_35_msg(prompt=prompt) for prompt in batch_inputs]
+        elif 'claude35' in model_name:
             responses = [get_claude_response(llm="sonnet", prompt=prompt) for prompt in batch_inputs]
+        elif 'claude3' in model_name:
+            responses = [get_claude_response(llm="hiku", prompt=prompt) for prompt in batch_inputs]
             
         all_responses.extend(responses)
         
@@ -136,7 +146,7 @@ def evaluate_model(data_path, model_name, batch_size=8):
                 # convert target from ndarray to list
                 
                 extracted_solution = extract_solution(generated_text)
-                query = json.loads(extracted_solution)['query']
+                query = extract_json_from_llm_output(extracted_solution)
                 
                 rank = 1001
                 target = targets[idx].tolist()

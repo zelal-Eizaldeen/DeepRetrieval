@@ -51,12 +51,9 @@ def get_claude_response(llm, prompt, max_tokens=2048, temperature=0, tools=None,
 
     request_body = json.dumps(request_body)
 
-    start_time = time.time()
     response = boto3_client.invoke_model(
         body=request_body,
         modelId=model
     )
-    end_time = time.time()
-    print(f"Time taken: {end_time - start_time:.2f}s")
     response_body = json.loads(response.get('body').read())
     return response_body['content'][0]['text']

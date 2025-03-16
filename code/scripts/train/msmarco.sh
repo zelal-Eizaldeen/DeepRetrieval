@@ -36,10 +36,10 @@ python3 -m verl.trainer.main_ppo \
     trainer.n_gpus_per_node=6 \
     trainer.nnodes=1 \
     trainer.save_freq=50 \
-    trainer.test_freq=50 \
+    trainer.test_freq=1000 \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXP_NAME \
-    actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct \
-    critic.model.path=Qwen/Qwen2.5-3B-Instruct \
+    actor_rollout_ref.model.path=/shared/eng/pj20/lmr_model/msmarco_health_sparse_3b_new/actor/global_step_100 \
+    critic.model.path=/shared/eng/pj20/lmr_model/msmarco_health_sparse_3b_new/critic/global_step_100 \
     trainer.default_local_dir=/shared/eng/pj20/lmr_model/msmarco_${train_domain}_${retrieval_mode}_3b_new \
     trainer.total_epochs=5 2>&1 | tee exp_log/$PROJECT_NAME-3b-ppo-verl_demo_$DATE.log 
