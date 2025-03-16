@@ -77,7 +77,7 @@ def gpt_chat_4o(prompt):
     )
     
     model = AzureChatOpenAI(
-        deployment_name="gpt-4o", # "gpt-35"
+        deployment_name="gpt-4o",
         model_name='gpt-4o'
     )
     response = model.invoke([message]).content
