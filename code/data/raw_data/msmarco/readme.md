@@ -59,6 +59,7 @@ python -m pyserini.encode \
  encoder --encoder facebook/contriever \
         --fields text \
         --batch 16 \
+        --pooling mean \
         --dimension 768
         --fp16
 ```
