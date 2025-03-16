@@ -1,9 +1,9 @@
 import json
 import re
 
-dataset_name = 'fever'
+dataset_name = 'nfcorpus'
 
-file_path = f'../results/claude-3.5_{dataset_name}.json'
+file_path = f'../results_dense/claude-3.5_{dataset_name}.json'
 with open(file_path, 'r') as file:
     data = json.load(file)
 
@@ -27,7 +27,7 @@ for key, value in data.items():
 
 
 # save to filename claude-3.5_postprocessed_scifact.json
-file_path = f'../results/claude-3.5_post_{dataset_name}.json'
+file_path = f'../results_dense/claude-3.5_post_{dataset_name}.json'
 with open(file_path, 'w') as file:
     json.dump(answers, file, indent=4)
 
