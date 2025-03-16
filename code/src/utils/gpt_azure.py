@@ -32,15 +32,22 @@ def gpt_chat_35(prompt, query_dict):
     
     return chain.invoke(query_dict)
 
-def gpt_chat_35_msg(prompt):
+def gpt_chat_35_msg(prompt, max_tokens=None):
     message = HumanMessage(
         content=prompt
     )
     
-    model = AzureChatOpenAI(
-        deployment_name="gpt-35", # "gpt-35"
-        model_name='gpt-35-turbo'
-    )
+    if max_tokens is not None:
+        model = AzureChatOpenAI(
+            deployment_name="gpt-35", # "gpt-35"
+            model_name='gpt-35-turbo',
+            max_tokens=max_tokens
+        )
+    else:
+        model = AzureChatOpenAI(
+            deployment_name="gpt-35", # "gpt-35"
+            model_name='gpt-35-turbo',
+        )
     
     response = model.invoke([message]).content
     
@@ -71,15 +78,22 @@ def gpt_chat_4omini(prompt):
     
     return response
 
-def gpt_chat_4o(prompt):
+def gpt_chat_4o(prompt, max_tokens=None):
     message = HumanMessage(
         content=prompt
     )
     
-    model = AzureChatOpenAI(
-        deployment_name="gpt-4o", # "gpt-35"
-        model_name='gpt-4o'
-    )
+    if max_tokens is not None:
+        model = AzureChatOpenAI(
+            deployment_name="gpt-4o", # "gpt-35"
+            model_name='gpt-4o',
+            max_tokens=max_tokens
+        )
+    else:
+        model = AzureChatOpenAI(
+            deployment_name="gpt-4o", # "gpt-35"
+            model_name='gpt-4o',
+        )
     response = model.invoke([message]).content
     
     return response

@@ -1,6 +1,6 @@
 python src/eval/evidence_gpt_claude.py \
-    --data_path data/local_index_search/triviaqa/test.parquet \
-    --model_name tqa-gpt35-no-block \
+    --data_path data/local_index_search/nq_serini/test.parquet \
+    --model_name nq-gpt4o-no-block \
     --batch_size 8
 
 # python src/eval/evidence_gpt_claude.py \
