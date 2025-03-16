@@ -85,6 +85,9 @@ def _select_rm_score_fn(data_source):
     elif 'bird' in data_source:
         from verl.utils.reward_score import bird
         return bird.compute_score
+    elif 'spider' in data_source:
+        from verl.utils.reward_score import spider
+        return spider.compute_score
     else:
         raise NotImplementedError
 

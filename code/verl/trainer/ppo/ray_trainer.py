@@ -688,8 +688,10 @@ class RayPPOTrainer(object):
             
             elif 'bird' in data_source or 'spider' in data_source:
                 count_acc = 0
+                format_score = 0.1
+                accuracy_score = 2
                 for reward in rewards:
-                    if reward == 2.1:
+                    if reward == accuracy_score + format_score:
                         count_acc += 1
                 total_count = len(rewards)
                 metric_dict[f'val/test_score/{data_source}'] = count_acc / total_count if total_count > 0 else 0

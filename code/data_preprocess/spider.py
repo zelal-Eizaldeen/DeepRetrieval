@@ -12,7 +12,7 @@ import random
 import pdb
 import sqlite3
 
-# prompt reference: https://github.com/AlibabaResearch/DAMO-ConvAI/blob/main/bird/llm/src/gpt_request.py
+
 
 
 INSTRUCTION_SQL = """
@@ -20,65 +20,28 @@ You are a SQL query writing expert. Your task is to write the SQL query for the 
 """
 
 
-def nice_look_table(column_names: list, values: list):
-    rows = []
-    # Determine the maximum width of each column
-    widths = [max(len(str(value[i])) for value in values + [column_names]) for i in range(len(column_names))]
-
-    # Print the column names
-    header = ''.join(f'{column.rjust(width)} ' for column, width in zip(column_names, widths))
-    # print(header)
-    # Print the values
-    for value in values:
-        row = ''.join(f'{str(v).rjust(width)} ' for v, width in zip(value, widths))
-        rows.append(row)
-    rows = "\n".join(rows)
-    final_output = header + '\n' + rows
-    return final_output
 
 
 def generate_schema_prompt(db_id, split, num_rows=None):
 
-    if split == 'train':
-        db_path = f'data/raw_data/bird/train/train_databases/{db_id}/{db_id}.sqlite'
-    elif split == 'val' or split == 'test':
-        db_path = f'data/raw_data/bird/dev/dev_databases/{db_id}/{db_id}.sqlite'
+    if split == 'train' or split == 'val':
+        db_schema_path = f'data/raw_data/spider/spider_data/database/{db_id}/schema.sql'
+    elif split == 'test':
+        db_schema_path = f'data/raw_data/spider/spider_data/test_database/{db_id}/schema.sql'
 
-    full_schema_prompt_list = []
-    conn = sqlite3.connect(db_path)
-    # Create a cursor object
-    cursor = conn.cursor()
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-    tables = cursor.fetchall()
-    schemas = {}
-    for table in tables:
-        if table == 'sqlite_sequence':
-            continue
-        cursor.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name='{}';".format(table[0]))
-        create_prompt = cursor.fetchone()[0]
-        schemas[table[0]] = create_prompt
-        try:
-            if num_rows:
-                cur_table = table[0]
-                if cur_table in ['order', 'by', 'group']:
-                    cur_table = "`{}`".format(cur_table)
+    if not os.path.exists(db_schema_path):
+        db_schema_path = db_schema_path.replace('schema', db_id)
 
-                cursor.execute("SELECT * FROM {} LIMIT {}".format(cur_table, num_rows))
-                column_names = [description[0] for description in cursor.description]
-                values = cursor.fetchall()
-                rows_prompt = nice_look_table(column_names=column_names, values=values)
-                verbose_prompt = "/* \n {} example rows: \n SELECT * FROM {} LIMIT {}; \n {} \n */".format(num_rows, cur_table, num_rows, rows_prompt)
-                schemas[table[0]] = "{} \n {}".format(create_prompt, verbose_prompt)
-        except Exception as e:
-            print(f"Error: {e}")
-            continue
+    if not os.path.exists(db_schema_path):
+        return ''
 
-    for k, v in schemas.items():
-        full_schema_prompt_list.append(v)
+    schema_prompt = ''
+    with open(db_schema_path, 'r') as f:
+        for line in f:
+            if 'insert' not in line.lower():
+                schema_prompt += line
 
-    schema_prompt = "\n\n".join(full_schema_prompt_list)
-
-    return schema_prompt
+    return schema_prompt.strip()
 
 
 
@@ -98,9 +61,6 @@ def make_prefix(dp, split):
 {schema_prompt}
 """
 
-    # use external knowledge in bird
-    input_str += f"""External Knowledge: {dp['knowledge']}
-"""
 
     input_str += """Note: Using valid SQLite and understading External Knowledge, answer the following questions for the tables provided above.
 
@@ -115,13 +75,6 @@ Show your work in <think> </think> tags. Your final response must be in JSON for
 </answer>. 
 """
 
-#     input_str += """
-# Important rules:  
-# - You should only think once and answer once.
-# - You should only include one <think> </think> block and one <answer> </answer> block.  
-# - End your response immediately after the <answer> </answer> tag — no extra text.  
-# """
-
     input_str += """
 Here's the user query:
 """
@@ -130,26 +83,28 @@ Here's the user query:
 Assistant: Let me write the SQL query with reasoning. 
 <think>
 """
-    # print('--------------------------------')
-    # print(input_str)
-    # print('--------------------------------')
     return input_str
 
 
 def load_bird_dataset():
     
-    with open(f'data/raw_data/bird/train/train.json', 'r') as f:
-        data_train = json.load(f)
+    with open(f'data/raw_data/spider/spider_data/train_spider.json', 'r') as f:
+        data_train_spider = json.load(f)
 
-    with open(f'data/raw_data/bird/dev/dev.json', 'r') as f:
+    with open(f'data/raw_data/spider/spider_data/train_others.json', 'r') as f:
+        data_train_other = json.load(f)
+
+    data_train = data_train_spider + data_train_other
+
+    with open(f'data/raw_data/spider/spider_data/test.json', 'r') as f:
         data_test = json.load(f)
             
-    with open(f'data/raw_data/bird/dev/dev.json', 'r') as f:
-        data_val = json.load(f)[:100]
+    with open(f'data/raw_data/spider/spider_data/dev.json', 'r') as f:
+        data_val = json.load(f)
     
-    train_data = [{'question': x['question'], 'db_id': x['db_id'], 'knowledge': x['evidence'], 'sql': x['SQL']} for x in data_train]
-    test_data = [{'question': x['question'], 'db_id': x['db_id'], 'knowledge': x['evidence'], 'sql': x['SQL']} for x in data_test]
-    val_data = [{'question': x['question'], 'db_id': x['db_id'], 'knowledge': x['evidence'], 'sql': x['SQL']} for x in data_val]
+    train_data = [{'question': x['question'], 'db_id': x['db_id'], 'sql': x['query']} for x in data_train]
+    test_data = [{'question': x['question'], 'db_id': x['db_id'], 'sql': x['query']} for x in data_test]
+    val_data = [{'question': x['question'], 'db_id': x['db_id'], 'sql': x['query']} for x in data_val]
     
     return train_data, test_data, val_data
 
@@ -158,7 +113,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--local_dir', default='data/sql')
     parser.add_argument('--hdfs_dir', default=None)
-    parser.add_argument('--dataset', type=str, default='bird')
+    parser.add_argument('--dataset', type=str, default='spider')
     parser.add_argument('--output_dir', type=str, default='data/sql')
 
     args = parser.parse_args()
@@ -180,10 +135,10 @@ if __name__ == '__main__':
             }
 
             db_id = example['db_id']
-            if split == 'train':
-                db_path = f'data/raw_data/bird/train/train_databases/{db_id}/{db_id}.sqlite'
-            elif split == 'val' or split == 'test':
-                db_path = f'data/raw_data/bird/dev/dev_databases/{db_id}/{db_id}.sqlite'
+            if split == 'train' or split == 'val':
+                db_path = f'data/raw_data/spider/spider_data/database/{db_id}/{db_id}.sqlite'
+            elif split == 'test':
+                db_path = f'data/raw_data/spider/spider_data/test_database/{db_id}/{db_id}.sqlite'
 
             data = {
                 "data_source": f"{data_source}_{split}",

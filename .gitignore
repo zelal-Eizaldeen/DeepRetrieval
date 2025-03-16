@@ -18,6 +18,8 @@ code/data/raw_data/msmarco/msmarco_all/queries.dev.tsv
 code/data/raw_data/bird/train
 code/data/raw_data/bird/dev
 code/data/sql/bird/
+code/data/raw_data/spider/spider_data
+code/data/sql/spider/
 
 # other
 LLaMA-Factory
