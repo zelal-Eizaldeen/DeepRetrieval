@@ -15,7 +15,7 @@ import argparse
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", type=str, default="scifact", help="Dataset to evaluate")
-    parser.add_argument('--res_path', type=str, default="../results/gpt-4o_post_scifact.json", help="Path to the qrels file")
+    parser.add_argument('--res_path', type=str, default="../results/claude-3.5_post_scifact.json", help="Path to the qrels file")
     args = parser.parse_args()
 
     search_system = PyseriniMultiFieldSearch(index_dir=f"data/local_index_search/{args.dataset}/pyserini_index")
