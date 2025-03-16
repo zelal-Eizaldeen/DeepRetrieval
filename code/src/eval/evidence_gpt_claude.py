@@ -13,6 +13,8 @@ from tqdm import tqdm
 import json
 import re
 
+import utils.java_init
+
 # Add these at the top with other global variables
 from pyserini.search.lucene import LuceneSearcher
 from pyserini.eval.evaluate_dpr_retrieval import has_answers, SimpleTokenizer
@@ -78,6 +80,25 @@ def process_prompt(prompt):
     prompt = prompt.replace("Note: ", "Note: Do not inject your own knowledge into the query. You should assume you don't know the answer and just use the query itself to find the answer. The content between <answer> and </answer> should be a valid JSON object.")
     return prompt
 
+def compute_filtered_recall(recall_list, error_count, total_queries):
+    """
+    Compute filtered recall by excluding error cases.
+    
+    Args:
+        recall_list: List of recall values (0s and 1s)
+        error_count: Number of errors encountered
+        total_queries: Total number of queries processed
+    
+    Returns:
+        tuple: (filtered_recall, raw_recall)
+    """
+    successful_queries = total_queries - error_count
+    if successful_queries == 0:
+        return 0.0, 0.0
+    
+    raw_recall = sum(recall_list) / total_queries
+    filtered_recall = sum(recall_list) / successful_queries
+    return filtered_recall, raw_recall
 
 def evaluate_model(data_path, model_name, batch_size=8):
     df = pd.read_parquet(data_path)
@@ -88,6 +109,7 @@ def evaluate_model(data_path, model_name, batch_size=8):
     targets = df['label'].tolist()
     
     error_count = 0
+    total_queries = len(inputs)
     
     recall_at_1 = []
     recall_at_5 = []
