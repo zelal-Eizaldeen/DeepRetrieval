@@ -679,25 +679,25 @@ class RayPPOTrainer(object):
                 metric_dict[f'val/test_score/{data_source}'] = count_ndcg / total_count if total_count > 0 else 0
                 
             elif 'msmarco' in data_source:
+                format_score = 0.1
+                recall_score = 0.2
+                count_ndcg = 0
+                for reward in rewards:
+                    if reward > recall_score:
+                        count_ndcg += reward - format_score - recall_score
+                    elif reward > format_score:
+                        count_ndcg += reward - format_score
+                    else:
+                        count_ndcg += 0
+                total_count = len(rewards)
+                metric_dict[f'val/test_score/{data_source}'] = count_ndcg / total_count if total_count > 0 else 0
                 # format_score = 0.1
                 # recall_score = 0.2
                 # count_ndcg = 0
                 # for reward in rewards:
-                #     if reward > recall_score:
-                #         count_ndcg += reward - format_score - recall_score
-                #     elif reward > format_score:
-                #         count_ndcg += reward - format_score
-                #     else:
-                #         count_ndcg += 0
+                #     count_ndcg += reward
                 # total_count = len(rewards)
                 # metric_dict[f'val/test_score/{data_source}'] = count_ndcg / total_count if total_count > 0 else 0
-                                # format_score = 0.1
-                # recall_score = 0.2
-                count_ndcg = 0
-                for reward in rewards:
-                    count_ndcg += reward
-                total_count = len(rewards)
-                metric_dict[f'val/test_score/{data_source}'] = count_ndcg / total_count if total_count > 0 else 0
                 
             elif 'nq_serini' in data_source or 'squad' in data_source or 'triviaqa' in data_source:
                 count_hit_5 = 0
@@ -964,8 +964,8 @@ class RayPPOTrainer(object):
                         or 'hotpotqa' in self.config.data.train_files or 'fever' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_ndcg(batch)
                     elif 'msmarco' in self.config.data.train_files:
-                        # reward_metrics = compute_reward_metrics_recall_ndcg(batch)
-                        reward_metrics = compute_reward_metrics_recall_at_k(batch)
+                        reward_metrics = compute_reward_metrics_recall_ndcg(batch)
+                        # reward_metrics = compute_reward_metrics_recall_at_k(batch)
                     elif 'nq_serini' in self.config.data.train_files or 'triviaqa' in self.config.data.train_files or 'squad' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_nq_serini(batch)
                     elif 'bird' in self.config.data.train_files or 'spider' in self.config.data.train_files:
