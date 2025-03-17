@@ -20,10 +20,12 @@ else:
 if __name__ == '__main__':
     # res_dir = '../results/gpt-4o_post_hotpotqa.json'
     # res_dir = '../results/claude-3.5_post_hotpotqa.json'
-    res_dir = '../results/no_reason/Qwen-inst-hotpotqa.json'
+    # res_dir = '../results/no_reason/Qwen-inst-hotpotqa.json'
+    res_dir = '../results/no_reason/claude-3.5_post_hotpotqa.json'
+    # res_dir = '../results/no_reason/gpt-4o_post_hotpotqa.json'
     with open(res_dir, "r", encoding="utf-8") as file:
         res = json.load(file)
-
+    
     with open("data/raw_data/hotpotqa/qrels/test.tsv", "r", encoding="utf-8") as file:
         qrel_test = [line.strip().split("\t") for line in file]
 
