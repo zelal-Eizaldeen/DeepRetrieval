@@ -10,33 +10,11 @@ import json
 import os
 import argparse
 import pandas as pd
+import time
+import concurrent.futures
 
 _searcher = None
 _tokenizer = SimpleTokenizer()
-
-PROMPT = """ Your task is to (1) carefully check if there's a answer span in the query that either exactly matches any of the answer candidates or is a very similar paraphrase of any of the answer candidates.
-(2) If there is, remove the answer span(s) from the query and return the cleaned query.
-
-You response should be in the following JSON format:
-<answer>
-{
-    "has_answer": "True/False",
-    "answer_span_in_query": ["answer_span_1", "answer_span_2", ...],
-    "matched_answer_candidates": ["answer_candidate_1", "answer_candidate_2", ...],
-    "cleaned_query": "..."
-}
-</answer>
-
-Note: The content between <answer> and </answer> should be a valid JSON object, e.g., using double quotes for strings, using slashes for special characters.
-
-Here's the query:
-{query}
-
-Here's the answer candidates:
-{answer_candidates}
-
-Your response:
-"""
 
 
 def get_searcher():
@@ -60,35 +38,151 @@ def extract_solution(response):
         return response
     
 
+def process_llm_query_with_retry(prompt, retry_count=0, max_retries=3):
+    """Process a single LLM query with retry logic."""
+    try:
+        if retry_count > 0:
+            # Add exponential backoff delay
+            wait_time = min(2 ** retry_count, 32)  # Cap at 32 seconds
+            time.sleep(wait_time)
+        
+        response = get_claude_response("sonnet", prompt)
+        return response
+    except Exception as e:
+        if retry_count < max_retries:
+            print(f"API call failed. Error: {str(e)}. Retrying ({retry_count + 1}/{max_retries})...")
+            return process_llm_query_with_retry(prompt, retry_count + 1, max_retries)
+        else:
+            print(f"Failed after {max_retries} attempts. Error: {str(e)}")
+            return None
+
+def get_if_answer_span_in_query_batch(queries, answer_candidates_list, batch_size=10):
+    """Process multiple queries in parallel using a thread pool."""
+    def create_prompt(query, answer_candidates):
+        return """Your task is to analyze if there are answer spans in the query that match or paraphrase any of the answer candidates.
+
+Instructions:
+1. Check if any part of the query exactly matches or paraphrases any answer candidate
+2. If found, remove those answer spans from the query
+3. Return your analysis in a strict JSON format
+
+IMPORTANT: 
+You must respond with valid JSON wrapped in <answer> tags. The JSON must have this exact structure:
+{
+    "has_answer": boolean (true or false),
+    "answer_span_in_query": [string],
+    "matched_answer_candidates": [string],
+    "cleaned_query": string
+}
+
+The content between <answer> and </answer> must be a valid JSON object:
+- Use double quotes for strings
+- Escape special characters with backslashes (e.g., \\" for quotes within strings)
+- Follow standard JSON formatting rules
+
+Example valid response:
+<answer>
+{
+    "has_answer": true,
+    "answer_span_in_query": ["new york city"],
+    "matched_answer_candidates": ["NYC"],
+    "cleaned_query": "(\\"population\\" OR \\"residents\\") AND \\"2020\\""
+}
+</answer>
+
+Query to analyze:
+""" + query + """   
+
+Answer candidates to check against:
+""" + str(answer_candidates) + """
+
+Your response:
+"""
+
+    results = []
+    for i in range(0, len(queries), batch_size):
+        batch_queries = queries[i:i + batch_size]
+        batch_candidates = answer_candidates_list[i:i + batch_size]
+        prompts = [create_prompt(q, c) for q, c in zip(batch_queries, batch_candidates)]
+        
+        with concurrent.futures.ThreadPoolExecutor(max_workers=batch_size) as executor:
+            future_to_idx = {
+                executor.submit(process_llm_query_with_retry, prompt): idx 
+                for idx, prompt in enumerate(prompts)
+            }
+            
+            batch_results = [None] * len(batch_queries)
+            for future in concurrent.futures.as_completed(future_to_idx):
+                idx = future_to_idx[future]
+                try:
+                    response = future.result()
+                    if response:
+                        batch_results[idx] = extract_solution(response)
+                    else:
+                        batch_results[idx] = None
+                except Exception as e:
+                    print(f"Error processing query at index {i + idx}: {str(e)}")
+                    batch_results[idx] = None
+                    
+        results.extend(batch_results)
+    
+    return results
+
 def get_if_answer_span_in_query(query, answer_candidates):
-    prompt = PROMPT.format(query=query, answer_candidates=answer_candidates)
-    response = get_claude_response("sonnet", prompt)
-    return extract_solution(response)
+    """Single query wrapper around the batch processing function."""
+    results = get_if_answer_span_in_query_batch([query], [answer_candidates], batch_size=1)
+    return results[0] if results else None
 
 def extract_json_from_llm_output(text):
-    pattern = r"```json\n([\s\S]+?)\n```"
-    matched_jsons = re.findall(pattern, text)
-    
-    if matched_jsons:
-        extracted_json = matched_jsons[-1]  # get the final one
-        return json.loads(extracted_json)
-    else:
+    def debug_json_parse(json_str):
         try:
-            pattern = r"\{.*?\}"
-            matched_jsons = re.findall(pattern, text, re.DOTALL)
-            
-            if matched_jsons:
-                extracted_json = matched_jsons[-1]  # get the final one
-                try:
-                    print(f"Extracted JSON: {extracted_json}")
-                    return json.loads(extracted_json)
-                except:
-                    print(f"Warning: No JSON structure found. Using the response itself. {extracted_json}")
-                    return None
-            else:
-                raise ValueError('No JSON structure found.')
-        except:
-            return None
+            # First try direct parsing
+            return json.loads(json_str)
+        except json.JSONDecodeError as e:
+            print(f"Debug - JSON parse error: {str(e)}")
+            print(f"Debug - Problem string: {repr(json_str)}")
+            # Try with quote normalization
+            try:
+                # Replace escaped quotes with single quotes
+                normalized = json_str.replace('\\"', "'")
+                return json.loads(normalized)
+            except json.JSONDecodeError:
+                return None
+
+    # First try to find JSON within <answer> tags
+    answer_pattern = r'<answer>(.*?)</answer>'
+    answer_matches = re.findall(answer_pattern, text, re.DOTALL)
+    
+    if answer_matches:
+        json_str = answer_matches[-1].strip()
+        result = debug_json_parse(json_str)
+        if result:
+            return result
+    
+    # Try to find JSON within code blocks
+    code_pattern = r'```(?:json)?\s*(.*?)\s*```'
+    code_matches = re.findall(code_pattern, text, re.DOTALL)
+    
+    if code_matches:
+        json_str = code_matches[-1].strip()
+        result = debug_json_parse(json_str)
+        if result:
+            return result
+    
+    # Try to find any JSON-like structure
+    json_pattern = r'\{[^{}]*\}'
+    json_matches = re.findall(json_pattern, text, re.DOTALL)
+    
+    if json_matches:
+        json_str = json_matches[-1].strip()
+        result = debug_json_parse(json_str)
+        if result:
+            return result
+        print(f"Warning: Failed to parse JSON from response: {text}")
+        return None
+    
+    print(f"Warning: No JSON structure found in response: {text}")
+    return None
 
 def run_index_search_bm25(search_query, topk=50):
     searcher = get_searcher()
@@ -113,7 +207,6 @@ def evaluate_query(query, target, topk=100):
         "recall@50": 1 if rank <= 50 else 0,
         "recall@100": 1 if rank <= 100 else 0
     }
-    
     return recall_dict
 
 def process_generations(dataset_name, model_name, generations_path, data_path):
@@ -146,28 +239,57 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
         try:
             # Extract original query
             original_query = extract_json_from_llm_output(response)['query']
-            target = targets[idx]
+            target = targets[idx].tolist()
             
             # Evaluate original query
+            # print(f"Original query: {original_query}")
             original_metrics = evaluate_query(original_query, target)
             for k, v in original_metrics.items():
                 results["original_metrics"][k].append(v)
             
+            injection_check_flag = False
+            format_correct = False
             # Check for knowledge injection
             injection_check = get_if_answer_span_in_query(original_query, target)
             injection_result = extract_json_from_llm_output(injection_check)
+            # print(type(injection_result))
             
-            if injection_result and injection_result.get("has_answer") == "True":
+            try: 
+                if injection_result and "true" in str(injection_result.get("has_answer")).lower():
+                    injection_check_flag = True
+                    format_correct = True
+                    print(f"Injection check flag: {injection_check_flag}")
+                # else:
+                    # print(f"Injection check flag: {injection_check_flag}")
+            except:
+                print(f"Warning: No JSON structure found. Using the response itself. {injection_check}")
+                if "true" in injection_check.lower():
+                    injection_check_flag = True
+                    format_correct = False
+                    if "cleaned_query" in injection_check:
+                        cleaned_query = injection_check.split("\"cleaned_query\": \"")[1].split("\n")[0]
+                        cleaned_metrics = evaluate_query(cleaned_query, target)
+                        for k, v in cleaned_metrics.items():
+                            results["cleaned_metrics"][k].append(v)
+                            
+                else:
+                    injection_check_flag = False
+                    format_correct = False
+                    
+            if injection_check_flag and format_correct:
                 results["injection_stats"]["queries_with_injection"] += 1
                 results["injection_stats"]["answer_spans"].extend(injection_result.get("answer_span_in_query", []))
                 
                 # Evaluate cleaned query
                 cleaned_query = injection_result.get("cleaned_query", original_query)
+                print(f"Original query: {original_query}")
+                print(f"Target: {target}")
+                print(f"Cleaned query: {cleaned_query}")
                 cleaned_metrics = evaluate_query(cleaned_query, target)
                 for k, v in cleaned_metrics.items():
                     results["cleaned_metrics"][k].append(v)
-            else:
-                # If no injection, use same metrics as original
+            elif not injection_check_flag and not format_correct:
+                # If no injection and format is incorrect, use same metrics as original
                 for k, v in original_metrics.items():
                     results["cleaned_metrics"][k].append(v)
                 
@@ -209,7 +331,7 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--datasets", nargs="+", default=["nq_serini", "triviaqa", "squad"])
-    parser.add_argument("--models", nargs="+", default=["gpt35", "gpt4o", "claude3", "claude35"])
+    parser.add_argument("--models", nargs="+", default=["gpt4o", "claude35"])
     args = parser.parse_args()
     
     all_results = {}
