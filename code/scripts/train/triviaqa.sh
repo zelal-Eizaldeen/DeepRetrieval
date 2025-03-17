@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=0,3
+export CUDA_VISIBLE_DEVICES=2,3
 
 PROJECT_NAME=triviaqa_search
 EXP_NAME=triviaqa_search_3b
@@ -21,6 +21,7 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.2 \
     actor_rollout_ref.ref.log_prob_micro_batch_size=2 \
+    actor_rollout_ref.rollout.temperature=0.6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     critic.model.enable_gradient_checkpointing=True \
@@ -36,7 +37,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.test_freq=50 \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXP_NAME \
-    actor_rollout_ref.model.path=/shared/eng/pj20/lmr_model/triviaqa_3b_new_nq/actor/global_step_100_  \
-    critic.model.path=/shared/eng/pj20/lmr_model/triviaqa_3b_new_nq/critic/global_step_100_  \
-    trainer.default_local_dir=/shared/eng/pj20/lmr_model/triviaqa_3b_new_nq \
+    actor_rollout_ref.model.path=/shared/eng/pj20/lmr_model/nq_serini_3b/actor/global_step_1800  \
+    critic.model.path=/shared/eng/pj20/lmr_model/nq_serini_3b/critic/global_step_1800  \
+    trainer.default_local_dir=/shared/eng/pj20/lmr_model/triviaqa_3b_nq_1800 \
     trainer.total_epochs=5 2>&1 | tee exp_log/$PROJECT_NAME-3b-ppo-verl_demo_$DATE.log 

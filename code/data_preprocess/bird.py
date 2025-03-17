@@ -159,7 +159,7 @@ if __name__ == '__main__':
     parser.add_argument('--local_dir', default='data/sql')
     parser.add_argument('--hdfs_dir', default=None)
     parser.add_argument('--dataset', type=str, default='bird')
-    parser.add_argument('--output_dir', type=str, default='data/bird')
+    parser.add_argument('--output_dir', type=str, default='data/sql')
 
     args = parser.parse_args()
     

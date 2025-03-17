@@ -19,10 +19,12 @@ wget https://msmarco.z22.web.core.windows.net/msmarcoranking/collectionandquerie
 tar xvfz collections/msmarco-passage/collectionandqueries.tar.gz -C collections/msmarco-passage
 ```
 
+* download from https://huggingface.co/windszzlang/DeepRetrieval-MSMARCO/tree/main to use `collection_800k.tsv` for more efficient dense retrival
+
 2. Concert to Pyserini format
 ```bash
 python code/data/raw_data/msmarco/convert.py \
- --collection-path ./collections/msmarco-passage/collection.tsv \
+ --collection-path ./DeepRetrieval-MSMARCO/collection_800k.tsv \
  --output-folder ./collections/msmarco-passage/collection_jsonl
 ```
 
@@ -61,43 +63,5 @@ python -m pyserini.encode \
         --batch 16 \
         --pooling mean \
         --dimension 768
-        --fp16
-```
-
-
-```bash
-export CUDA_VISIBLE_DEVICES=3
-
-python -m pyserini.encode \
- input  --corpus collections/msmarco-passage/collection_jsonl \
-        --fields text \
-        --delimiter "\n" \
-        --shard-id 0 \
-        --shard-num 1 \
- output --embeddings indexes/mpnet-msmarco-passage-dense-index \
-        --to-faiss \
- encoder --encoder sentence-transformers/all-mpnet-base-v2 \
-        --fields text \
-        --batch 16 \
-        --dimension 768
-        --fp16
-```
-
-
-```bash
-export CUDA_VISIBLE_DEVICES=2
-
-python -m pyserini.encode \
- input  --corpus collections/msmarco-passage/collection_jsonl \
-        --fields text \
-        --delimiter "\n" \
-        --shard-id 0 \
-        --shard-num 1 \
- output --embeddings indexes/minilm-msmarco-passage-dense-index \
-        --to-faiss \
- encoder --encoder sentence-transformers/all-MiniLM-L6-v2 \
-        --fields text \
-        --batch 16 \
-        --dimension 384
         --fp16
 ```
