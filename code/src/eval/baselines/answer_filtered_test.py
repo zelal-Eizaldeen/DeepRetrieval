@@ -57,7 +57,17 @@ def process_llm_query_with_retry(prompt, retry_count=0, max_retries=3):
             return None
 
 def get_if_answer_span_in_query_batch(queries, answer_candidates_list, batch_size=10):
-    """Process multiple queries in parallel using a thread pool."""
+    """
+    Process multiple queries in parallel using a thread pool.
+    
+    Args:
+        queries: List of query strings
+        answer_candidates_list: List of answer candidate lists
+        batch_size: Number of concurrent API calls to make
+        
+    Returns:
+        List of LLM responses in the same order as the input queries
+    """
     def create_prompt(query, answer_candidates):
         return """Your task is to analyze if there are answer spans in the query that match or paraphrase any of the answer candidates.
 
@@ -99,32 +109,40 @@ Answer candidates to check against:
 Your response:
 """
 
-    results = []
-    for i in range(0, len(queries), batch_size):
-        batch_queries = queries[i:i + batch_size]
-        batch_candidates = answer_candidates_list[i:i + batch_size]
-        prompts = [create_prompt(q, c) for q, c in zip(batch_queries, batch_candidates)]
-        
-        with concurrent.futures.ThreadPoolExecutor(max_workers=batch_size) as executor:
-            future_to_idx = {
-                executor.submit(process_llm_query_with_retry, prompt): idx 
-                for idx, prompt in enumerate(prompts)
-            }
+    # Create all prompts upfront
+    all_prompts = [create_prompt(q, c) for q, c in zip(queries, answer_candidates_list)]
+    total_queries = len(all_prompts)
+    results = [None] * total_queries  # Pre-allocate results list to maintain order
+    
+    # Process queries in batches
+    with tqdm(total=total_queries, desc="Processing LLM queries") as pbar:
+        for batch_start in range(0, total_queries, batch_size):
+            batch_end = min(batch_start + batch_size, total_queries)
+            batch_indices = list(range(batch_start, batch_end))
+            batch_prompts = [all_prompts[i] for i in batch_indices]
             
-            batch_results = [None] * len(batch_queries)
-            for future in concurrent.futures.as_completed(future_to_idx):
-                idx = future_to_idx[future]
-                try:
-                    response = future.result()
-                    if response:
-                        batch_results[idx] = extract_solution(response)
-                    else:
-                        batch_results[idx] = None
-                except Exception as e:
-                    print(f"Error processing query at index {i + idx}: {str(e)}")
-                    batch_results[idx] = None
-                    
-        results.extend(batch_results)
+            # Process batch in parallel
+            with concurrent.futures.ThreadPoolExecutor(max_workers=batch_size) as executor:
+                # Map batch indices to futures
+                future_to_idx = {
+                    executor.submit(process_llm_query_with_retry, prompt): idx 
+                    for idx, prompt in zip(batch_indices, batch_prompts)
+                }
+                
+                # Collect results as they complete
+                for future in concurrent.futures.as_completed(future_to_idx):
+                    idx = future_to_idx[future]
+                    try:
+                        response = future.result()
+                        if response:
+                            results[idx] = extract_solution(response)
+                        else:
+                            print(f"Warning: Null response for query at index {idx}")
+                            results[idx] = None
+                    except Exception as e:
+                        print(f"Error processing query at index {idx}: {str(e)}")
+                        results[idx] = None
+                    pbar.update(1)
     
     return results
 
@@ -232,66 +250,87 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
             "total_queries": len(generations),
             "queries_with_injection": 0,
             "answer_spans": []
-        }
+        },
+        "sample_details": []  # New field to store per-sample information
     }
     
-    for idx, response in enumerate(tqdm(generations, desc=f"Processing {dataset_name}-{model_name}")):
+    # Extract original queries and targets first
+    original_queries = []
+    target_list = []
+    
+    for idx, response in enumerate(generations):
         try:
             # Extract original query
             original_query = extract_json_from_llm_output(response)['query']
             target = targets[idx].tolist()
             
+            original_queries.append(original_query)
+            target_list.append(target)
+        except Exception as e:
+            print(f"Error extracting query {idx}: {str(e)}")
+            # Add placeholder values
+            original_queries.append("error")
+            target_list.append(targets[idx].tolist())
+    
+    # Batch process injection checks
+    print(f"Checking for knowledge injection in {len(original_queries)} queries...")
+    batch_size = 10  # Adjust based on API rate limits
+    injection_check_results = get_if_answer_span_in_query_batch(
+        original_queries, target_list, batch_size=batch_size
+    )
+    
+    # Process the results
+    for idx in tqdm(range(len(generations)), desc=f"Processing {dataset_name}-{model_name}"):
+        try:
+            original_query = original_queries[idx]
+            target = target_list[idx]
+            
+            # Skip completely errored entries
+            if original_query == "error":
+                continue
+            
+            # Initialize sample details
+            sample_info = {
+                "index": idx,
+                "original_query": original_query,
+                "answer_candidate": target,
+                "cleaned_query": original_query,  # Default to original if no cleaning needed
+                "has_injection": False
+            }
+            
             # Evaluate original query
-            # print(f"Original query: {original_query}")
             original_metrics = evaluate_query(original_query, target)
             for k, v in original_metrics.items():
                 results["original_metrics"][k].append(v)
             
-            injection_check_flag = False
-            format_correct = False
-            # Check for knowledge injection
-            injection_check = get_if_answer_span_in_query(original_query, target)
-            injection_result = extract_json_from_llm_output(injection_check)
-            # print(type(injection_result))
+            # Get the injection check result from the batch processing
+            injection_check = injection_check_results[idx]
             
-            try: 
-                if injection_result and "true" in str(injection_result.get("has_answer")).lower():
-                    injection_check_flag = True
-                    format_correct = True
-                    print(f"Injection check flag: {injection_check_flag}")
-                # else:
-                    # print(f"Injection check flag: {injection_check_flag}")
-            except:
-                print(f"Warning: No JSON structure found. Using the response itself. {injection_check}")
-                if "true" in injection_check.lower():
-                    injection_check_flag = True
-                    format_correct = False
-                    if "cleaned_query" in injection_check:
-                        cleaned_query = injection_check.split("\"cleaned_query\": \"")[1].split("\n")[0]
-                        cleaned_metrics = evaluate_query(cleaned_query, target)
-                        for k, v in cleaned_metrics.items():
-                            results["cleaned_metrics"][k].append(v)
-                            
-                else:
-                    injection_check_flag = False
-                    format_correct = False
-                    
-            if injection_check_flag and format_correct:
-                results["injection_stats"]["queries_with_injection"] += 1
-                results["injection_stats"]["answer_spans"].extend(injection_result.get("answer_span_in_query", []))
+            if injection_check:
+                injection_result = extract_json_from_llm_output(injection_check)
                 
-                # Evaluate cleaned query
-                cleaned_query = injection_result.get("cleaned_query", original_query)
-                print(f"Original query: {original_query}")
-                print(f"Target: {target}")
-                print(f"Cleaned query: {cleaned_query}")
-                cleaned_metrics = evaluate_query(cleaned_query, target)
-                for k, v in cleaned_metrics.items():
-                    results["cleaned_metrics"][k].append(v)
-            elif not injection_check_flag and not format_correct:
-                # If no injection and format is incorrect, use same metrics as original
+                if injection_result and "true" in str(injection_result.get("has_answer")).lower():
+                    sample_info["has_injection"] = True
+                    results["injection_stats"]["queries_with_injection"] += 1
+                    results["injection_stats"]["answer_spans"].extend(injection_result.get("answer_span_in_query", []))
+                    
+                    # Evaluate cleaned query
+                    cleaned_query = injection_result.get("cleaned_query", original_query)
+                    sample_info["cleaned_query"] = cleaned_query
+                    cleaned_metrics = evaluate_query(cleaned_query, target)
+                    for k, v in cleaned_metrics.items():
+                        results["cleaned_metrics"][k].append(v)
+                else:
+                    # If no injection, use same metrics as original
+                    for k, v in original_metrics.items():
+                        results["cleaned_metrics"][k].append(v)
+            else:
+                # If processing failed, use same metrics as original
                 for k, v in original_metrics.items():
                     results["cleaned_metrics"][k].append(v)
+            
+            # Add sample details to results
+            results["sample_details"].append(sample_info)
                 
         except Exception as e:
             print(f"Error processing query {idx}: {str(e)}")
@@ -299,24 +338,34 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
             for metric_dict in [results["original_metrics"], results["cleaned_metrics"]]:
                 for k in metric_dict:
                     metric_dict[k].append(0)
+            # Add error case to sample details
+            results["sample_details"].append({
+                "index": idx,
+                "original_query": original_queries[idx] if idx < len(original_queries) else "error",
+                "answer_candidate": target_list[idx] if idx < len(target_list) else [],
+                "cleaned_query": "error",
+                "has_injection": False,
+                "error": str(e)
+            })
     
     # Calculate average metrics
     final_results = {
         "dataset": dataset_name,
         "model": model_name,
         "original_metrics": {
-            k: sum(v)/len(v) for k, v in results["original_metrics"].items()
+            k: sum(v)/len(v) if v else 0 for k, v in results["original_metrics"].items()
         },
         "cleaned_metrics": {
-            k: sum(v)/len(v) for k, v in results["cleaned_metrics"].items()
+            k: sum(v)/len(v) if v else 0 for k, v in results["cleaned_metrics"].items()
         },
         "injection_stats": {
             "total_queries": results["injection_stats"]["total_queries"],
             "queries_with_injection": results["injection_stats"]["queries_with_injection"],
-            "injection_rate": results["injection_stats"]["queries_with_injection"] / results["injection_stats"]["total_queries"],
+            "injection_rate": results["injection_stats"]["queries_with_injection"] / results["injection_stats"]["total_queries"] if results["injection_stats"]["total_queries"] > 0 else 0,
             "unique_answer_spans": len(set(results["injection_stats"]["answer_spans"])),
             "answer_spans": list(set(results["injection_stats"]["answer_spans"]))
-        }
+        },
+        "sample_details": results["sample_details"]  # Include all sample details in final results
     }
     
     # Save results
