@@ -39,6 +39,9 @@ def _select_rm_score_fn(data_source):
     elif "pubmed" in data_source:
         from verl.utils.reward_score import pubmed
         return pubmed.compute_score
+    elif "pmd_no_reason" in data_source:
+        from verl.utils.reward_score import pmd_no_reason
+        return pmd_no_reason.compute_score
     elif "ctgov" in data_source:
         from verl.utils.reward_score import ctgov
         return ctgov.compute_score
@@ -141,9 +144,9 @@ class RewardManager():
             # select rm_score
             data_source = data_item.non_tensor_batch['data_source']
             
-            if 'pubmed' in data_source or 'ctgov' in data_source:
+            if 'pubmed' in data_source or 'ctgov' in data_source or 'pmd_no_reason' in data_source or 'trial_no_reason' in data_source:
                 pub_date = data_item.non_tensor_batch['pub_date']
-                literature_type = 'publication' if 'pubmed' in data_source else 'trial'
+                literature_type = 'publication' if ('pubmed' in data_source or 'pmd_no_reason' in data_source) else 'trial'
                 if literature_type == 'publication':
                     api = self.pubmed_api
                 elif literature_type == 'trial':
@@ -153,7 +156,7 @@ class RewardManager():
             
             compute_score_fn = _select_rm_score_fn(data_source)
 
-            if 'pubmed' in data_source or 'ctgov' in data_source:
+            if 'pubmed' in data_source or 'ctgov' in data_source or 'pmd_no_reason' in data_source or 'trial_no_reason' in data_source:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, search_api=api, literature_type=literature_type, pub_date=pub_date)
             elif 'scifact' in data_source or 'fiqa' in data_source or 'nfcorpus' in data_source or 'hotpotqa' in data_source \
                     or 'fever' in data_source or 'msmarco' in data_source:

@@ -274,7 +274,7 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
     
     # Batch process injection checks
     print(f"Checking for knowledge injection in {len(original_queries)} queries...")
-    batch_size = 10  # Adjust based on API rate limits
+    batch_size = 8
     injection_check_results = get_if_answer_span_in_query_batch(
         original_queries, target_list, batch_size=batch_size
     )
@@ -380,7 +380,8 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--datasets", nargs="+", default=["nq_serini", "triviaqa", "squad"])
-    parser.add_argument("--models", nargs="+", default=["gpt4o", "claude35"])
+    # parser.add_argument("--models", nargs="+", default=["gpt4o", "claude35"])
+    parser.add_argument("--models", nargs="+", default=["gpt35", "claude3"])
     args = parser.parse_args()
     
     all_results = {}
@@ -401,7 +402,7 @@ def main():
             all_results[dataset][model] = results
     
     # Save overall results
-    with open("results/answer_filtered/overall_results.json", "w") as f:
+    with open("results/answer_filtered/overall_results_gpt35_cluade3.json", "w") as f:
         json.dump(all_results, f, indent=2)
 
 if __name__ == "__main__":

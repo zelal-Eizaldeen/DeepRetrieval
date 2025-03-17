@@ -256,7 +256,7 @@ def compute_data_metrics(batch, use_critic=True):
     }
     return metrics
 
-def compute_reward_metrics(batch):
+def compute_reward_metrics_search_engine(batch):
     reward_tensor = batch.batch['token_level_scores'].sum(-1)
 
     reward_metrics = {}
@@ -669,7 +669,9 @@ class RayPPOTrainer(object):
         metric_dict = {}
         for data_source, rewards in data_source_reward.items():
             # metric_dict[f'val/test_score/{data_source}'] = np.mean(rewards)
-            if 'scifact' in data_source or 'fiqa' in data_source or 'nfcorpus' in data_source or 'hotpotqa' in data_source \
+            if 'pubmed' in data_source or 'ctgov' in data_source or 'pmd_no_reason' in data_source or 'trial_no_reason' in data_source:
+                pass
+            elif 'scifact' in data_source or 'fiqa' in data_source or 'nfcorpus' in data_source or 'hotpotqa' in data_source \
                     or 'fever' in data_source:
                 format_score = 0.1
                 count_ndcg = sum(reward - format_score for reward in rewards if reward > format_score)
@@ -969,7 +971,7 @@ class RayPPOTrainer(object):
                     elif 'bird' in self.config.data.train_files or 'spider' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_sql(batch)
                     else:
-                        reward_metrics = compute_reward_metrics(batch)
+                        reward_metrics = compute_reward_metrics_search_engine(batch)
                     metrics.update(reward_metrics)
 
                     # validate
