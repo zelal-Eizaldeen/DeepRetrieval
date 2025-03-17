@@ -15,7 +15,7 @@ import argparse
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", type=str, default="scifact", help="Dataset to evaluate")
-    parser.add_argument('--res_path', type=str, default="../results_dense/no_reason/Qwen-inst-scifact.json", help="Path to the qrels file")
+    parser.add_argument('--res_path', type=str, default="../results_dense/no_reason/gpt-4o_post_scifact.json", help="Path to the qrels file")
     args = parser.parse_args()
     
     model_path = "intfloat/multilingual-e5-large-instruct"
