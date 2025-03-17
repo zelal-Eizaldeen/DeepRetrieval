@@ -79,8 +79,8 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_path", type=str, default="Qwen/Qwen2.5-3B-Instruct")
-    parser.add_argument("--data_path", type=str, default="code/data/local_index_search/hotpotqa/sparse/test.parquet")
-    parser.add_argument("--model_name", type=str, default="Qwen-inst-hotpotqa")
+    parser.add_argument("--data_path", type=str, default="code/data/local_index_search/msmarco_beir/sparse/test.parquet")
+    parser.add_argument("--model_name", type=str, default="Qwen-inst-msmarco_beir")
     parser.add_argument("--save_dir", type=str, default="results")
     parser.add_argument("--batch_size", type=int, default=64)
     args = parser.parse_args()

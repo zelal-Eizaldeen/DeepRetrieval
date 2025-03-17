@@ -18,7 +18,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # res_path = '../results/claude-3.5_post_scifact.json'
-    res_path = '../results/no_reason/Qwen-inst-scifact.json'
+    # res_path = '../results/no_reason/Qwen-inst-scifact.json'
+    # res_path = '../results/no_reason/claude-3.5_post_scifact.json'
+    res_path = '../results/no_reason/gpt-4o_post_scifact.json'
 
     search_system = PyseriniMultiFieldSearch(index_dir=f"data/local_index_search/{args.dataset}/pyserini_index")
 

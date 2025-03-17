@@ -672,7 +672,7 @@ class RayPPOTrainer(object):
             if 'pubmed' in data_source or 'ctgov' in data_source or 'pmd_no_reason' in data_source or 'trial_no_reason' in data_source:
                 pass
             elif 'scifact' in data_source or 'fiqa' in data_source or 'nfcorpus' in data_source or 'hotpotqa' in data_source \
-                    or 'fever' in data_source:
+                    or 'fever' in data_source or 'msmarco_beir' in data_source:
                 format_score = 0.1
                 count_ndcg = sum(reward - format_score for reward in rewards if reward > format_score)
                 total_count = len(rewards)
@@ -961,7 +961,7 @@ class RayPPOTrainer(object):
 
                     # reward
                     if 'scifact'in self.config.data.train_files or 'fiqa' in self.config.data.train_files or 'nfcorpus' in self.config.data.train_files \
-                        or 'hotpotqa' in self.config.data.train_files or 'fever' in self.config.data.train_files:
+                        or 'hotpotqa' in self.config.data.train_files or 'fever' in self.config.data.train_files or 'msmarco_beir' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_ndcg(batch)
                     elif 'msmarco' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_recall_ndcg(batch)
