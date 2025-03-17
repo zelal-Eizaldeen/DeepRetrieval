@@ -80,8 +80,8 @@ def _select_rm_score_fn(data_source):
             from verl.utils.reward_score import fever
             return fever.compute_score
     elif 'msmarco' in data_source:
-        from verl.utils.reward_score import msmarco
-        return msmarco.compute_score
+        from verl.utils.reward_score import msmarco_
+        return msmarco_.compute_score
     elif 'bird' in data_source:
         from verl.utils.reward_score import bird
         return bird.compute_score

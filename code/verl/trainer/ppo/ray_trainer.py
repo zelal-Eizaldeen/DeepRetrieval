@@ -322,6 +322,36 @@ def compute_reward_metrics_nq_serini(batch):
 
     return reward_metrics
 
+def compute_reward_metrics_recall_at_k(batch):
+    reward_tensor = batch.batch['token_level_scores'].sum(-1)
+
+    reward_metrics = {}
+    reward_metrics["reward/mean"] = torch.mean(reward_tensor).detach().item()
+    # Calculate all_correct ratio (value == 3)
+    five_recall = torch.sum(reward_tensor >= 6).float() / reward_tensor.numel()
+    reward_metrics["reward/recall@10>0.5"] = five_recall.detach().item()
+    
+    twenty_recall = torch.sum(reward_tensor >= 5).float() / reward_tensor.numel()
+    reward_metrics["reward/recall@10>0.4"] = twenty_recall.detach().item()
+    
+    fifty_recall = torch.sum(reward_tensor >= 4).float() / reward_tensor.numel()
+    reward_metrics["reward/recall@10>0.3"] = fifty_recall.detach().item()
+    
+    hundred_recall = torch.sum(reward_tensor >= 1.1).float() / reward_tensor.numel()
+    reward_metrics["reward/recall@3000>0.5"] = hundred_recall.detach().item()
+    
+    hundred_recall = torch.sum(reward_tensor >= 2).float() / reward_tensor.numel()
+    reward_metrics["reward/recall@100>0.5"] = hundred_recall.detach().item()
+    
+    format_error = torch.sum(reward_tensor == -4).float() / reward_tensor.numel()
+    reward_metrics["reward/format_error_ratio"] = format_error.detach().item()
+
+    format_error = torch.sum(reward_tensor <= -1.5).float() / reward_tensor.numel()
+    reward_metrics["reward/wrong_answer_ratio"] = format_error.detach().item()
+    
+    return reward_metrics
+
+
 def compute_reward_metrics_ndcg(batch):
     reward_tensor = batch.batch['token_level_scores'].sum(-1)
 
@@ -647,16 +677,23 @@ class RayPPOTrainer(object):
                 metric_dict[f'val/test_score/{data_source}'] = count_ndcg / total_count if total_count > 0 else 0
                 
             elif 'msmarco' in data_source:
-                format_score = 0.1
-                recall_score = 0.2
+                # format_score = 0.1
+                # recall_score = 0.2
+                # count_ndcg = 0
+                # for reward in rewards:
+                #     if reward > recall_score:
+                #         count_ndcg += reward - format_score - recall_score
+                #     elif reward > format_score:
+                #         count_ndcg += reward - format_score
+                #     else:
+                #         count_ndcg += 0
+                # total_count = len(rewards)
+                # metric_dict[f'val/test_score/{data_source}'] = count_ndcg / total_count if total_count > 0 else 0
+                                # format_score = 0.1
+                # recall_score = 0.2
                 count_ndcg = 0
                 for reward in rewards:
-                    if reward > recall_score:
-                        count_ndcg += reward - format_score - recall_score
-                    elif reward > format_score:
-                        count_ndcg += reward - format_score
-                    else:
-                        count_ndcg += 0
+                    count_ndcg += reward
                 total_count = len(rewards)
                 metric_dict[f'val/test_score/{data_source}'] = count_ndcg / total_count if total_count > 0 else 0
                 
@@ -925,7 +962,8 @@ class RayPPOTrainer(object):
                         or 'hotpotqa' in self.config.data.train_files or 'fever' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_ndcg(batch)
                     elif 'msmarco' in self.config.data.train_files:
-                        reward_metrics = compute_reward_metrics_recall_ndcg(batch)
+                        # reward_metrics = compute_reward_metrics_recall_ndcg(batch)
+                        reward_metrics = compute_reward_metrics_recall_at_k(batch)
                     elif 'nq_serini' in self.config.data.train_files or 'triviaqa' in self.config.data.train_files or 'squad' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_nq_serini(batch)
                     elif 'bird' in self.config.data.train_files or 'spider' in self.config.data.train_files:
