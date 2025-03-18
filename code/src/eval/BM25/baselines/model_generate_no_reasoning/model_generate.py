@@ -50,7 +50,10 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
             generated_text = tokenizer.decode(output, skip_special_tokens=True)
             
             # extract from \nAssistant:
-            generated_text = generated_text.split("\nAssistant:")[1]
+            try:
+                generated_text = generated_text.split("\nAssistant:")[1]
+            except:
+                generated_text = generated_text.split("\nassistant:")[1]
             
             # findall <answer> </answer>
             answer_pattern = r'<answer>(.*?)</answer>'
