@@ -10,7 +10,7 @@ from src.Dense.msmarco_beir.search import PyseriniFaissSearcher
 from pyserini.search.faiss import AutoQueryEncoder
 from src.Lucene.utils import ndcg_at_k
 
-index_path = 'data/local_index_search/msmarco_beir/dense_index/faiss-flat.beir-v1.0.0-msmarco_beir.bge-base-en-v1.5.20240107'
+index_path = 'data/local_index_search/msmarco_beir/dense_index/faiss-flat.msmarco-v1-passage.bge-base-en-v1.5.20240107'
 model_name = 'BAAI/bge-base-en-v1.5'
 
 if not os.path.exists(index_path):
