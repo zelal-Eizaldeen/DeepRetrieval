@@ -136,7 +136,8 @@ def calculate_answer_score(pred_sql, gold_sql, db_path, do_print=False):
         pred_results = execute_sql(pred_sql, db_path)
         gold_results = execute_sql(gold_sql, db_path)
         
-        answer_score = 2 if set(pred_results) == set(gold_results) else 0.5
+        # answer_score = 2 if set(pred_results) == set(gold_results) else 0.5
+        answer_score = 1 if set(pred_results) == set(gold_results) else 0
         
     except Exception as e:
         if do_print:
@@ -144,10 +145,11 @@ def calculate_answer_score(pred_sql, gold_sql, db_path, do_print=False):
         pred_results = []
         gold_results = []
 
-        if 'syntax' in str(e):
-            answer_score = 0
-        else:
-            answer_score = 0.1
+        answer_score = 0
+        # if 'syntax' in str(e):
+        #     answer_score = 0
+        # else:
+        #     answer_score = 0.1
 
     if do_print:
         print(f"Retrieved results: {pred_results}")

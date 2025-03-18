@@ -407,17 +407,17 @@ def compute_reward_metrics_sql(batch):
     format_score = 0.1
     sql_syntax_score = 0.1
     execution_score = 0.5
-    accuracy_score = 2
+    accuracy_score = 1
 
     reward_metrics = {}
 
-    # sql syntax
-    sql_syntax = torch.sum(reward_tensor == format_score + sql_syntax_score).float() / reward_tensor.numel()
-    reward_metrics["reward/sql_syntax"] = sql_syntax.detach().item()
+    # # sql syntax
+    # sql_syntax = torch.sum(reward_tensor == format_score + sql_syntax_score).float() / reward_tensor.numel()
+    # reward_metrics["reward/sql_syntax"] = sql_syntax.detach().item()
 
-    # execution
-    execution = torch.sum(reward_tensor == format_score + execution_score).float() / reward_tensor.numel()
-    reward_metrics["reward/execution"] = execution.detach().item()
+    # # execution
+    # execution = torch.sum(reward_tensor == format_score + execution_score).float() / reward_tensor.numel()
+    # reward_metrics["reward/execution"] = execution.detach().item()
 
     # accuracy
     accuracy = torch.sum(reward_tensor == format_score + accuracy_score).float() / reward_tensor.numel()
@@ -720,9 +720,10 @@ class RayPPOTrainer(object):
             elif 'bird' in data_source or 'spider' in data_source:
                 count_acc = 0
                 format_score = 0.1
-                accuracy_score = 2
+                accuracy_score = 1
                 for reward in rewards:
-                    if reward == accuracy_score + format_score:
+                    # loss of significance -> 1.09999? 
+                    if reward > accuracy_score:
                         count_acc += 1
                 total_count = len(rewards)
                 metric_dict[f'val/test_score/{data_source}'] = count_acc / total_count if total_count > 0 else 0
