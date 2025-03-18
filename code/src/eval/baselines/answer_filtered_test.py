@@ -127,15 +127,8 @@ Instructions:
 
 IMPORTANT: 
 You must respond with valid JSON wrapped in <answer> tags. The JSON must have this exact structure:
-{
-    "has_answer": boolean (true or false),
-    "cannot_be_derived": boolean (true or false),
-    "answer_span_in_query": [string],
-    "matched_answer_candidates": [string],
-    "cleaned_query": string
-}
 
-The content between <answer> and </answer> must be a valid JSON object:
+The content between <answer> and </answer> MUST be a valid JSON object:
 - Use double quotes for strings
 - Escape special characters with backslashes (e.g., \\" for quotes within strings)
 - Follow standard JSON formatting rules
@@ -145,7 +138,7 @@ For the following original query:
 "How many people live in New York City in 2020?"
 
 and the augmented query:
-"(\\"population\\" OR \\"residents\\") AND \\"new york city\\" AND \\"2020\\""
+("population" OR "residents") AND "new york city" AND "2020"
 
 <answer>
 {
@@ -219,15 +212,33 @@ def extract_json_from_llm_output(text):
             # First try direct parsing
             return json.loads(json_str)
         except json.JSONDecodeError as e:
-            print(f"Debug - JSON parse error: {str(e)}")
-            print(f"Debug - Problem string: {repr(json_str)}")
-            # Try with quote normalization
+            # print(f"Debug - JSON parse error: {str(e)}")
+            # print(f"Debug - Problem string: {repr(json_str)}")
+            
+            # Try with proper quote escaping for nested quotes in cleaned_query
             try:
-                # Replace escaped quotes with single quotes
-                normalized = json_str.replace('\\"', "'")
-                return json.loads(normalized)
+                # First normalize any already escaped quotes
+                normalized = json_str.replace('\\"', '"')
+                # Then find the cleaned_query value and properly escape its quotes
+                pattern = r'"cleaned_query":\s*"(.*?)"(?=\s*[,}])'
+                def escape_quotes(match):
+                    query = match.group(1)
+                    # Escape any quotes that aren't already escaped
+                    escaped = query.replace('"', '\\"')
+                    return f'"cleaned_query": "{escaped}"'
+                
+                fixed_json = re.sub(pattern, escape_quotes, normalized, flags=re.DOTALL)
+                # print("Fixed JSON (1): ", fixed_json)
+                return json.loads(fixed_json)
             except json.JSONDecodeError:
-                return None
+                # If that fails, try the original quote normalization approach
+                try:
+                    normalized = json_str.replace('\\"', "'")
+                    # print("Fixed JSON (2): ", normalized)
+                    return json.loads(normalized)
+                except json.JSONDecodeError:
+                    print("Failed to parse JSON (3): ", json_str)
+                    return None
 
     # First try to find JSON within <answer> tags
     answer_pattern = r'<answer>(.*?)</answer>'
@@ -337,6 +348,7 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
             
         except Exception as e:
             print(f"Error extracting query {idx}: {str(e)}")
+            print(raw_queries_[idx])
             # Add placeholder values
             original_queries.append("error")
             target_list.append(targets[idx].tolist())
@@ -451,9 +463,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--datasets", nargs="+", default=["nq_serini", "triviaqa", "squad"])
     # parser.add_argument("--datasets", nargs="+", default=["squad"])
+    # parser.add_argument("--datasets", nargs="+", default=["nq_serini"])
+    # parser.add_argument("--models", nargs="+", default=["gpt4o"])
     # parser.add_argument("--models", nargs="+", default=["gpt4o", "claude35"])
     # parser.add_argument("--models", nargs="+", default=["gpt35", "claude3"])
-    parser.add_argument("--models", nargs="+", default=["ours", "gpt4o", "claude35", "gpt35", "claude3"])
+    parser.add_argument("--models", nargs="+", default=["gpt4o", "ours", "claude35", "gpt35", "claude3"])
     args = parser.parse_args()
     
     all_results = {}
