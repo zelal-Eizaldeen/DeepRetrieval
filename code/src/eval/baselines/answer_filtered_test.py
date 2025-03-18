@@ -56,7 +56,7 @@ def process_llm_query_with_retry(prompt, retry_count=0, max_retries=3):
             print(f"Failed after {max_retries} attempts. Error: {str(e)}")
             return None
 
-def get_if_answer_span_in_query_batch(queries, answer_candidates_list, batch_size=10):
+def get_if_answer_span_in_query_batch(original_queries, queries, answer_candidates_list, batch_size=10):
     """
     Process multiple queries in parallel using a thread pool.
     
@@ -68,21 +68,68 @@ def get_if_answer_span_in_query_batch(queries, answer_candidates_list, batch_siz
     Returns:
         List of LLM responses in the same order as the input queries
     """
-    def create_prompt(query, answer_candidates):
+#     def create_prompt(query, answer_candidates):
+#         if type(query) == list:
+#             query = query[0]
+#         # print(answer_candidates)
+#         return """Your task is to analyze if there are answer spans in the query that match or paraphrase any of the answer candidates.
+
+# Instructions:
+# 1. Check if any part of the query exactly matches or paraphrases any answer candidate
+# 2. If found, remove those answer spans from the query
+# 3. Return your analysis in a strict JSON format
+
+# IMPORTANT: 
+# You must respond with valid JSON wrapped in <answer> tags. The JSON must have this exact structure:
+# {
+#     "has_answer": boolean (true or false),
+#     "answer_span_in_query": [string],
+#     "matched_answer_candidates": [string],
+#     "cleaned_query": string
+# }
+
+# The content between <answer> and </answer> must be a valid JSON object:
+# - Use double quotes for strings
+# - Escape special characters with backslashes (e.g., \\" for quotes within strings)
+# - Follow standard JSON formatting rules
+
+# Example valid response:
+# <answer>
+# {
+#     "has_answer": true,
+#     "answer_span_in_query": ["new york city"],
+#     "matched_answer_candidates": ["NYC"],
+#     "cleaned_query": "(\\"population\\" OR \\"residents\\") AND \\"2020\\""
+# }
+# </answer>
+
+# Query to analyze:
+# """ + query + """   
+
+# Answer candidates to check against:
+# """ + str(answer_candidates) + """
+
+# Your response:
+# """
+
+    def create_prompt(original_query, query, answer_candidates):
         if type(query) == list:
             query = query[0]
         # print(answer_candidates)
-        return """Your task is to analyze if there are answer spans in the query that match or paraphrase any of the answer candidates.
+        return """You are a helpful assistant that checks the quality of query augmentation. As we use LLM to augment the query, we need to check if the augmented query can be derived from the original query.
+Your task is to analyze if there are answer spans in the query that directly match the answer candidates and cannot be derived from the original query without using prior knowledge.
 
 Instructions:
-1. Check if any part of the query exactly matches or paraphrases any answer candidate
-2. If found, remove those answer spans from the query
-3. Return your analysis in a strict JSON format
+1. Check if any part of the augmented query exactly matches or paraphrases any answer candidate, if so, set "has_answer" to true.
+2. If the augmented query cannot be derived from the original query without using prior knowledge, set "cannot_be_derived" to true.
+3. If both "has_answer" and "cannot_be_derived" are true, remove those answer spans from the query, without changing other parts of the augmented query.
+4. Return your analysis in a strict JSON format
 
 IMPORTANT: 
 You must respond with valid JSON wrapped in <answer> tags. The JSON must have this exact structure:
 {
     "has_answer": boolean (true or false),
+    "cannot_be_derived": boolean (true or false),
     "answer_span_in_query": [string],
     "matched_answer_candidates": [string],
     "cleaned_query": string
@@ -94,16 +141,28 @@ The content between <answer> and </answer> must be a valid JSON object:
 - Follow standard JSON formatting rules
 
 Example valid response:
+For the following original query:
+"How many people live in New York City in 2020?"
+
+and the augmented query:
+"(\\"population\\" OR \\"residents\\") AND \\"new york city\\" AND \\"2020\\""
+
 <answer>
 {
     "has_answer": true,
+    "cannot_be_derived": true,
     "answer_span_in_query": ["new york city"],
     "matched_answer_candidates": ["NYC"],
     "cleaned_query": "(\\"population\\" OR \\"residents\\") AND \\"2020\\""
 }
 </answer>
 
-Query to analyze:
+Now, your turn:
+
+Original query:
+""" + original_query + """
+
+Augmented query to analyze:
 """ + query + """   
 
 Answer candidates to check against:
@@ -113,7 +172,7 @@ Your response:
 """
 
     # Create all prompts upfront
-    all_prompts = [create_prompt(q, c) for q, c in zip(queries, answer_candidates_list)]
+    all_prompts = [create_prompt(oq, q, c) for oq, q, c in zip(original_queries, queries, answer_candidates_list)]
     total_queries = len(all_prompts)
     results = [None] * total_queries  # Pre-allocate results list to maintain order
     
@@ -234,6 +293,9 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
     """Process generations and evaluate cleaned queries."""
     # Load original data
     df = pd.read_parquet(data_path)
+    raw_queries_ = df['input'].tolist()
+    # print(raw_queries[:10])
+    # print("length of raw queries: ", len(raw_queries))
     targets = df['label'].tolist()
     
     # Load generations
@@ -260,26 +322,31 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
     # Extract original queries and targets first
     original_queries = []
     target_list = []
+    raw_queries = []
     
     for idx, response in enumerate(generations):
         try:
             # Extract original query
             original_query = extract_json_from_llm_output(response)['query']
             target = targets[idx].tolist()
+            raw_query = str(raw_queries_[idx])
             
             original_queries.append(original_query)
             target_list.append(target)
+            raw_queries.append(raw_query)
+            
         except Exception as e:
             print(f"Error extracting query {idx}: {str(e)}")
             # Add placeholder values
             original_queries.append("error")
             target_list.append(targets[idx].tolist())
-    
+            raw_queries.append(str(raw_queries_[idx]))
+            
     # Batch process injection checks
     print(f"Checking for knowledge injection in {len(original_queries)} queries...")
-    batch_size = 15
+    batch_size = 12
     injection_check_results = get_if_answer_span_in_query_batch(
-        original_queries, target_list, batch_size=batch_size
+        raw_queries, original_queries, target_list, batch_size=batch_size
     )
     
     # Process the results
@@ -312,7 +379,7 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
             if injection_check:
                 injection_result = extract_json_from_llm_output(injection_check)
                 
-                if injection_result and "true" in str(injection_result.get("has_answer")).lower():
+                if injection_result and "true" in str(injection_result.get("has_answer")).lower() and "true" in str(injection_result.get("cannot_be_derived")).lower():
                     sample_info["has_injection"] = True
                     results["injection_stats"]["queries_with_injection"] += 1
                     results["injection_stats"]["answer_spans"].extend(injection_result.get("answer_span_in_query", []))
@@ -372,7 +439,7 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
     }
     
     # Save results
-    output_dir = "results/answer_filtered"
+    output_dir = "results/answer_filtered_new"
     os.makedirs(output_dir, exist_ok=True)
     output_file = os.path.join(output_dir, f"{dataset_name}_{model_name}_results.json")
     with open(output_file, 'w') as f:
@@ -382,11 +449,11 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--datasets", nargs="+", default=["nq_serini", "triviaqa"])
+    parser.add_argument("--datasets", nargs="+", default=["nq_serini", "triviaqa", "squad"])
     # parser.add_argument("--datasets", nargs="+", default=["squad"])
     # parser.add_argument("--models", nargs="+", default=["gpt4o", "claude35"])
     # parser.add_argument("--models", nargs="+", default=["gpt35", "claude3"])
-    parser.add_argument("--models", nargs="+", default=["ours"])
+    parser.add_argument("--models", nargs="+", default=["ours", "gpt4o", "claude35", "gpt35", "claude3"])
     args = parser.parse_args()
     
     all_results = {}
@@ -407,7 +474,7 @@ def main():
             all_results[dataset][model] = results
     
     # Save overall results
-    with open("results/answer_filtered/overall_results_ours.json", "w") as f:
+    with open("results/answer_filtered_new/overall_results_ours.json", "w") as f:
         json.dump(all_results, f, indent=2)
 
 if __name__ == "__main__":

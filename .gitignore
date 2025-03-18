@@ -10,6 +10,9 @@ code/outputs
 outputs
 training_outputs
 
+# key files
+*.key
+
 
 # large files
 code/data/local_index_search/msmarco_all
