@@ -1,7 +1,7 @@
 <div align="center">
 
 # DeepRetrieval - Hacking Search Engines & Retrievers with LLM + RL
-### **Let LLMs learn how to search!**
+### **Let LLMs learn how to search! (New results on ~10 more datasets coming soon!)**
 
 </div>
 

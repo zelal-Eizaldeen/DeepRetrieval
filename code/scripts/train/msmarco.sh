@@ -1,8 +1,8 @@
-export CUDA_VISIBLE_DEVICES=2,3
+export CUDA_VISIBLE_DEVICES=0,1
 
 PROJECT_NAME=msmarco_search
-train_domain=science
-eval_domain=science
+train_domain=health
+eval_domain=health
 retrieval_mode=sparse
 EXP_NAME=msmarco_search_3b_${train_domain}_${retrieval_mode}_new_corpus
 
@@ -41,5 +41,5 @@ python3 -m verl.trainer.main_ppo \
     trainer.experiment_name=$EXP_NAME \
     actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct \
     critic.model.path=Qwen/Qwen2.5-3B-Instruct \
-    trainer.default_local_dir=/shared/eng/pj20/lmr_model/msmarco_${train_domain}_${retrieval_mode}_new_corpus \
+    trainer.default_local_dir=/shared/eng/pj20/lmr_model/msmarco_${train_domain}_${retrieval_mode}_new_corpus_k_10 \
     trainer.total_epochs=5 2>&1 | tee exp_log/$PROJECT_NAME-3b-ppo-verl_demo_$DATE.log 
