@@ -1,8 +1,8 @@
-export CUDA_VISIBLE_DEVICES=0,1
+export CUDA_VISIBLE_DEVICES=2,3
 
 PROJECT_NAME=msmarco_search
-train_domain=health
-eval_domain=health
+train_domain=science
+eval_domain=science
 retrieval_mode=sparse
 EXP_NAME=msmarco_search_3b_${train_domain}_${retrieval_mode}_new_corpus
 

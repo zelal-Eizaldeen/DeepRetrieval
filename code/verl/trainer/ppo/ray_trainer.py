@@ -680,15 +680,7 @@ class RayPPOTrainer(object):
                 
             elif 'msmarco' in data_source:
                 format_score = 0.1
-                recall_score = 0.2
-                count_ndcg = 0
-                for reward in rewards:
-                    if reward > recall_score:
-                        count_ndcg += reward - format_score - recall_score
-                    elif reward > format_score:
-                        count_ndcg += reward - format_score
-                    else:
-                        count_ndcg += 0
+                count_ndcg = sum(reward - format_score for reward in rewards if reward > format_score)
                 total_count = len(rewards)
                 metric_dict[f'val/test_score/{data_source}'] = count_ndcg / total_count if total_count > 0 else 0
                 # format_score = 0.1

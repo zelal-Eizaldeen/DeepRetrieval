@@ -171,15 +171,15 @@ def calculate_answer_score(json_str, label, scores, top_k, test_k, mode='sparse'
         recall = hit_count / len(targets)
         
         
-        if recall > 0:
-            recall_score = 0.2
-        else:
-            recall_score = 0
+        # if recall > 0:
+        #     recall_score = 0.2
+        # else:
+        #     recall_score = 0
         
         ndcg_score = ndcg_at_k(results, targets, top_k, rel_scores=scores)
         # ndcg_test_score = ndcg_at_k(results, targets, test_k, rel_scores=scores)
         
-        answer_score = recall_score + ndcg_score
+        answer_score = ndcg_score
         
         
         if do_print:
@@ -232,7 +232,7 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
     if 'test' in data_source or 'val' in data_source:
         top_k = 10
     else:
-        top_k = 100
+        top_k = 10
         
     if 'sparse' in data_source:
         mode = 'sparse'
