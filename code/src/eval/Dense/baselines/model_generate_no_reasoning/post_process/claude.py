@@ -1,7 +1,7 @@
 import json
 import re
 
-dataset_name = 'nfcorpus'
+dataset_name = 'msmarco_beir'
 
 file_path = f'../results_dense/no_reason/claude-3.5_{dataset_name}.json'
 with open(file_path, 'r') as file:
