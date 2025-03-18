@@ -43,7 +43,7 @@ def get_searcher(mode='sparse'):
             _searcher = LuceneSearcher(index_dir=index_dir)
     if _searcher is None and mode == 'dense':
 
-        index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/-index-msmarco-passage"
+        index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/contriever-msmarco-passage-dense-index"
         query_encoder_name = "facebook/contriever"
 
         if not os.path.exists(index_dir):
