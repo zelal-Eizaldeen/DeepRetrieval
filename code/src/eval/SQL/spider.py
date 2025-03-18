@@ -12,7 +12,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0, project_root)
 
-from src.sql.bird import BirdDatabaseSearcher
+from src.sql.spider import SpiderDatabaseSearcher
 
 
 
@@ -21,7 +21,7 @@ _searcher = None
 
 def get_searcher():
     global _searcher
-    _searcher = BirdDatabaseSearcher()
+    _searcher = SpiderDatabaseSearcher()
     return _searcher
     
 
@@ -151,9 +151,9 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_path", type=str, default="/shared/eng/pj20/lmr_model/bird_3b/actor/global_step_400")
-    parser.add_argument("--data_path", type=str, default="data/sql/bird/test.parquet")
-    parser.add_argument("--model_name", type=str, default="bird-3b-step-400")
+    parser.add_argument("--model_path", type=str, default="/dev/v-langcao/training_outputs/spider_3b/actor/global_step_400")
+    parser.add_argument("--data_path", type=str, default="data/sql/spider/test.parquet")
+    parser.add_argument("--model_name", type=str, default="spider-3b-step-400")
     parser.add_argument("--save_dir", type=str, default="results")
     parser.add_argument("--batch_size", type=int, default=8)
     args = parser.parse_args()
