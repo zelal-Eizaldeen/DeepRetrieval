@@ -79,8 +79,9 @@ Show your work in <think> </think> tags. Your final response must be in JSON for
 Here's the user query:
 """
 
-    input_str +=  dp['question'] + """
-Assistant: Let me write the SQL query with reasoning. 
+    input_str +=  dp['question'] + """<|im_end|>
+<|im_start|>assistant\n
+Let me write the SQL query with reasoning. 
 <think>
 """
     return input_str
