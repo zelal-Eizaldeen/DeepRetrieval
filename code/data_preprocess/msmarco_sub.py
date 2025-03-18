@@ -53,8 +53,9 @@ def make_prefix(dp, retrieval_mode):
 Here's the user query:
 """
 
-    input_str +=  dp['input'] + """
-Assistant: Let me rewrite the query with reasoning. 
+    input_str +=  dp['input'] + """<|im_end|>
+<|im_start|>assistant\n
+Let me rewrite the query with reasoning. 
 <think>
 """
 
