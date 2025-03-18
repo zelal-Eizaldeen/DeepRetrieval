@@ -83,8 +83,12 @@ def _select_rm_score_fn(data_source):
             from verl.utils.reward_score import fever
             return fever.compute_score
     elif 'msmarco_beir' in data_source:
-        from verl.utils.reward_score import msmarco_beir
-        return msmarco_beir.compute_score
+        if 'dense' in data_source:
+            from verl.utils.reward_score_dense import msmarco_beir
+            return msmarco_beir.compute_score
+        else:
+            from verl.utils.reward_score import msmarco_beir
+            return msmarco_beir.compute_score
     elif 'msmarco' in data_source:
         from verl.utils.reward_score import msmarco
         return msmarco.compute_score
