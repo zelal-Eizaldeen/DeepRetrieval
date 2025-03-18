@@ -2,12 +2,10 @@ export HYDRA_FULL_ERROR=1
 export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 PROJECT_NAME=msmarco_search
-train_domain=science
-val_domain=science
+train_domain=health
+val_domain=health
 retrieval_mode=dense
 encoder=contriever
-# encoder=minilm
-# encoder=mpnet
 EXP_NAME=msmarco_search_3b_${train_domain}_${retrieval_mode}_${encoder}
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
