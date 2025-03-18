@@ -50,7 +50,10 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
             generated_text = tokenizer.decode(output, skip_special_tokens=True)
             
             # extract from \nAssistant:
-            generated_text = generated_text.split("\nAssistant:")[1]
+            try:
+                generated_text = generated_text.split("\nAssistant:")[1]
+            except:
+                generated_text = generated_text.split("\nassistant:")[1]
             
             # findall <answer> </answer>
             answer_pattern = r'<answer>(.*?)</answer>'
@@ -79,8 +82,8 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_path", type=str, default="Qwen/Qwen2.5-3B-Instruct")
-    parser.add_argument("--data_path", type=str, default="code/data/local_index_search/no_reason/Dense/fever/test.parquet")
-    parser.add_argument("--model_name", type=str, default="Qwen-inst-fever")
+    parser.add_argument("--data_path", type=str, default="code/data/local_index_search/no_reason/Dense/msmarco_beir/test.parquet")
+    parser.add_argument("--model_name", type=str, default="Qwen-inst-msmarco_beir")
     parser.add_argument("--save_dir", type=str, default="results_dense/no_reason")
     parser.add_argument("--batch_size", type=int, default=64)
     args = parser.parse_args()
