@@ -107,6 +107,8 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
     recall_at_50 = []
     recall_at_100 = []
     
+    generated_text_list = []
+    
     for batch_start in tqdm(range(0, len(inputs), batch_size), desc="Evaluating"):
         batch_end = min(batch_start + batch_size, len(inputs))
         batch_inputs = inputs[batch_start:batch_end]
@@ -120,6 +122,7 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
         for i, output in enumerate(output_ids):
             try:
                 generated_text = tokenizer.decode(output)
+                generated_text_list.append(generated_text)
                 idx = batch_start + i
                 # convert target from ndarray to list
                 
@@ -164,6 +167,9 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
         except:
             continue
 
+    # save generated text
+    with open(os.path.join(save_dir, f"{model_name}_generations.json"), "w") as f:
+        json.dump(generated_text_list, f, indent=2)
     
     print("Error count: ", error_count)
     
@@ -171,8 +177,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_path", type=str, default="/shared/eng/pj20/lmr_model/squad/actor/global_step_400")
     parser.add_argument("--data_path", type=str, default="data/local_index_search/squad/test.parquet")
-    parser.add_argument("--model_name", type=str, default="squad-3b-step-400")
-    parser.add_argument("--save_dir", type=str, default="results")
+    parser.add_argument("--model_name", type=str, default="squad_ours")
+    parser.add_argument("--save_dir", type=str, default="results/generations")
     parser.add_argument("--batch_size", type=int, default=32)
     args = parser.parse_args()
 

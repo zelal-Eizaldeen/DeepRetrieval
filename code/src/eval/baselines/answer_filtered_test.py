@@ -69,6 +69,9 @@ def get_if_answer_span_in_query_batch(queries, answer_candidates_list, batch_siz
         List of LLM responses in the same order as the input queries
     """
     def create_prompt(query, answer_candidates):
+        if type(query) == list:
+            query = query[0]
+        # print(answer_candidates)
         return """Your task is to analyze if there are answer spans in the query that match or paraphrase any of the answer candidates.
 
 Instructions:
@@ -274,7 +277,7 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
     
     # Batch process injection checks
     print(f"Checking for knowledge injection in {len(original_queries)} queries...")
-    batch_size = 8
+    batch_size = 15
     injection_check_results = get_if_answer_span_in_query_batch(
         original_queries, target_list, batch_size=batch_size
     )
@@ -379,9 +382,11 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--datasets", nargs="+", default=["nq_serini", "triviaqa", "squad"])
+    parser.add_argument("--datasets", nargs="+", default=["nq_serini", "triviaqa"])
+    # parser.add_argument("--datasets", nargs="+", default=["squad"])
     # parser.add_argument("--models", nargs="+", default=["gpt4o", "claude35"])
-    parser.add_argument("--models", nargs="+", default=["gpt35", "claude3"])
+    # parser.add_argument("--models", nargs="+", default=["gpt35", "claude3"])
+    parser.add_argument("--models", nargs="+", default=["ours"])
     args = parser.parse_args()
     
     all_results = {}
@@ -402,7 +407,7 @@ def main():
             all_results[dataset][model] = results
     
     # Save overall results
-    with open("results/answer_filtered/overall_results_gpt35_cluade3.json", "w") as f:
+    with open("results/answer_filtered/overall_results_ours.json", "w") as f:
         json.dump(all_results, f, indent=2)
 
 if __name__ == "__main__":

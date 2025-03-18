@@ -22,6 +22,9 @@ jsonl_docs
 dense_index
 patches
 
+# corpus
+collection_800k.tsv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

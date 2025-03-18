@@ -18,7 +18,7 @@ from src.Lucene.utils import ndcg_at_k
 # index_dir = "/shared/eng/pj20/lmr_model/raw_data/msmarco/indexes/lucene-index-msmarco-passage"
 
 
-index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/contriever-msmarco-passage-dense-index"
+index_dir = "indexes/lucene-index-msmarco-passage"
 query_encoder_name = "facebook/contriever"
 
 # index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/minilm-msmarco-passage-dense-index"
@@ -34,9 +34,10 @@ def get_searcher(mode='sparse'):
     global _searcher
     if _searcher is None and mode == 'sparse':
         if not os.path.exists(index_dir):
-            # print("[Warning] Pyserini index not found for scifact")
+            print(f"Index not found for {index_dir}, using prebuilt index")
             _searcher = LuceneSearcher.from_prebuilt_index('msmarco-v1-passage')
         else:
+            print(f"Loading index from {index_dir}")
             _searcher = LuceneSearcher(index_dir=index_dir)
     if _searcher is None and mode == 'dense':
         if not os.path.exists(index_dir):
@@ -225,7 +226,7 @@ def compute_score(solution_str, ground_truth, data_source, format_reward=0.1, an
     if 'test' in data_source or 'val' in data_source:
         top_k = 10
     else:
-        top_k = 3000
+        top_k = 1000
         
     if 'sparse' in data_source:
         mode = 'sparse'

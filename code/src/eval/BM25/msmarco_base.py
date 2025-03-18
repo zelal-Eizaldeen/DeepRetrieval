@@ -8,7 +8,7 @@ sys.path.append('./')
 from pyserini.search.lucene import LuceneSearcher
 from src.Lucene.utils import ndcg_at_k
 
-index_dir = "/shared/eng/pj20/lmr_model/raw_data/msmarco/indexes/lucene-index-msmarco-passage"
+index_dir = "indexes/lucene-index-msmarco-passage"
 # dense_encoder_name = "castorini/tct_colbert-msmarco"
 _searcher = None
 

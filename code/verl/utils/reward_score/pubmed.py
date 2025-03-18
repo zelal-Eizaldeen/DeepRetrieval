@@ -137,7 +137,9 @@ def run_search_pubmed(search_query, search_api, pub_date):
     
     print('Query:', search_query)
     # search
-    pmid_list = search_api.search_with_keywords(search_query, topk=3000)
+    # Note: you should set topk to -1 first if you are training from scratch
+    # After the first round training, you can set topk to 3000 and train a few more epochs to get the best performance
+    pmid_list = search_api.search_with_keywords(search_query, topk=3000) 
     
     return pmid_list
     
