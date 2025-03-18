@@ -16,7 +16,7 @@ dataset = 'spider'
 MAX_WORKERS = 5
 
 
-rl_data_parquet_path = f'/home/azureuser/cloudfiles/code/DeepRetrieval/code/data/sql/{dataset}/train.parquet'
+rl_data_parquet_path = f'data/sql/{dataset}/train.parquet'
 
 
 
@@ -98,4 +98,5 @@ print(f'Error count: {error_count}')
 with open(sft_data_path, 'w') as f:
     for D in sft_data:
         f.write(json.dumps(D) + '\n')
+
 

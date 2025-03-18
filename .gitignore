@@ -20,9 +20,12 @@ code/data/raw_data/msmarco/msmarco_all/queries.train.tsv
 code/data/raw_data/msmarco/msmarco_all/queries.dev.tsv
 code/data/raw_data/bird/train
 code/data/raw_data/bird/dev
+code/data/raw_data/wikisql
 code/data/sql/bird/
 code/data/raw_data/spider/spider_data
 code/data/sql/spider/
+code/data/sql/wikisql/
+code/data/sql/cold_start/
 DeepRetrieval-MSMARCO
 
 # other
