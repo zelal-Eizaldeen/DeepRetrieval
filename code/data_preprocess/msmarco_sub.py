@@ -46,7 +46,7 @@ def make_prefix(dp, retrieval_mode):
         input_str += """Note: The query should use Boolean operators (AND, OR) and parentheses for grouping terms appropriately."
 """
     elif retrieval_mode == 'dense':
-        input_str += """Note: The query will be directly used in a dense retrieval system, so do not include any irrelevant terms.
+        input_str += """Note: Given a question, your need to retain the original query while expanding it with additional semantically relevant information, to retrieve documents that can help answer the question. If no useful expansion is needed, return the original query as is.
 """
 
     input_str += """
