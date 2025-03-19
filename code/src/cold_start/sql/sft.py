@@ -18,9 +18,9 @@ from trl import (
 dataset = 'bird'
 # dataset = 'spider'
 
-for_cold_start = True
+# for_cold_start = True
 cold_start_data_size = 1000
-# for_cold_start = False
+for_cold_start = False
 
 
 model_name = 'Qwen/Qwen2.5-3B-Instruct'
@@ -80,7 +80,7 @@ training_args = SFTConfig(
     gradient_accumulation_steps=1,
     num_train_epochs=1,
     save_strategy='epoch',
-    output_dir="/dev/v-langcao/sft_training_outputs",
+    output_dir="/shared/eng/pj20/lmr_model/cold_start",
 )
 
 trainer = SFTTrainer(
