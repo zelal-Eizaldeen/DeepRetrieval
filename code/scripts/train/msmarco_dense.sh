@@ -4,6 +4,7 @@ export CUDA_VISIBLE_DEVICES=0,1
 
 PROJECT_NAME=msmarco_search
 domain=health
+# domain=tech
 # domain=science
 retrieval_mode=dense
 encoder=contriever
