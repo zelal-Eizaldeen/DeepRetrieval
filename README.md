@@ -154,4 +154,13 @@ Current version (will update the author list upon project completion):
 }
 ```
 
+```
+@article{deepretrieval,
+  title={DeepRetrieval: Hacking Real Search Engines and Retrievers with Large Language Models and Reinforcement Learning},
+  author={Jiang, Pengcheng and Lin, Jiacheng and Cao, Lang and Tian, Runchu and Kang, SeongKu and Wang, Zifeng and Sun, Jimeng and Han, Jiawei},
+  howpublished={\url{https://github.com/pat-jj/DeepRetrieval}},
+  year={2025}
+}
+```
+
 Thanks for your interests! 😊
