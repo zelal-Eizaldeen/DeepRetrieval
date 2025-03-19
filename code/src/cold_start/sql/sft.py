@@ -5,7 +5,6 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from datasets import Dataset
 from trl import (
     ModelConfig,
-    ScriptArguments,
     SFTConfig,
     SFTTrainer,
     TrlParser,
@@ -21,7 +20,7 @@ dataset = 'spider'
 
 for_cold_start = True
 cold_start_data_size = 1000
-# for_cold_start = False
+for_cold_start = False
 
 
 model_name = 'Qwen/Qwen2.5-3B-Instruct'
@@ -75,6 +74,10 @@ if tokenizer.pad_token is None:
 # Training
 ################
 training_args = SFTConfig(
+    learning_rate=2e-5,
+    per_device_train_batch_size=2,
+    gradient_accumulation_steps=1,
+    num_train_epochs=1,
     output_dir="/dev/v-langcao/sft_training_outputs",
 )
 
