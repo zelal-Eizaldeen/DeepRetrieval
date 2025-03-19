@@ -4,4 +4,5 @@ export CUDA_VISIBLE_DEVICES=1
 # --model_path Qwen/Qwen2.5-3B-Instruct \
 python src/eval/BM25/triviaqa.py \
     --model_path Qwen/Qwen2.5-3B-Instruct \
-    --model_name triviaqa_base
+    --model_name triviaqa_base_no_reason \
+    --data_path data/local_index_search/no_reason/triviaqa_no_reason/test.parquet
