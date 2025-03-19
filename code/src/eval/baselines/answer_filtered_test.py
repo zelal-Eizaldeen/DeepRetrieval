@@ -468,6 +468,7 @@ def main():
     # parser.add_argument("--models", nargs="+", default=["gpt4o", "claude35"])
     # parser.add_argument("--models", nargs="+", default=["gpt35", "claude3"])
     parser.add_argument("--models", nargs="+", default=["gpt4o", "ours", "claude35", "gpt35", "claude3"])
+    # parser.add_argument("--models", nargs="+", default=["base"])
     args = parser.parse_args()
     
     all_results = {}
