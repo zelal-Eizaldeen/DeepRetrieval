@@ -15,8 +15,8 @@ from trl import (
 
 
 
-dataset = 'bird'
-# dataset = 'spider'
+# dataset = 'bird'
+dataset = 'spider'
 
 # for_cold_start = True
 cold_start_data_size = 1000
@@ -70,7 +70,6 @@ if tokenizer.pad_token is None:
 
 
 
-
 ################
 # Training
 ################
@@ -80,7 +79,7 @@ training_args = SFTConfig(
     gradient_accumulation_steps=1,
     num_train_epochs=1,
     save_strategy='epoch',
-    output_dir="/shared/eng/pj20/lmr_model/cold_start",
+    output_dir=f"/shared/eng/pj20/lmr_model/cold_start/{dataset}",
 )
 
 trainer = SFTTrainer(

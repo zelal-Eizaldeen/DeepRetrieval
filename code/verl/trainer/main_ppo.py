@@ -60,13 +60,25 @@ def _select_rm_score_fn(data_source):
             from verl.utils.reward_score import nfcorpus
             return nfcorpus.compute_score
     elif 'nq_serini' in data_source:
-        from verl.utils.reward_score import nq_serini
-        return nq_serini.compute_score
+        if 'no_reason' in data_source:
+            from verl.utils.reward_score import nq_no_reason
+            return nq_no_reason.compute_score
+        else:
+            from verl.utils.reward_score import nq_serini
+            return nq_serini.compute_score
     elif 'triviaqa' in data_source:
-        from verl.utils.reward_score import triviaqa
-        return triviaqa.compute_score
+        if 'no_reason' in data_source:
+            from verl.utils.reward_score import tqa_no_reason
+            return tqa_no_reason.compute_score
+        else:
+            from verl.utils.reward_score import triviaqa
+            return triviaqa.compute_score
     elif 'squad' in data_source:
-        from verl.utils.reward_score import squad
+        if 'no_reason' in data_source:
+            from verl.utils.reward_score import squad_no_reason
+            return squad_no_reason.compute_score
+        else:
+            from verl.utils.reward_score import squad
         return squad.compute_score
     elif 'hotpotqa' in data_source:
         if 'dense' in data_source:

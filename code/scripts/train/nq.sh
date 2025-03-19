@@ -36,7 +36,6 @@ python3 -m verl.trainer.main_ppo \
     trainer.test_freq=50 \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXP_NAME \
-    actor_rollout_ref.model.path=/shared/eng/pj20/lmr_model/nq_serini_3b/actor/global_step_1900 \
-    critic.model.path=/shared/eng/pj20/lmr_model/nq_serini_3b/critic/global_step_1900 \
-    trainer.default_local_dir=/shared/eng/pj20/lmr_model/nq_serini_3b_continue \
+    actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct \
+    critic.model.path=Qwen/Qwen2.5-3B-Instruct \
     trainer.total_epochs=5 2>&1 | tee exp_log/$PROJECT_NAME-3b-ppo-verl_demo_$DATE.log 

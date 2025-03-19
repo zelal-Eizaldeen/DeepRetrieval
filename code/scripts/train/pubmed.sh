@@ -33,6 +33,6 @@ python3 -m verl.trainer.main_ppo \
     trainer.test_freq=200 \
     trainer.project_name=pubmed_search \
     trainer.experiment_name=pubmed_search_3b_3000 \
-    actor_rollout_ref.model.path=/shared/eng/pj20/lmr_model/pubmed_search/pubmed_search_3b/actor/global_step_1250 \
-    critic.model.path=/shared/eng/pj20/lmr_model/pubmed_search/pubmed_search_3b/critic/global_step_1250 \
+    actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct \
+    critic.model.path=Qwen/Qwen2.5-3B-Instruct \
     trainer.total_epochs=5 2>&1 | tee exp_log/3b-ppo-verl_demo_$DATE.log 
