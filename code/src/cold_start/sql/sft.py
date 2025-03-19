@@ -15,12 +15,12 @@ from trl import (
 
 
 
-# dataset = 'bird'
-dataset = 'spider'
+dataset = 'bird'
+# dataset = 'spider'
 
 for_cold_start = True
 cold_start_data_size = 1000
-for_cold_start = False
+# for_cold_start = False
 
 
 model_name = 'Qwen/Qwen2.5-3B-Instruct'
@@ -35,7 +35,8 @@ train_data = []
 with open(f'data/sql/cold_start/{dataset}_reason_sft_train.jsonl', 'r') as f:
     for line in f:
         D = json.loads(line)
-        train_data.append(D['new_prompt'])
+        if D != {}:
+            train_data.append(D['new_prompt'])
 
 random.seed(42)
 if for_cold_start:
@@ -59,7 +60,7 @@ model_kwargs = dict(
     use_cache=False,
     device_map=get_kbit_device_map(),
 )
-
+ 
 model = AutoModelForCausalLM.from_pretrained(model_name, **model_kwargs)
 
 tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True, use_fast=True)
@@ -78,6 +79,7 @@ training_args = SFTConfig(
     per_device_train_batch_size=2,
     gradient_accumulation_steps=1,
     num_train_epochs=1,
+    save_strategy='epoch',
     output_dir="/dev/v-langcao/sft_training_outputs",
 )
 

@@ -3,6 +3,7 @@ export CUDA_VISIBLE_DEVICES=2,3
 
 PROJECT_NAME=spider
 EXP_NAME=spider_3b
+INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
@@ -38,7 +39,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.test_freq=20 \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXP_NAME \
-    actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct \
-    critic.model.path=Qwen/Qwen2.5-3B-Instruct \
+    actor_rollout_ref.model.path=$INIT_MODEL \
+    critic.model.path=$INIT_MODEL \
     trainer.default_local_dir=/dev/v-langcao/training_outputs/${EXP_NAME} \
     trainer.total_epochs=5 2>&1 | tee exp_log/$PROJECT_NAME-3b-ppo-verl_demo_$DATE.log 

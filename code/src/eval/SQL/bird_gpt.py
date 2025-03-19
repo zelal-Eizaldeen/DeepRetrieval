@@ -12,7 +12,22 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0, project_root)
 
-from src.sql.spider import SpiderDatabaseSearcher
+from src.sql.bird import BirdDatabaseSearcher
+from src.utils.gpt_azure import gpt_chat_4o, gpt_chat_35_msg
+from src.utils.claude_api import get_claude_response
+
+
+
+
+def get_llm_response(prompt, llm_name):
+    if llm_name == "gpt-4o":
+        return gpt_chat_4o(prompt)
+    elif llm_name == "gpt-35":
+        return gpt_chat_35_msg(prompt)
+    elif llm_name == "claude-35":
+        return get_claude_response("sonnet", prompt)
+    else:
+        raise ValueError(f"Unknown LLM: {llm_name}")
 
 
 
@@ -21,15 +36,9 @@ _searcher = None
 
 def get_searcher():
     global _searcher
-    _searcher = SpiderDatabaseSearcher()
+    _searcher = BirdDatabaseSearcher()
     return _searcher
     
-
-def load_model(model_path):
-    tokenizer = AutoTokenizer.from_pretrained(model_path, padding_side='left')
-    model = AutoModelForCausalLM.from_pretrained(model_path, attn_implementation="flash_attention_2", torch_dtype=torch.bfloat16)
-    model.eval()
-    return tokenizer, model
 
 def extract_solution(solution_str):
     """Extract the SQL query from the solution string."""
@@ -73,56 +82,45 @@ def calculate_execution_score(pred_sql, gold_sql, db_path):
 
     return execution_score
 
-def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, batch_size=8):
+def evaluate_model(llm_name, data_path, save_dir, batch_size=1):
     df = pd.read_parquet(data_path)
     
     inputs = [item[0]['content'] for item in df['prompt'].tolist()]
     targets = df['reward_model'].apply(lambda x: x['ground_truth']['target']).tolist()
     db_paths = df['extra_info'].apply(lambda x: x['db_path']).tolist()
     
-    model = model.to(device)
     error_count = 0
     execution_scores = []
     sampled_text = []
     
-    for batch_start in tqdm(range(0, len(inputs), batch_size), desc="Evaluating"):
-        batch_end = min(batch_start + batch_size, len(inputs))
-        batch_inputs = inputs[batch_start:batch_end]
-        
-        tokenized_inputs = tokenizer(batch_inputs, return_tensors="pt", padding=True, truncation=True).to(device)
-        
-        with torch.no_grad():
-            output_ids = model.generate(**tokenized_inputs, max_new_tokens=512)
-        
-        for i, output in enumerate(output_ids):
-            try:
-                generated_text = tokenizer.decode(output, skip_special_tokens=True)
-                sampled_text.append(generated_text)
+    for single_input in tqdm(inputs, desc="Evaluating"):
+        try:
+            generated_text = get_llm_response(single_input, llm_name)
+            sampled_text.append(generated_text)
 
-                idx = batch_start + i
-                answer_text, processed_str = extract_solution(generated_text)
-                if answer_text:
-                    try:
-                        pred_sql = json.loads(answer_text)['sql']
-                        score = calculate_execution_score(
-                            pred_sql,
-                            targets[idx],
-                            db_paths[idx]
-                        )
-                        execution_scores.append(score)
-                    except (json.JSONDecodeError, KeyError) as e:
-                        print(f"[Error] JSON parsing error: {e}")
-                        execution_scores.append(0.0)
-                        error_count += 1
-                else:
+            answer_text, processed_str = extract_solution(generated_text)
+            if answer_text:
+                try:
+                    pred_sql = json.loads(answer_text)['sql']
+                    score = calculate_execution_score(
+                        pred_sql,
+                        targets[idx],
+                        db_paths[idx]
+                    )
+                    execution_scores.append(score)
+                except (json.JSONDecodeError, KeyError) as e:
+                    print(f"[Error] JSON parsing error: {e}")
                     execution_scores.append(0.0)
                     error_count += 1
-                
-            except Exception as e:
-                print(f"[Error] Evaluation error: {e}")
+            else:
                 execution_scores.append(0.0)
                 error_count += 1
-                continue
+            
+        except Exception as e:
+            print(f"[Error] Evaluation error: {e}")
+            execution_scores.append(0.0)
+            error_count += 1
+            continue
             
         # Print intermediate results
         if len(execution_scores) > 0:
@@ -137,30 +135,36 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
     # Save results
     os.makedirs(save_dir, exist_ok=True)
     results = {
-        "model_name": model_name,
+        "model_name": llm_name,
         "execution_accuracy": final_accuracy,
         "error_count": error_count,
         "total_samples": len(inputs)
     }
     
-    with open(os.path.join(save_dir, f"{model_name}_results.json"), "w") as f:
+    with open(os.path.join(save_dir, f"{llm_name}_results.json"), "w") as f:
         json.dump(results, f, indent=2)
 
-    with open(os.path.join(save_dir, f"{model_name}_sampled_text.json"), "w") as f:
+    with open(os.path.join(save_dir, f"{llm_name}_sampled_text.json"), "w") as f:
         json.dump(sampled_text, f, indent=2)
+
+
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_path", type=str, default="/dev/v-langcao/training_outputs/spider_3b/actor/global_step_400")
-    parser.add_argument("--data_path", type=str, default="data/sql/spider/test.parquet")
-    parser.add_argument("--model_name", type=str, default="spider-3b-step-400")
-    parser.add_argument("--save_dir", type=str, default="results")
-    parser.add_argument("--batch_size", type=int, default=8)
+    parser.add_argument("--llm_name", type=str, default="gpt-4o")
+    parser.add_argument("--data_path", type=str, default="data/sql/bird/test.parquet")
+    parser.add_argument("--save_dir", type=str, default="results/sql/bird")
+    parser.add_argument("--batch_size", type=int, default=1)
     args = parser.parse_args()
     
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    tokenizer, model = load_model(args.model_path)
-    evaluate_model(model, tokenizer, args.data_path, device, args.model_name, args.save_dir, args.batch_size)
+    # llm_name = "gpt-4o"
+    # llm_name = "gpt-35"
+    llm_name = "claude-35"
+
+    args.llm_name = llm_name
+
+    evaluate_model(args.llm_name, args.data_path, args.save_dir, args.batch_size)
+
 
 if __name__ == "__main__":
     main()
