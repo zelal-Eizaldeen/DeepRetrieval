@@ -25,10 +25,35 @@ O: Outcome - What are the relevant outcomes or effects being measured?
 """
 
 
+# def make_prefix(dp, dataset):
+#     # input_str = dp['input']
+
+#     input_str = """A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer.\n""" + INSTRUCTION
+#     input_str += """The Assistant should show his thinking process in <think> </think> tags. The Assistant should return the final answer in JSON format in <answer> </answer> tags, 
+# For example:
+# <think>
+# [thinking process]
+# </think>
+# <answer>
+# {
+#     "query": "...."
+# } 
+# </answer>. 
+# Note: The query should use Boolean operators (AND, OR) and parentheses for grouping terms appropriately.
+
+# User: The research is defined by the following PICO:
+# """
+
+#     input_str +=  dp['input'] + """
+# Assistant: Let me solve this step by step. 
+# <think>
+# """
+#     return input_str
+
 def make_prefix(dp, dataset):
     # input_str = dp['input']
 
-    input_str = """A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer.\n""" + INSTRUCTION
+    input_str = """<|im_start|>system\nA conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer.<|im_end|>\n<|im_start|>user\n""" + INSTRUCTION
     input_str += """The Assistant should show his thinking process in <think> </think> tags. The Assistant should return the final answer in JSON format in <answer> </answer> tags, 
 For example:
 <think>
@@ -44,7 +69,8 @@ Note: The query should use Boolean operators (AND, OR) and parentheses for group
 User: The research is defined by the following PICO:
 """
 
-    input_str +=  dp['input'] + """
+    input_str +=  dp['input'] + """<|im_end|>
+<|im_start|>assistant\n
 Assistant: Let me solve this step by step. 
 <think>
 """
