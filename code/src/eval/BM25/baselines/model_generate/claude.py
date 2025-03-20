@@ -11,7 +11,7 @@ tqdm.pandas()
 
 sys.path.append('./')
 
-from src.utils.claude_aws import chat_sonnet
+from src.utils.claude_aws import chat_sonnet, chat_haiku
 
 
 
@@ -29,8 +29,14 @@ if __name__ == '__main__':
     df = pd.read_parquet(args.data_path)
 
     inputs = [item[0]['content'] for item in df['prompt'].tolist()]
-    targets = df['target'].tolist()
-    qids = df['qid'].tolist()
+    try:
+        targets = df['target'].tolist()
+    except:
+        targets = df['label'].tolist()
+    try:
+        qids = df['qid'].tolist()
+    except:
+        qids = list(range(len(df)))
 
     # if targets[i] is a array, then convert to list
     for i in range(len(targets)):
@@ -66,6 +72,8 @@ if __name__ == '__main__':
             try:
                 if args.model_name == 'claude-3.5':            
                     decoded = chat_sonnet(prompt)
+                elif args.model_name == 'claude-haiku':
+                    decoded = chat_haiku(prompt)
                 
                 break
             except Exception as e:

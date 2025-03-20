@@ -11,13 +11,13 @@ tqdm.pandas()
 
 sys.path.append('./')
 
-from src.utils.gpt_azure import gpt_chat_4o, gpt_chat_4omini
+from src.utils.gpt_azure import gpt_chat_4o, gpt_chat_35
 
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_name', type=str, default='gpt-4o')
+    parser.add_argument('--model_name', type=str, default='gpt-35')
     parser.add_argument('--save_dir', type=str, default='../results_dense')
     parser.add_argument("--data_path", type=str, default="data/local_index_search/scifact/dense/test.parquet")
     parser.add_argument('--dataset', type=str, default='scifact')
@@ -64,8 +64,8 @@ if __name__ == '__main__':
         attempts = 0
         while attempts < 10:
             try:
-                if args.model_name == 'gpt-4o-mini':            
-                    decoded = gpt_chat_4omini(prompt)
+                if args.model_name == 'gpt-35':            
+                    decoded = gpt_chat_35(prompt)
                 elif args.model_name == 'gpt-4o':
                     decoded = gpt_chat_4o(prompt)
                 

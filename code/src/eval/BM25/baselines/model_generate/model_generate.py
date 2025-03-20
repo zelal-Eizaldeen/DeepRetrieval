@@ -22,9 +22,15 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
     df = pd.read_parquet(data_path)
     
     inputs = [item[0]['content'] for item in df['prompt'].tolist()]
-    targets = df['target'].tolist()
-    qids = df['qid'].tolist()
-
+    try:
+        targets = df['target'].tolist()
+    except:
+        targets = df['label'].tolist()
+    try:
+        qids = df['qid'].tolist()
+    except:
+        qids = list(range(len(df)))
+    
     # if targets[i] is a array, then convert to list
     for i in range(len(targets)):
         # if is a np.ndarray, then convert to list

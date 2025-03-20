@@ -12,7 +12,10 @@ from src.Lucene.utils import ndcg_at_k
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
-index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/contriever-msmarco-passage-dense-index"
+# index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/contriever-msmarco-passage-dense-index"
+# query_encoder_name = "facebook/contriever"
+
+index_dir = "/shared/eng/pj20/lmr_model/raw_data/msmarco/indexes/contriever-msmarco-passage-dense-index"
 query_encoder_name = "facebook/contriever"
 
 # index_dir = "/home/azureuser/cloudfiles/code/DeepRetrieval/indexes/minilm-msmarco-passage-dense-index"

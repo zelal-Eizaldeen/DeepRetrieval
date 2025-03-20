@@ -23,8 +23,10 @@ if __name__ == '__main__':
     # res_dir = '../results/claude-3.5_post_msmarco_beir.json'
     # res_dir = '../results/no_reason/Qwen-inst-msmarco_beir.json'
     # res_dir = '../results/no_reason/claude-3.5_post_msmarco_beir.json'
-    res_dir = '../results/no_reason/gpt-4o_post_msmarco_beir.json'
+    # res_dir = '../results/no_reason/gpt-4o_post_msmarco_beir.json'
     # res_dir = '../results/Qwen-inst-msmarco_beir.json'
+    # res_dir = '../results/no_reason/gpt-35_post_msmarco_beir.json'
+    res_dir = '../results/gpt-35_post_msmarco_beir.json'
     with open(res_dir, "r", encoding="utf-8") as file:
         res = json.load(file)
     
