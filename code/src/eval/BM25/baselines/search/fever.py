@@ -22,8 +22,12 @@ if __name__ == '__main__':
     # res_dir = '../results/gpt-4o_post_fever.json'
     # res_dir = '../results/claude-3.5_post_fever.json'
     # res_dir = '../results/no_reason/Qwen-inst-fever.json'
-    res_dir = '../results/no_reason/claude-3.5_post_fever.json'
+    # res_dir = '../results/no_reason/claude-3.5_post_fever.json'
     # res_dir = '../results/no_reason/gpt-4o_post_fever.json'
+
+    # res_dir = '../results/no_reason/gpt-35_post_fever.json'
+    res_dir = '../results/gpt-35_post_fever.json'
+
     with open(res_dir, "r", encoding="utf-8") as file:
         res = json.load(file)
     
@@ -53,9 +57,9 @@ if __name__ == '__main__':
 
     for i in tqdm(range(0, len(test_data), batch_size)):
         batch = test_data[i:i+batch_size]
-        queries = [res[item['qid']]['generated_text'] for item in batch]
-        targets = {res[item['qid']]['generated_text']: item['target'] for item in batch} 
-        scores = {res[item['qid']]['generated_text']: item['score'] for item in batch}
+        queries = [str(res[item['qid']]['generated_text']) for item in batch]
+        targets = {str(res[item['qid']]['generated_text']): item['target'] for item in batch} 
+        scores = {str(res[item['qid']]['generated_text']): item['score'] for item in batch}
         
         results = search_system.batch_search(queries, top_k=10, threads=16)
         

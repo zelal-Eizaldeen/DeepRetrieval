@@ -1,7 +1,13 @@
 import json
 import re
 
-dataset_name = 'msmarco_beir'
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--dataset_name', type=str, default='msmarco_beir')
+args = parser.parse_args()
+
+dataset_name = args.dataset_name
 
 file_path = f'../results_dense/claude-3.5_{dataset_name}.json'
 with open(file_path, 'r') as file:

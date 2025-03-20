@@ -1,7 +1,12 @@
 import json
 import re
+import argparse
 
-dataset_name = 'msmarco_beir'
+parser = argparse.ArgumentParser()
+parser.add_argument('--dataset_name', type=str, default='msmarco_beir')
+args = parser.parse_args()
+
+dataset_name = args.dataset_name
 
 file_path = f'../results_dense/no_reason/gpt-4o_{dataset_name}.json'
 with open(file_path, 'r') as file:

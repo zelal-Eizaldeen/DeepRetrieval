@@ -3,12 +3,13 @@ import sys
 import os
 from tqdm import tqdm
 import pdb
+import torch
 sys.path.append('./')
 
 from src.Lucene.utils import ndcg_at_k
 from src.eval.BM25.utils import parse_qrel
 
-from pyserini.search.faiss import FaissSearcher
+from pyserini.search.faiss import FaissSearcher, AutoQueryEncoder
 
 class PyseriniFaissSearcher:
     def __init__(self, index_dir, model_name):
@@ -19,7 +20,9 @@ class PyseriniFaissSearcher:
         """
         self.index_dir = index_dir
         self.model_name = model_name
-        self.searcher = FaissSearcher(index_dir, query_encoder=model_name)
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        query_encoder = AutoQueryEncoder(model_name, pooling='mean', device=device)
+        self.searcher = FaissSearcher(index_dir=index_dir, query_encoder=query_encoder)
     
     def search(self, query, top_k=5, threads=8):
         """ Perform a search for a single query. """
@@ -47,22 +50,22 @@ else:
 if __name__ == '__main__':
     # res_dir = '../results_dense/Qwen-inst-msmarco_health.json'
     # res_dir = '../results_dense/Qwen-inst-msmarco_science.json'
-    # res_dir = '../results_dense/Qwen-inst-msmarco_tech.json'
+    res_dir = '../results_dense/Qwen-inst-msmarco_tech.json'
     # res_dir = '../results_dense/no_reason/Qwen-inst-msmarco_health.json'
     # res_dir = '../results_dense/no_reason/Qwen-inst-msmarco_science.json'
     # res_dir = '../results_dense/no_reason/Qwen-inst-msmarco_tech.json'
-    res_dir = '../results_dense/gpt-4o_post_msmarco_health.json'
+    # res_dir = '../results_dense/gpt-4o_post_msmarco_health.json'
     # res_dir = '../results_dense/gpt-4o_post_msmarco_science.json'
     # res_dir = '../results_dense/gpt-4o_post_msmarco_tech.json'
-    # res_dir = '../results_dense/claude-3.5_msmarco_health.json'
-    # res_dir = '../results_dense/claude-3.5_msmarco_science.json'
-    # res_dir = '../results_dense/claude-3.5_msmarco_tech.json'
+    # res_dir = '../results_dense/claude-3.5_post_msmarco_health.json'
+    # res_dir = '../results_dense/claude-3.5_post_msmarco_science.json'
+    # res_dir = '../results_dense/claude-3.5_post_msmarco_tech.json'
     # res_dir = '../results_dense/no_reason/gpt-4o_post_msmarco_health.json'
     # res_dir = '../results_dense/no_reason/gpt-4o_post_msmarco_science.json'
     # res_dir = '../results_dense/no_reason/gpt-4o_post_msmarco_tech.json'
-    # res_dir = '../results_dense/no_reason/claude-3.5_msmarco_health.json'
-    # res_dir = '../results_dense/no_reason/claude-3.5_msmarco_science.json'
-    # res_dir = '../results_dense/no_reason/claude-3.5_msmarco_tech.json'
+    # res_dir = '../results_dense/no_reason/claude-3.5_post_msmarco_health.json'
+    # res_dir = '../results_dense/no_reason/claude-3.5_post_msmarco_science.json'
+    # res_dir = '../results_dense/no_reason/claude-3.5_post_msmarco_tech.json'
     print(f"Reading {res_dir}")
     with open(res_dir, "r", encoding="utf-8") as file:
         res = json.load(file)
@@ -74,7 +77,7 @@ if __name__ == '__main__':
 
     for i in tqdm(range(0, len(test_data))):
         item = test_data[i]
-        query = item['generated_text']
+        query = str(item['generated_text'])
         target = eval(item['target'])
         scores = [1 for _ in range(len(target))]
         

@@ -11,26 +11,32 @@ tqdm.pandas()
 
 sys.path.append('./')
 
-from src.utils.gpt_azure import gpt_chat_4o, gpt_chat_4omini
+from src.utils.gpt_azure import gpt_chat_4o, gpt_chat_4omini, gpt_chat_35_msg
 
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_name', type=str, default='gpt-4o')
-    parser.add_argument('--save_dir', type=str, default='../results/no_reason')
-    parser.add_argument("--data_path", type=str, default="data/local_index_search/no_reason/BM25/scifact/test.parquet")
+    parser.add_argument('--save_dir', type=str, default='../results')
+    parser.add_argument("--data_path", type=str, default="data/local_index_search/scifact/sparse/test.parquet")
     parser.add_argument('--dataset', type=str, default='scifact')
     args = parser.parse_args()
     
     os.makedirs(args.save_dir, exist_ok=True)
     
-
+    
     df = pd.read_parquet(args.data_path)
 
     inputs = [item[0]['content'] for item in df['prompt'].tolist()]
-    targets = df['target'].tolist()
-    qids = df['qid'].tolist()
+    try:
+        targets = df['target'].tolist()
+    except:
+        targets = df['label'].tolist()
+    try:
+        qids = df['qid'].tolist()
+    except:
+        qids = list(range(len(df)))
 
     # if targets[i] is a array, then convert to list
     for i in range(len(targets)):
@@ -58,7 +64,7 @@ if __name__ == '__main__':
 
         prompt = prompt.replace("<im_end>", "")
         prompt = prompt.strip()
-
+        
         prompt = prompt.replace("{", "(")
         prompt = prompt.replace("}", ")")
         attempts = 0
@@ -68,6 +74,8 @@ if __name__ == '__main__':
                     decoded = gpt_chat_4omini(prompt)
                 elif args.model_name == 'gpt-4o':
                     decoded = gpt_chat_4o(prompt)
+                elif args.model_name == 'gpt-35':
+                    decoded = gpt_chat_35_msg(prompt)
                 
                 break
             except Exception as e:
