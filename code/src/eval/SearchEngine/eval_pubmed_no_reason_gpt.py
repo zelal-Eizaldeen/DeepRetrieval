@@ -5,38 +5,37 @@ import time
 from functools import partial
 
 
-TRIAL_DETAILED_PROMPT = """You are a clinical specialist conducting research and performing a medical literature review. The research is defined by the following PICO elements:
-P (Patient, Problem, or Population): {P}
+PUBLICATION_DETAILED_PROMPT = """You are a clinical specialist. You are conducting research and doing a medical literature review.
+The research is defined by the following PICO elements:
+P (Patient, Problem or Population): {P}
 I (Intervention): {I}
 C (Comparison): {C}
 O (Outcome): {O}
 
-Your task is to create a URL for a search query to find relevant trials on ClinicalTrials.gov.
+Your task is to create an URL of search query for relevant publications on PubMed.
 
-template URL: https://clinicaltrials.gov/api/v2/studies?query.term=query+term
-You should output a URL for the search query based on this template.
+template URL: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=query+term
+You should output an URL of search query based on it.
 
 Notice:
 1. Extract the most relevant and specific keywords from each PICO element.
 2. Avoid using full sentences; focus on short, impactful terms.
-3. Use Boolean operators (AND, OR, NOT) to structure your query logically.
+3. Use Boolean operators (AND, OR) to structure your query logically.
 4. Ensure the query is concise to maximize recall.
 5. Use parentheses to group terms and control the query logic.
 6. If there are synonymous terms or common variations, include them using the OR operator.
 
 Steps to create the query:
-1. Identify 1-2 primary keywords from each PICO element.
+1. Identify 1-2 primary keyword from each PICO element.
 2. Combine these keywords using Boolean operators to form a structured search query.
 3. Use parentheses to ensure proper grouping and logic in the query.
 4. Include synonyms and variations using the OR operator to expand the search scope, if necessary.
 
-Please do the reasoning before generating the query.
 Note: The output should be a valid JSON object, e.g., using double quotes for strings, using slashes for special characters.
 
 Your output should be in the following JSON format:
 {{
-"reasoning": "...",
-"query": "https://clinicaltrials.gov/api/v2/studies?query.term=..."
+"query": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=..."
 }}
 """
 
@@ -58,7 +57,7 @@ import re
 from collections import deque
 from threading import Lock
 
-from verl.utils.apis.ctgov import CTGovAPI
+from verl.utils.apis.pubmed import PubmedAPI
 from src.utils.claude_api import get_claude_response
 from src.utils.gpt_azure import gpt_chat_35_msg, gpt_chat_4o
 
@@ -83,7 +82,7 @@ def init_mistral():
             device_map="auto"
         )
 
-def run_search_ctgov(search_query, search_api):
+def run_search_pubmed(search_query, search_api, pub_date):
     # Rate limit checking
     current_time = time.time()
     with _request_lock:
@@ -93,14 +92,20 @@ def run_search_ctgov(search_query, search_api):
         
         # Check if we're exceeding rate limit (10 requests per second)
         if len(_request_times) >= 10:
-            print("\033[93m[Warning] CTGov rate limit (10 req/s) reached! Consider reducing batch size.\033[0m")
+            print("\033[93m[Warning] PubMed rate limit (10 req/s) reached! Consider reducing batch size.\033[0m")
         
         # Record this request
         _request_times.append(current_time)
-        
-    nctid_list = search_api.search_with_query(search_query, topk=3000)
-    return nctid_list
-
+    
+    # add date
+    date_query_part = f'&datetype=pdat&mindate=1970/01/01&maxdate={pub_date}'
+    search_query += date_query_part
+    
+    print('Query:', search_query)
+    # search
+    pmid_list = search_api.search_with_query(search_query, topk=3000)
+    
+    return pmid_list
     
 def extract_json_from_llm_output(text):
     # pattern = r"```json\n([\s\S]+?)\n```"
@@ -138,7 +143,7 @@ def extract_json_from_llm_output(text):
 def llm_query_generation(P, I, C, O, llm):
     
     if "claude" in llm:
-        llm_response = get_claude_response(llm.replace("claude-", ""), TRIAL_DETAILED_PROMPT.format(
+        llm_response = get_claude_response(llm.replace("claude-", ""), PUBLICATION_DETAILED_PROMPT.format(
             P=P,
             I=I,
             C=C,
@@ -147,7 +152,7 @@ def llm_query_generation(P, I, C, O, llm):
     elif "mistral" in llm.lower():
         init_mistral()  # Initialize if not already done
         
-        prompt = TRIAL_DETAILED_PROMPT.format(P=P, I=I, C=C, O=O)
+        prompt = PUBLICATION_DETAILED_PROMPT.format(P=P, I=I, C=C, O=O)
         inputs = mistral_tokenizer(f"<s>[INST] {prompt} [/INST]", return_tensors="pt").to(mistral_model.device)
         
         outputs = mistral_model.generate(
@@ -160,14 +165,14 @@ def llm_query_generation(P, I, C, O, llm):
         llm_response = mistral_tokenizer.decode(outputs[0], skip_special_tokens=True)
     elif "gpt" in llm:
         if "35" in llm:
-            llm_response = gpt_chat_35_msg(TRIAL_DETAILED_PROMPT.format(
+            llm_response = gpt_chat_35_msg(PUBLICATION_DETAILED_PROMPT.format(
                 P=P,
                 I=I,
                 C=C,
                 O=O
             ))
         elif "4o" in llm:
-            llm_response = gpt_chat_4o(TRIAL_DETAILED_PROMPT.format(
+            llm_response = gpt_chat_4o(PUBLICATION_DETAILED_PROMPT.format(
                 P=P,
                 I=I,
                 C=C,
@@ -184,7 +189,7 @@ def arg_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument("--llm", type=str, default="")
     parser.add_argument("--batch_size", type=int, default=1)
-    parser.add_argument("--save_dir", type=str, default="results/ctgov_reason")
+    parser.add_argument("--save_dir", type=str, default="results/pubmed_reason")
     args = parser.parse_args()
     return args
 
@@ -232,7 +237,7 @@ def process_batch(batch_data, search_api, llm):
             try:
                 query, llm_response = future.result()
                 if query is not None:
-                    llm_results[idx] = (query, llm_response, batch_data[idx]['pub_date'], batch_data[idx]['trial_nctids'])
+                    llm_results[idx] = (query, llm_response, batch_data[idx]['pub_date'], batch_data[idx]['publication_pmids'])
             except Exception as e:
                 print(f"Unexpected error processing LLM call at index {idx}: {str(e)}")
                 llm_results[idx] = None
@@ -248,8 +253,8 @@ def process_batch(batch_data, search_api, llm):
         batch_responses.append(llm_response)
         
         try:
-            nctid_list = run_search_ctgov(query, search_api)
-            recall = len(set(nctid_list) & set(ground_truth)) / len(ground_truth)
+            pmid_list = run_search_pubmed(query, search_api, pub_date)
+            recall = len(set(pmid_list) & set(ground_truth)) / len(ground_truth)
             batch_recalls.append(recall)
         except Exception as e:
             print(f"Error in search query: {str(e)}")
@@ -260,9 +265,11 @@ def process_batch(batch_data, search_api, llm):
 def main():
     args = arg_parser()
     
-    search_api = CTGovAPI()
+    if os.path.exists('verl/utils/reward_score/apis/pubmed_api.key'):
+        api_key = open('verl/utils/reward_score/apis/pubmed_api.key', 'r').read().strip()
+        search_api = PubmedAPI(api_key=api_key)
         
-    test_path = "data/raw_data/ctgov/test.jsonl"
+    test_path = "data/raw_data/pubmed/test.jsonl"
     test_data = []
     with open(test_path, 'r') as f:
         for line in f:
@@ -288,7 +295,7 @@ def main():
     
     # Save results
     os.makedirs(args.save_dir, exist_ok=True)
-    with open(os.path.join(args.save_dir, f"llm_responses_{args.llm}.json"), 'w') as f:
+    with open(os.path.join(args.save_dir, f"llm_responses_{args.llm}_no_reason.json"), 'w') as f:
         json.dump(llm_responses, f, indent=2)
 
 if __name__ == "__main__":

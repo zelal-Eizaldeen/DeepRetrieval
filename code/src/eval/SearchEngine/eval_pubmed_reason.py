@@ -69,7 +69,20 @@ from src.utils.gpt_azure import gpt_chat_35_msg, gpt_chat_4o
 _request_times = deque(maxlen=20)  # Track last 20 requests
 _request_lock = Lock()  # Thread-safe lock for request tracking
 
+# Initialize Mistral model and tokenizer at module level
+mistral_tokenizer = None
+mistral_model = None
 
+def init_mistral():
+    global mistral_tokenizer, mistral_model
+    if mistral_tokenizer is None:
+        mistral_tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.3")
+    if mistral_model is None:
+        mistral_model = AutoModelForCausalLM.from_pretrained(
+            "mistralai/Mistral-7B-Instruct-v0.3", 
+            torch_dtype=torch.float16, 
+            device_map="auto"
+        )
 
 def run_search_pubmed(search_query, search_api, pub_date):
     # Rate limit checking
@@ -138,6 +151,20 @@ def llm_query_generation(P, I, C, O, llm):
             C=C,
             O=O
         ))
+    elif "mistral" in llm.lower():
+        init_mistral()  # Initialize if not already done
+        
+        prompt = PUBLICATION_DETAILED_PROMPT.format(P=P, I=I, C=C, O=O)
+        inputs = mistral_tokenizer(f"<s>[INST] {prompt} [/INST]", return_tensors="pt").to(mistral_model.device)
+        
+        outputs = mistral_model.generate(
+            **inputs,
+            max_new_tokens=512,
+            temperature=0.7,
+            top_p=0.95,
+            do_sample=True
+        )
+        llm_response = mistral_tokenizer.decode(outputs[0], skip_special_tokens=True)
     elif "gpt" in llm:
         if "35" in llm:
             llm_response = gpt_chat_35_msg(PUBLICATION_DETAILED_PROMPT.format(

@@ -30,12 +30,8 @@ Steps to create the query:
 3. Use parentheses to ensure proper grouping and logic in the query.
 4. Include synonyms and variations using the OR operator to expand the search scope, if necessary.
 
-Please do the reasoning before generating the query.
-Note: The output should be a valid JSON object, e.g., using double quotes for strings, using slashes for special characters.
-
 Your output should be in the following JSON format:
 {{
-"reasoning": "...",
 "query": "https://clinicaltrials.gov/api/v2/studies?query.term=..."
 }}
 """
@@ -129,7 +125,7 @@ def extract_json_from_llm_output(text):
         print(text)
         extraction =  text.split("query\": ")[1].split("\n")[0].strip()
         if extraction.startswith("\"") and extraction.endswith("\""):
-            return extraction[1:-1]
+            return extraction[1:-1].replace("\"", "").replace("\\", "")
         else:
             return extraction
 
@@ -288,7 +284,7 @@ def main():
     
     # Save results
     os.makedirs(args.save_dir, exist_ok=True)
-    with open(os.path.join(args.save_dir, f"llm_responses_{args.llm}.json"), 'w') as f:
+    with open(os.path.join(args.save_dir, f"llm_responses_{args.llm}_no_reason.json"), 'w') as f:
         json.dump(llm_responses, f, indent=2)
 
 if __name__ == "__main__":
