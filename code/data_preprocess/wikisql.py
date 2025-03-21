@@ -11,7 +11,7 @@ from collections import defaultdict, Counter
 import random
 import pdb
 import sqlite3
-
+import records
 
 
 
@@ -21,39 +21,59 @@ You are a SQL query writing expert. Your task is to write the SQL query for the 
 
 
 
+# def generate_schema_prompt(db_id, split, num_rows=None):
+
+#     if split == 'train' or split == 'test':
+#         table_schema_path = f'data/raw_data/wikisql/WikiSQL/data/test.tables.jsonl'
+#     elif split == 'val':
+#         table_schema_path = f'data/raw_data/wikisql/WikiSQL/data/dev.tables.jsonl'
+
+#     table_schema = None
+#     with open(table_schema_path, 'r') as f:
+#         for line in f:
+#             D = json.loads(line)
+#             if D['id'] == db_id:
+#                 table_schema = D
+#                 break
+
+#     assert table_schema is not None, f"Table schema not found for db_id: {db_id}"
+
+#     schema_prompt = ""
+#     if 'page_title' in table_schema:
+#         schema_prompt += f"Page Title: {table_schema['page_title']}\n"
+#     if 'section_title' in table_schema:
+#         schema_prompt += f"Section Title: {table_schema['section_title']}\n"
+#     if 'caption' in table_schema:
+#         schema_prompt += f"Caption: {table_schema['caption']}\n"
+#     schema_prompt += f"Header: {table_schema['header']}\n"
+#     schema_prompt += f"Column Types: {table_schema['types']}\n"
+
+#     if num_rows is not None:
+#         schema_prompt += f"""Rows: {table_schema['rows']}"""
+
+#     return schema_prompt
+
 
 
 def generate_schema_prompt(db_id, split, num_rows=None):
 
     if split == 'train' or split == 'test':
-        table_schema_path = f'data/raw_data/wikisql/WikiSQL/data/{split}.tables.jsonl'
+        table_path = f'data/raw_data/wikisql/WikiSQL/data/{split}.db'
+    elif split == 'val':
+        table_path = f'data/raw_data/wikisql/WikiSQL/data/dev.db'
+
+    db = records.Database('sqlite:///{}'.format(table_path))
+    conn = db.get_connection()
+
+    if 'table' in db_id:
+        table_name = db_id
     else:
-        table_schema_path = f'data/raw_data/wikisql/WikiSQL/data/dev.tables.jsonl'
+        table_name = 'table_' + db_id.replace('-', '_')
 
-    table_schema = None
-    with open(table_schema_path, 'r') as f:
-        for line in f:
-            D = json.loads(line)
-            if D['id'] == db_id:
-                table_schema = D
-                break
-
-    assert table_schema is not None, f"Table schema not found for db_id: {db_id}"
-
-    schema_prompt = ""
-    if 'page_title' in table_schema:
-        schema_prompt += f"Page Title: {table_schema['page_title']}\n"
-    if 'section_title' in table_schema:
-        schema_prompt += f"Section Title: {table_schema['section_title']}\n"
-    if 'caption' in table_schema:
-        schema_prompt += f"Caption: {table_schema['caption']}\n"
-    schema_prompt += f"Header: {table_schema['header']}\n"
-    schema_prompt += f"Column Types: {table_schema['types']}\n"
-
-    if num_rows is not None:
-        schema_prompt += f"""Rows: {table_schema['rows']}"""
-
+    print(table_name)
+    schema_prompt = conn.query('SELECT sql from sqlite_master WHERE tbl_name = :name', name=table_name).all()[0].sql
     return schema_prompt
+
 
 
 
@@ -98,10 +118,11 @@ Here's the user query:
 """
 
     input_str +=  dp['question'] + """<|im_end|>
-<|im_start|>assistant\n
+<|im_start|>assistant
 Let me write the SQL query with reasoning. 
 <think>
 """
+    print(input_str)
     return input_str
 
 
@@ -169,7 +190,7 @@ if __name__ == '__main__':
             solution = {
                 "target": example['sql'],
             }
-
+            
             db_id = example['db_id']
             db_path = f'data/raw_data/wikisql/WikiSQL/data/{split}.db'
 
@@ -202,7 +223,6 @@ if __name__ == '__main__':
     test_dataset = test_dataset.shuffle(seed=42)
     val_dataset = val_dataset.shuffle(seed=42)
     
-
     # print(f"Train dataset size before filtering: {train_dataset.num_rows}")
     # train_dataset = train_dataset.filter(
     #     lambda example: len(example['prompt'][0]['content'].split()) <= 1000

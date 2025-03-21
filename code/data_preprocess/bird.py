@@ -127,7 +127,7 @@ Here's the user query:
 """
 
     input_str +=  dp['question'] + """<|im_end|>
-<|im_start|>assistant\n
+<|im_start|>assistant
 Let me write the SQL query with reasoning. 
 <think>
 """
