@@ -12,11 +12,10 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0, project_root)
 
-from src.sql.bird import BirdDatabaseSearcher
+from src.sql.spider import SpiderDatabaseSearcher
 from src.utils.gpt_azure import gpt_chat_4o, gpt_chat_35_msg
 from src.utils.gpt import gpt_chat
 from src.utils.claude_api import get_claude_response
-
 
 
 
@@ -41,7 +40,7 @@ _searcher = None
 
 def get_searcher():
     global _searcher
-    _searcher = BirdDatabaseSearcher()
+    _searcher = SpiderDatabaseSearcher()
     return _searcher
     
 
@@ -107,11 +106,12 @@ def evaluate_model(llm_name, data_path, save_dir, with_reasoning=True):
                 data_input = data_input.replace("Show your work in <think> </think> tags. ", "")
                 data_input = data_input.replace("<think>\n[thinking process]\n</think>", "")
                 data_input = data_input.replace("<think>", "")
-
-            data_input = data_input + '\nYour output of SQL query must be in one line.'
             
+            data_input = data_input + '\nYour output of SQL query must be in one line.'
+
             generated_text = get_llm_response(data_input, llm_name)
             sampled_text.append(generated_text)
+            # print(generated_text)
 
             answer_text, processed_str = extract_solution(generated_text)
             if answer_text:
@@ -167,16 +167,16 @@ def evaluate_model(llm_name, data_path, save_dir, with_reasoning=True):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--llm_name", type=str, default="gpt-4o")
-    parser.add_argument("--data_path", type=str, default="data/sql/bird/test.parquet")
-    parser.add_argument("--save_dir", type=str, default="results/sql/bird")
+    parser.add_argument("--data_path", type=str, default="data/sql/spider/test.parquet")
+    parser.add_argument("--save_dir", type=str, default="results/sql/spider")
     parser.add_argument("--with_reasoning", type=bool, default=True)
     # parser.add_argument("--with_reasoning", type=bool, default=False)
     args = parser.parse_args()
     
 
 
-    # llm_name = "gpt-35"
-    llm_name = "gpt-4o"
+    llm_name = "gpt-35"
+    # llm_name = "gpt-4o"
     # llm_name = "claude-3-haiku"
     # llm_name = "claude-35-sonnet"
 

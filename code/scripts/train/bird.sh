@@ -1,6 +1,6 @@
 export HYDRA_FULL_ERROR=1
-# export CUDA_VISIBLE_DEVICES=0,1
-export CUDA_VISIBLE_DEVICES=2,3
+export CUDA_VISIBLE_DEVICES=0,1
+# export CUDA_VISIBLE_DEVICES=2,3
 
 PROJECT_NAME=bird
 
@@ -8,7 +8,9 @@ PROJECT_NAME=bird
 # INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
 
 EXP_NAME=bird_3b_cold_start
-INIT_MODEL=/dev/v-langcao/sft_training_outputs/bird_cold_start_ckpt_1000
+# INIT_MODEL=/dev/v-langcao/sft_training_outputs/bird_cold_start_ckpt_1k
+# INIT_MODEL=/dev/v-langcao/sft_training_outputs/bird_cold_start_ckpt_3k
+INIT_MODEL=/dev/v-langcao/sft_training_outputs/bird/checkpoint-8456
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
@@ -40,7 +42,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.default_hdfs_dir=null \
     trainer.n_gpus_per_node=2 \
     trainer.nnodes=1 \
-    trainer.save_freq=20 \
+    trainer.save_freq=200 \
     trainer.test_freq=20 \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXP_NAME \
