@@ -717,7 +717,7 @@ class RayPPOTrainer(object):
                 metric_dict[f'val/recall@50'] = count_hit_50 / len(rewards)
                 metric_dict[f'val/recall@100'] = count_hit_100 / len(rewards)
             
-            elif 'bird' in data_source or 'spider' in data_source:
+            elif 'bird' in data_source or 'spider' in data_source or 'wikisql' in data_source:
                 count_acc = 0
                 format_score = 0.1
                 accuracy_score = 1
@@ -961,7 +961,7 @@ class RayPPOTrainer(object):
                         # reward_metrics = compute_reward_metrics_recall_at_k(batch)
                     elif 'nq_serini' in self.config.data.train_files or 'triviaqa' in self.config.data.train_files or 'squad' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_nq_serini(batch)
-                    elif 'bird' in self.config.data.train_files or 'spider' in self.config.data.train_files:
+                    elif 'bird' in self.config.data.train_files or 'spider' in self.config.data.train_files or 'wikisql' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_sql(batch)
                     else:
                         reward_metrics = compute_reward_metrics_search_engine(batch)

@@ -1,9 +1,12 @@
-import sqlite3
+from wikisql_lib.dbengine import DBEngine
+from wikisql_lib.query import Query
+from wikisql_lib.common import count_lines
+
 from func_timeout import func_timeout, FunctionTimedOut
 
+# reference: lib at https://github.com/salesforce/WikiSQL/tree/master
 
-
-class BirdDatabaseSearcher:
+class WikiSQLDatabaseSearcher:
     def __init__(self):
         self.timeout = 30
 
@@ -18,9 +21,6 @@ class BirdDatabaseSearcher:
         return results
 
     def _search(self, sql_query: str, db_path: str, db_id: str=None):
-        conn = sqlite3.connect(db_path)
-        # Connect to the database
-        cursor = conn.cursor()
-        cursor.execute(sql_query)
-        results = cursor.fetchall()
+        engine = DBEngine(db_path)
+        results = engine.execute_query(db_id, sql_query, lower=True)
         return results

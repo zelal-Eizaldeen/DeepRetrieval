@@ -110,6 +110,9 @@ def _select_rm_score_fn(data_source):
     elif 'spider' in data_source:
         from verl.utils.reward_score import spider
         return spider.compute_score
+    elif 'wikisql' in data_source:
+        from verl.utils.reward_score import wikisql
+        return wikisql.compute_score
     else:
         raise NotImplementedError
 
@@ -183,6 +186,10 @@ class RewardManager():
             elif 'bird' in data_source or 'spider' in data_source:
                 db_path = data_item.non_tensor_batch['extra_info']['db_path']
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, data_source=data_source, db_path=db_path)
+            elif 'wikisql' in data_source:
+                db_path = data_item.non_tensor_batch['extra_info']['db_path']
+                db_id = data_item.non_tensor_batch['extra_info']['db_id']
+                score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, data_source=data_source, db_path=db_path, db_id=db_id)
             else:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth)
             
