@@ -10,7 +10,8 @@ from src.utils.gpt_azure import gpt_chat_4o
 
 
 # dataset = 'bird'
-dataset = 'spider'
+# dataset = 'spider'
+dataset = 'wikisql'
 
 
 MAX_WORKERS = 5

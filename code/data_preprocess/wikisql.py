@@ -25,7 +25,10 @@ You are a SQL query writing expert. Your task is to write the SQL query for the 
 
 def generate_schema_prompt(db_id, split, num_rows=None):
 
-    table_schema_path = f'data/raw_data/wikisql/WikiSQL/data/{split}.tables.jsonl'
+    if split == 'train' or split == 'test':
+        table_schema_path = f'data/raw_data/wikisql/WikiSQL/data/{split}.tables.jsonl'
+    else:
+        table_schema_path = f'data/raw_data/wikisql/WikiSQL/data/dev.tables.jsonl'
 
     table_schema = None
     with open(table_schema_path, 'r') as f:
@@ -127,6 +130,7 @@ def load_wikisql_dataset():
         processed_data = []
         for x in data:
             sql = Query.from_dict(x['sql'])
+            # sql = x['sql']
             processed_data.append({
                 'question': x['question'],
                 'db_id': x['table_id'],
