@@ -10,17 +10,17 @@ from trl import (
 )
 
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
 # os.environ['CUDA_VISIBLE_DEVICES'] = '2,3'
 
 
 
-# dataset = 'bird'
-dataset = 'spider'
+dataset = 'bird'
+# dataset = 'spider'
 
 
-# wo_reasoning = False
-wo_reasoning = True
+wo_reasoning = False
+# wo_reasoning = True
 
 
 # for_cold_start = True
@@ -89,17 +89,17 @@ if tokenizer.pad_token is None:
 # Training
 ################
 if wo_reasoning:
-    output_dir = f"/dev/v-langcao/sft_training_outputs/{dataset}_wo_reasoning"
+    output_dir = f"/shared/eng/pj20/lmr_model/cold_start/{dataset}_wo_reasoning"
 else:
-    output_dir = f"/dev/v-langcao/sft_training_outputs/{dataset}"
+    output_dir = f"/shared/eng/pj20/lmr_model/cold_start/{dataset}"
 
 training_args = SFTConfig(
     learning_rate=2e-5,
     per_device_train_batch_size=4,
     gradient_accumulation_steps=1,
-    num_train_epochs=6,
+    num_train_epochs=4,
     save_strategy='epoch',
-    output_dir="/dev/v-langcao/sft_training_outputs",
+    output_dir=output_dir,
 )
 
 trainer = SFTTrainer(
@@ -111,3 +111,19 @@ trainer = SFTTrainer(
 )
 
 trainer.train()
+
+
+from huggingface_hub import HfApi
+
+# Initialize the API
+api = HfApi(token="")
+# Create repository
+repo_id = "windszzlang/DeepRetrieval-SQL"
+api.create_repo(repo_id, exist_ok=True)
+
+# Upload the pickle file
+api.upload_folder(
+    folder_path=f"/shared/eng/pj20/lmr_model/cold_start/{dataset}",
+    path_in_repo=f"cold_start/{dataset}",
+    repo_id=repo_id
+)

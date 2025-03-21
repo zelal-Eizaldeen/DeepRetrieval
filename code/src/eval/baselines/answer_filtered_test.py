@@ -68,49 +68,6 @@ def get_if_answer_span_in_query_batch(original_queries, queries, answer_candidat
     Returns:
         List of LLM responses in the same order as the input queries
     """
-#     def create_prompt(query, answer_candidates):
-#         if type(query) == list:
-#             query = query[0]
-#         # print(answer_candidates)
-#         return """Your task is to analyze if there are answer spans in the query that match or paraphrase any of the answer candidates.
-
-# Instructions:
-# 1. Check if any part of the query exactly matches or paraphrases any answer candidate
-# 2. If found, remove those answer spans from the query
-# 3. Return your analysis in a strict JSON format
-
-# IMPORTANT: 
-# You must respond with valid JSON wrapped in <answer> tags. The JSON must have this exact structure:
-# {
-#     "has_answer": boolean (true or false),
-#     "answer_span_in_query": [string],
-#     "matched_answer_candidates": [string],
-#     "cleaned_query": string
-# }
-
-# The content between <answer> and </answer> must be a valid JSON object:
-# - Use double quotes for strings
-# - Escape special characters with backslashes (e.g., \\" for quotes within strings)
-# - Follow standard JSON formatting rules
-
-# Example valid response:
-# <answer>
-# {
-#     "has_answer": true,
-#     "answer_span_in_query": ["new york city"],
-#     "matched_answer_candidates": ["NYC"],
-#     "cleaned_query": "(\\"population\\" OR \\"residents\\") AND \\"2020\\""
-# }
-# </answer>
-
-# Query to analyze:
-# """ + query + """   
-
-# Answer candidates to check against:
-# """ + str(answer_candidates) + """
-
-# Your response:
-# """
 
     def create_prompt(original_query, query, answer_candidates):
         if type(query) == list:
@@ -138,15 +95,18 @@ For the following original query:
 "How many people live in New York City in 2020?"
 
 and the augmented query:
-("population" OR "residents") AND "new york city" AND "2020"
+("population" OR "residents") AND "new york city" AND "2020" AND "8 million"
+
+Answer candidates to check against:
+["8.253 million", "8,253,213", "8.25M", "approximately 8.25 million"]
 
 <answer>
 {
     "has_answer": true,
     "cannot_be_derived": true,
-    "answer_span_in_query": ["new york city"],
-    "matched_answer_candidates": ["NYC"],
-    "cleaned_query": "(\\"population\\" OR \\"residents\\") AND \\"2020\\""
+    "answer_span_in_query": ["8 million"],
+    "matched_answer_candidates": ["approximately 8.25 million", "8.25M"],
+    "cleaned_query": "(\"population\" OR \"residents\") AND \"new york city\" AND \"2020\""
 }
 </answer>
 

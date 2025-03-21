@@ -36,4 +36,4 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct \
     critic.model.path=Qwen/Qwen2.5-3B-Instruct \
     trainer.default_local_dir=/shared/eng/pj20/lmr_model/pubmed_3b_new \
-    trainer.total_epochs=3 2>&1 | tee exp_log/3b-ppo-verl_demo_$DATE.log 
+    trainer.total_epochs=10 2>&1 | tee exp_log/3b-ppo-verl_demo_$DATE.log 

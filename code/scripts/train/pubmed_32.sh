@@ -36,4 +36,4 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.model.path=meta-llama/Llama-3.2-3B-Instruct \
     critic.model.path=meta-llama/Llama-3.2-3B-Instruct \
     trainer.default_local_dir=/shared/eng/pj20/lmr_model/pubmed_32_new \
-    trainer.total_epochs=3 2>&1 | tee exp_log/32-ppo-verl_demo_$DATE.log 
+    trainer.total_epochs=10 2>&1 | tee exp_log/32-ppo-verl_demo_$DATE.log 
