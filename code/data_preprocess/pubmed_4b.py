@@ -52,7 +52,7 @@ The research is defined by the following PICO:
 """
 
     input_str +=  dp['input'] + "<|end|>"
-    input_str += "<|assistant|>Let me solve this step by step. \n<think>"
+    input_str += "<|assistant|>\nAssistant: Let me solve this step by step. \n<think>"
     
     return input_str
 
