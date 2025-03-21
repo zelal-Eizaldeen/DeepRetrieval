@@ -2,8 +2,14 @@ export HYDRA_FULL_ERROR=1
 export CUDA_VISIBLE_DEVICES=2,3
 
 PROJECT_NAME=spider
-EXP_NAME=spider_3b
-INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
+# EXP_NAME=spider_3b
+# INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
+
+# EXP_NAME=bird_3b
+# INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
+
+EXP_NAME=spider_3b_cs_e4
+INIT_MODEL=/dev/v-langcao/sft_training_outputs/spider/checkpoint-4180
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
@@ -35,7 +41,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.default_hdfs_dir=null \
     trainer.n_gpus_per_node=2 \
     trainer.nnodes=1 \
-    trainer.save_freq=20 \
+    trainer.save_freq=200 \
     trainer.test_freq=20 \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXP_NAME \

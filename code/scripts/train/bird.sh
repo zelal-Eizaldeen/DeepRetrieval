@@ -7,9 +7,8 @@ PROJECT_NAME=bird
 # EXP_NAME=bird_3b
 # INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
 
-EXP_NAME=bird_3b_cold_start
-# INIT_MODEL=/dev/v-langcao/sft_training_outputs/bird_cold_start_ckpt_1k
-# INIT_MODEL=/dev/v-langcao/sft_training_outputs/bird_cold_start_ckpt_3k
+EXP_NAME=bird_3b_cs_e4
+# INIT_MODEL=/dev/v-langcao/sft_training_outputs/bird/checkpoint-1057
 INIT_MODEL=/dev/v-langcao/sft_training_outputs/bird/checkpoint-8456
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
