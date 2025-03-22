@@ -1,7 +1,11 @@
 import records
 import re
+import sys
+import os
 from babel.numbers import parse_decimal, NumberFormatError
-from wikisql_lib.query import Query
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from query import Query
 
 
 schema_re = re.compile(r'\((.+)\)')

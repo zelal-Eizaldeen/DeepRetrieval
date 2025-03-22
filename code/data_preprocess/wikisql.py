@@ -12,7 +12,13 @@ import random
 import pdb
 import sqlite3
 import records
+import sys
 
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from src.sql.wikisql_lib.dbengine import DBEngine
+from src.sql.wikisql_lib.query import Query, SQLToJsonConverter
+from src.sql.wikisql_lib.common import count_lines
 
 
 INSTRUCTION_SQL = """
@@ -122,7 +128,6 @@ Here's the user query:
 Let me write the SQL query with reasoning. 
 <think>
 """
-    print(input_str)
     return input_str
 
 
@@ -144,18 +149,17 @@ def load_wikisql_dataset():
             data_val.append(json.loads(line))
     data_val = data_val[:100]
 
-    import sys
-    sys.path.insert(0, 'data/raw_data/wikisql/WikiSQL')
-    from lib.query import Query
     def process_wikisql_data(data):
         processed_data = []
         for x in data:
             sql = Query.from_dict(x['sql'])
+            sql = sql.to_query(['text'])
             # sql = x['sql']
+            print(sql)
             processed_data.append({
                 'question': x['question'],
                 'db_id': x['table_id'],
-                'sql': str(sql)
+                'sql': sql
             })
         return processed_data
     

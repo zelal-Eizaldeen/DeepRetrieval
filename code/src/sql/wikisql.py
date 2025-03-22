@@ -3,10 +3,10 @@ import sys
 from func_timeout import func_timeout, FunctionTimedOut
 import records
 
-# sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-# from wikisql_lib.dbengine import DBEngine
-# from wikisql_lib.query import Query
-# from wikisql_lib.common import count_lines
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from wikisql_lib.dbengine import DBEngine
+from wikisql_lib.query import Query
+from wikisql_lib.common import count_lines
 
 
 

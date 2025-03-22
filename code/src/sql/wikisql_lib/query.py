@@ -1,4 +1,7 @@
-from wikisql_lib.common import detokenize
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from common import detokenize
 from collections import defaultdict
 from copy import deepcopy
 import re
@@ -49,6 +52,24 @@ class Query:
 
     def to_dict(self):
         return {'sel': self.sel_index, 'agg': self.agg_index, 'conds': self.conditions}
+
+    def to_query(self, types):
+        if self.agg_ops[self.agg_index]:
+            rep = 'SELECT {agg} ({sel}) FROM table'.format(
+                agg=self.agg_ops[self.agg_index],
+                sel='col{}'.format(self.sel_index),
+            )
+        else:
+            rep = f'SELECT col{self.sel_index} FROM table'
+        if self.conditions:
+            cond_strings = []
+            for i, o, v in self.conditions:
+                if types[i] == "text":
+                    cond_strings.append(f"col{i} {self.cond_ops[o]} '{v}'")
+                else:
+                    cond_strings.append(f"col{i} {self.cond_ops[o]} {v}")
+            rep +=  ' WHERE ' + ' AND '.join(cond_strings)
+        return rep
 
     def lower(self):
         conds = []
@@ -232,3 +253,63 @@ class Query:
             where_terms = where_terms[val_end_index+1:]
         q = cls(agg_col, agg_op, conditions)
         return q
+
+
+# reference: https://github.com/salesforce/WikiSQL/issues/102
+
+
+import json
+class SQLToJsonConverter:
+    def __init__(self, table_name, column_names):
+        self.table_name = table_name
+        self.column_names = column_names
+        self.agg_ops = ['', 'MAX', 'MIN', 'COUNT', 'SUM', 'AVG']  # Aggregation operations
+        self.cond_ops = ['=', '>', '<', 'OP']  # Condition operations
+
+    def parse_sql(self, sql_query):
+        # Initialize the JSON structure
+        query_json = {
+            "table": self.table_name,
+            "agg": 0,
+            "sel": 0,
+            "conds": []
+        }
+
+        # Parse the SELECT part
+        select_match = re.search(r'SELECT\s+(?:(\w+)\s*\(\s*(col\d+)\s*\)|col(\d+))\s+FROM', sql_query, re.IGNORECASE)
+        if select_match:
+            if select_match.group(1):  # Aggregation function exists
+                agg_function = select_match.group(1).upper()
+                if agg_function in self.agg_ops:
+                    query_json["agg"] = self.agg_ops.index(agg_function)
+                query_json["sel"] = int(select_match.group(2)[3:])
+            else:  # No aggregation function
+                query_json["sel"] = int(select_match.group(3)[3:])
+
+        # Parse the WHERE part
+        where_match = re.search(r'WHERE\s+(.+)', sql_query, re.IGNORECASE)
+        if where_match:
+            conditions_str = where_match.group(1)
+            conditions = conditions_str.split(' AND ')
+            for cond in conditions:
+                col_match = re.search(r'col(\d+)\s*(\W+)\s*(.+)', cond)
+                if col_match:
+                    i = int(col_match.group(1))
+                    o = col_match.group(2).strip()
+                    v = col_match.group(3).strip().strip("'")
+                    if o in self.cond_ops:
+                        o = self.cond_ops.index(o)
+                    query_json["conds"].append([i, o, v])
+
+        # Convert column indices to column names
+        query_json["sel"] = self.column_names[query_json["sel"]]
+        query_json["conds"] = [
+            [self.column_names[cond[0]], cond[1], cond[2]] for cond in query_json["conds"]
+        ]
+
+        return query_json
+
+    def sql_to_json(self, sql_query):
+        parsed_query = self.parse_sql(sql_query)
+        return json.dumps(parsed_query, indent=4)
+    
