@@ -10,7 +10,7 @@ from trl import (
 )
 
 
-# os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
 # os.environ['CUDA_VISIBLE_DEVICES'] = '2,3'
 
 
@@ -19,16 +19,21 @@ dataset = 'bird'
 # dataset = 'spider'
 
 
-wo_reasoning = False
-# wo_reasoning = True
+# wo_reasoning = False
+wo_reasoning = True
 
+if wo_reasoning:
+    train_epoch = 2
+else:
+    train_epoch = 4
 
 # for_cold_start = True
 # cold_start_data_size = 3000
 # for_cold_start = False
 
 
-model_name = 'Qwen/Qwen2.5-3B-Instruct'
+# model_name = 'Qwen/Qwen2.5-3B-Instruct'
+model_name = '/dev/v-langcao/qwen-7'
 
 
 
@@ -89,15 +94,15 @@ if tokenizer.pad_token is None:
 # Training
 ################
 if wo_reasoning:
-    output_dir = f"/shared/eng/pj20/lmr_model/cold_start/{dataset}_wo_reasoning"
+    output_dir = f"/dev/v-langcao/sft_qwen_7/{dataset}_wo_reasoning"
 else:
-    output_dir = f"/shared/eng/pj20/lmr_model/cold_start/{dataset}"
+    output_dir = f"/dev/v-langcao/sft_qwen_7/{dataset}"
 
 training_args = SFTConfig(
     learning_rate=2e-5,
     per_device_train_batch_size=4,
     gradient_accumulation_steps=1,
-    num_train_epochs=4,
+    num_train_epochs=train_epoch,
     save_strategy='epoch',
     output_dir=output_dir,
 )
@@ -113,17 +118,17 @@ trainer = SFTTrainer(
 trainer.train()
 
 
-from huggingface_hub import HfApi
+# from huggingface_hub import HfApi
 
-# Initialize the API
-api = HfApi(token="")
-# Create repository
-repo_id = "windszzlang/DeepRetrieval-SQL"
-api.create_repo(repo_id, exist_ok=True)
+# # Initialize the API
+# api = HfApi(token="")
+# # Create repository
+# repo_id = "windszzlang/DeepRetrieval-SQL"
+# api.create_repo(repo_id, exist_ok=True)
 
-# Upload the pickle file
-api.upload_folder(
-    folder_path=f"/shared/eng/pj20/lmr_model/cold_start/{dataset}",
-    path_in_repo=f"cold_start/{dataset}",
-    repo_id=repo_id
-)
+# # Upload the pickle file
+# api.upload_folder(
+#     folder_path=f"/shared/eng/pj20/lmr_model/cold_start/{dataset}",
+#     path_in_repo=f"cold_start/{dataset}",
+#     repo_id=repo_id
+# )

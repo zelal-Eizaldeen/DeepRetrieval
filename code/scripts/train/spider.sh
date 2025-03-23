@@ -5,8 +5,11 @@ PROJECT_NAME=spider
 # EXP_NAME=spider_3b
 # INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
 
-EXP_NAME=spider_3b_coder
-INIT_MODEL=Qwen/Qwen2.5-Coder-3B-Instruct
+# EXP_NAME=spider_3b_coder
+# INIT_MODEL=Qwen/Qwen2.5-Coder-3B-Instruct
+
+EXP_NAME=spider_3b_coder_cs_e1
+INIT_MODEL=/dev/v-langcao/DeepRetrieval-SQL/cold_start/spider_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-2090
 
 # EXP_NAME=spider_3b_coder_cs_e4
 # INIT_MODEL=/dev/v-langcao/sft_training_outputs/spider/checkpoint-4180
