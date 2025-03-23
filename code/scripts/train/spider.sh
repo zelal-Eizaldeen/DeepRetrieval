@@ -5,11 +5,12 @@ PROJECT_NAME=spider
 # EXP_NAME=spider_3b
 # INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
 
-# EXP_NAME=bird_3b
-# INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
+EXP_NAME=spider_3b_coder
+INIT_MODEL=Qwen/Qwen2.5-Coder-3B-Instruct
 
-EXP_NAME=spider_3b_cs_e4
-INIT_MODEL=/dev/v-langcao/sft_training_outputs/spider/checkpoint-4180
+# EXP_NAME=spider_3b_coder_cs_e4
+# INIT_MODEL=/dev/v-langcao/sft_training_outputs/spider/checkpoint-4180
+# INIT_MODEL=/dev/v-langcao/DeepRetrieval-SQL/cold_start/spider_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-8360
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 

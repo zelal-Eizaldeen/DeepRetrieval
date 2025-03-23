@@ -171,6 +171,8 @@ def main():
     
     args.with_reasoning = True if args.with_reasoning.lower() == "true" else False
     
+    print(f'args.with_reasoning: {args.with_reasoning}')
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tokenizer, model = load_model(args.model_path)
     evaluate_model(model, tokenizer, args.data_path, device, args.model_name, args.save_dir, args.batch_size, args.with_reasoning)

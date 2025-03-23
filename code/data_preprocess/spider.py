@@ -62,7 +62,7 @@ def make_prefix(dp, split):
 """
 
 
-    input_str += """Note: Using valid SQLite and understading External Knowledge, answer the following questions for the tables provided above.
+    input_str += """Note: Using valid SQLite and understanding External Knowledge, answer the following questions for the tables provided above.
 
 Show your work in <think> </think> tags. Your final response must be in JSON format within <answer> </answer>. For example,
 <think>

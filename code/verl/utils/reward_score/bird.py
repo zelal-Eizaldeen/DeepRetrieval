@@ -153,8 +153,8 @@ def calculate_answer_score(pred_sql, gold_sql, db_path, do_print=False):
             answer_score = 0.1
 
     if do_print:
-        print(f"Retrieved results: {pred_results}")
-        print(f"Target: {gold_results} ")
+        # print(f"Retrieved results: {pred_results}")
+        # print(f"Target: {gold_results} ")
         print(f"Answer score: {answer_score}")
 
     

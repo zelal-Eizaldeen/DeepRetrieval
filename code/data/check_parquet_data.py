@@ -1,13 +1,21 @@
 import pandas as pd
 
-# path = '/home/azureuser/cloudfiles/code/DeepRetrieval/code/data/sql/bird/train.parquet'
-path = '/home/pj20/server-04/LMR/code/data/local_index_search/nq_serini/test.parquet'
-df = pd.read_parquet(path)
-print(f"Loaded {len(df)} rows")
-print(df.head(30))
 
-for i in range(len(df)):
-    # print(df.iloc[i]['prompt'])
-    print(df.iloc[i]['extra_info']['db_path'])
-    print('--------------------------------')
-    break
+datasets = ['bird', 'spider']
+splits = ['train', 'test']
+
+
+for dataset in datasets:
+    for split in splits:
+        path = f'data/sql/{dataset}/{split}.parquet'
+        df = pd.read_parquet(path)
+        print(f"dataset: {dataset}, split: {split}, Loaded {len(df)} rows")
+        if split == 'test' and dataset == 'bird':
+            print(df.head(1)['prompt'][0][0]['content'])
+            break
+
+# for i in range(len(df)):
+#     # print(df.iloc[i]['prompt'])
+#     print(df.iloc[i]['extra_info']['db_path'])
+#     print('--------------------------------')
+#     break

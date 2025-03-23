@@ -174,6 +174,7 @@ def main():
     args = parser.parse_args()
 
     args.with_reasoning = True if args.with_reasoning.lower() == "true" else False
+    print(f'args.with_reasoning: {args.with_reasoning}')
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tokenizer, model = load_model(args.model_path)

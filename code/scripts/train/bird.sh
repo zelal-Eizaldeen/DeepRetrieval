@@ -1,15 +1,18 @@
 export HYDRA_FULL_ERROR=1
-export CUDA_VISIBLE_DEVICES=0,1
-# export CUDA_VISIBLE_DEVICES=2,3
+# export CUDA_VISIBLE_DEVICES=0,1
+export CUDA_VISIBLE_DEVICES=2,3
 
 PROJECT_NAME=bird
 
-# EXP_NAME=bird_3b
+# EXP_NAME=bird_3b_base
+# INIT_MODEL=Qwen/Qwen2.5-Coder-3B-Instruct
 # INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
 
-EXP_NAME=bird_3b_cs_e4
-# INIT_MODEL=/dev/v-langcao/sft_training_outputs/bird/checkpoint-1057
-INIT_MODEL=/dev/v-langcao/sft_training_outputs/bird/checkpoint-8456
+EXP_NAME=bird_3b_coder_cs_e1
+INIT_MODEL=/dev/v-langcao/DeepRetrieval-SQL/cold_start/bird_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-2114
+
+# EXP_NAME=bird_3b_coder_cs_e4
+# INIT_MODEL=/dev/v-langcao/DeepRetrieval-SQL/cold_start/bird_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-8456
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
