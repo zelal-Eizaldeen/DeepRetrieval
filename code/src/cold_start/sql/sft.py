@@ -10,17 +10,17 @@ from trl import (
 )
 
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 # os.environ['CUDA_VISIBLE_DEVICES'] = '2,3'
 
 
 
-dataset = 'bird'
-# dataset = 'spider'
+# dataset = 'bird'
+dataset = 'spider'
 
 
-# wo_reasoning = False
-wo_reasoning = True
+wo_reasoning = False
+# wo_reasoning = True
 
 if wo_reasoning:
     train_epoch = 2
@@ -100,8 +100,8 @@ else:
 
 training_args = SFTConfig(
     learning_rate=2e-5,
-    per_device_train_batch_size=4,
-    gradient_accumulation_steps=1,
+    per_device_train_batch_size=1,
+    gradient_accumulation_steps=8,
     num_train_epochs=train_epoch,
     save_strategy='epoch',
     output_dir=output_dir,

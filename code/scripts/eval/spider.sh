@@ -14,7 +14,9 @@ export CUDA_VISIBLE_DEVICES=0
 # MODEL_PATH=Qwen/Qwen2.5-3B-Instruct
 # MODEL_PATH=Qwen/Qwen2.5-Coder-3B-Instruct
 
-MODEL_PATH=/dev/v-langcao/qwen-7
+# MODEL_PATH=/dev/v-langcao/qwen-7
+# MODEL_PATH=/dev/v-langcao/sft_qwen_7/spider_wo_reasoning/checkpoint-2088
+MODEL_PATH=/dev/v-langcao/sft_qwen_7/spider/checkpoint-4176
 
 python src/eval/SQL/spider.py \
     --model_path $MODEL_PATH \
