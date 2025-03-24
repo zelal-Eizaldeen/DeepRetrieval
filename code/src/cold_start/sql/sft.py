@@ -10,9 +10,8 @@ from trl import (
 )
 
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-# os.environ['CUDA_VISIBLE_DEVICES'] = '2,3'
-
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0,1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '2,3'
 
 
 # dataset = 'bird'
@@ -100,8 +99,8 @@ else:
 
 training_args = SFTConfig(
     learning_rate=2e-5,
-    per_device_train_batch_size=1,
-    gradient_accumulation_steps=8,
+    per_device_train_batch_size=4,
+    gradient_accumulation_steps=1,
     num_train_epochs=train_epoch,
     save_strategy='epoch',
     output_dir=output_dir,
