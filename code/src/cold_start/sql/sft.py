@@ -14,12 +14,13 @@ from trl import (
 os.environ['CUDA_VISIBLE_DEVICES'] = '2,3'
 
 
-# dataset = 'bird'
-dataset = 'spider'
+
+dataset = 'bird'
+# dataset = 'spider'
 
 
-wo_reasoning = False
-# wo_reasoning = True
+# wo_reasoning = False
+wo_reasoning = True
 
 if wo_reasoning:
     train_epoch = 2
@@ -31,8 +32,7 @@ else:
 # for_cold_start = False
 
 
-# model_name = 'Qwen/Qwen2.5-3B-Instruct'
-model_name = '/dev/v-langcao/qwen-7'
+model_name = 'Qwen/Qwen2.5-3B-Instruct'
 
 
 

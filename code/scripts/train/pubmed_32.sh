@@ -30,10 +30,10 @@ python3 -m verl.trainer.main_ppo \
     trainer.n_gpus_per_node=2 \
     trainer.nnodes=1 \
     trainer.save_freq=50 \
-    trainer.test_freq=100 \
+    trainer.test_freq=500 \
     trainer.project_name=pubmed_search \
-    trainer.experiment_name=pubmed_search_32_new \
-    actor_rollout_ref.model.path=meta-llama/Llama-3.2-3B-Instruct \
-    critic.model.path=meta-llama/Llama-3.2-3B-Instruct \
-    trainer.default_local_dir=/shared/eng/pj20/lmr_model/pubmed_32_new \
+    trainer.experiment_name=pubmed_search_32_continue \
+    actor_rollout_ref.model.path=/shared/eng/pj20/lmr_model/pubmed_32_new/actor/global_step_600 \
+    critic.model.path=/shared/eng/pj20/lmr_model/pubmed_32_new/critic/global_step_600 \
+    trainer.default_local_dir=/shared/eng/pj20/lmr_model/pubmed_32_continue \
     trainer.total_epochs=10 2>&1 | tee exp_log/32-ppo-verl_demo_$DATE.log 

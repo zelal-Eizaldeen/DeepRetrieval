@@ -84,7 +84,6 @@ Instructions:
 
 IMPORTANT: 
 You must respond with valid JSON wrapped in <answer> tags. The JSON must have this exact structure:
-
 The content between <answer> and </answer> MUST be a valid JSON object:
 - Use double quotes for strings
 - Escape special characters with backslashes (e.g., \\" for quotes within strings)
@@ -229,9 +228,23 @@ def extract_json_from_llm_output(text):
         result = debug_json_parse(json_str)
         if result:
             return result
-        print(f"Warning: Failed to parse JSON from response: {text}")
-        return None
-    
+        else:
+            try:
+                print(f"Warning: Failed to parse JSON from response: {text}")
+                result = {
+                    "has_answer": json_str.split("\"has_answer\":")[1].split("\"cannot_be_derived\":")[0].strip(),
+                    "cannot_be_derived": json_str.split("\"cannot_be_derived\":")[1].split("\"answer_span_in_query\":")[0].strip(),
+                    "answer_span_in_query": json_str.split("\"answer_span_in_query\":")[1].split("\"matched_answer_candidates\":")[0].strip(),
+                    "matched_answer_candidates": json_str.split("\"matched_answer_candidates\":")[1].split("\"cleaned_query\":")[0].strip(),
+                    "cleaned_query": json_str.split("\"cleaned_query\":")[1].split("}", 1)[0].strip()
+                }
+                print("Result: ", result)
+                print("type of result: ", type(result))
+                return result
+            except Exception as e:
+                print(f"Error parsing JSON from response: {str(e)}")
+                return None
+
     print(f"Warning: No JSON structure found in response: {text}")
     return None
 
@@ -362,6 +375,10 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
                     cleaned_metrics = evaluate_query(cleaned_query, target)
                     for k, v in cleaned_metrics.items():
                         results["cleaned_metrics"][k].append(v)
+                elif injection_result == None:
+                    sample_info["has_injection"] = True
+                    results["injection_stats"]["queries_with_injection"] += 1
+                    results["injection_stats"]["answer_spans"].extend(target)
                 else:
                     # If no injection, use same metrics as original
                     for k, v in original_metrics.items():
@@ -411,7 +428,7 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
     }
     
     # Save results
-    output_dir = "results/answer_filtered_new"
+    output_dir = "results/answer_filtered_new_new"
     os.makedirs(output_dir, exist_ok=True)
     output_file = os.path.join(output_dir, f"{dataset_name}_{model_name}_results.json")
     with open(output_file, 'w') as f:
@@ -449,7 +466,7 @@ def main():
             all_results[dataset][model] = results
     
     # Save overall results
-    with open("results/answer_filtered_new/overall_results_ours.json", "w") as f:
+    with open("results/answer_filtered_new_new/overall_results_ours.json", "w") as f:
         json.dump(all_results, f, indent=2)
 
 if __name__ == "__main__":

@@ -1,10 +1,10 @@
-export CUDA_VISIBLE_DEVICES=1,2
+export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
 python3 -m verl.trainer.main_ppo \
-    data.train_files=data/search_engine/pubmed/train.parquet \
-    data.val_files=data/search_engine/pubmed/test.parquet \
+    data.train_files=data/search_engine/ctgov_32/train.parquet \
+    data.val_files=data/search_engine/ctgov_32/test.parquet \
     data.train_batch_size=64 \
     data.val_batch_size=64 \
     data.max_prompt_length=500 \
@@ -14,10 +14,10 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.ppo_mini_batch_size=16 \
     actor_rollout_ref.actor.ppo_micro_batch_size=8 \
     critic.ppo_micro_batch_size=8 \
-    actor_rollout_ref.rollout.log_prob_micro_batch_size=2 \
-    actor_rollout_ref.rollout.tensor_model_parallel_size=2 \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size=4 \
+    actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.2 \
-    actor_rollout_ref.ref.log_prob_micro_batch_size=2 \
+    actor_rollout_ref.ref.log_prob_micro_batch_size=4 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
     critic.model.enable_gradient_checkpointing=True \
@@ -27,13 +27,13 @@ python3 -m verl.trainer.main_ppo \
     trainer.logger=['wandb'] \
     +trainer.val_before_train=False \
     trainer.default_hdfs_dir=null \
-    trainer.n_gpus_per_node=2 \
+    trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
     trainer.save_freq=100 \
     trainer.test_freq=500 \
-    trainer.project_name=pubmed_search \
-    trainer.experiment_name=pubmed_search_3b_continue \
-    actor_rollout_ref.model.path=/shared/eng/pj20/lmr_model/pubmed_3b_new/actor/global_step_600 \
-    critic.model.path=/shared/eng/pj20/lmr_model/pubmed_3b_new/critic/global_step_600 \
-    trainer.default_local_dir=/shared/eng/pj20/lmr_model/pubmed_3b_new_continue \
-    trainer.total_epochs=10 2>&1 | tee exp_log/3b-ppo-verl_demo_$DATE.log 
+    trainer.project_name=ctgov_search \
+    trainer.experiment_name=ctgov_32_transfer \
+    actor_rollout_ref.model.path=/shared/eng/pj20/lmr_model/pubmed_32_continue/actor/global_step_1200 \
+    critic.model.path=/shared/eng/pj20/lmr_model/pubmed_32_continue/critic/global_step_1200 \
+    trainer.default_local_dir=/shared/eng/pj20/lmr_model/ctgov_32_transfer \
+    trainer.total_epochs=10 2>&1 | tee exp_log/32-ppo-verl_demo_$DATE.log 

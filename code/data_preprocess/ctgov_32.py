@@ -25,17 +25,22 @@ O: Outcome - What are the relevant outcomes or effects being measured?
 """
 
 
-def make_prefix_phi4(dp, dataset):
+def make_prefix_llama_32_3b(dp, dataset):
     """
-    Creates a prompt prefix formatted for Phi-4-mini-instruct model.
+    Creates a prompt prefix formatted for LLaMA-3.2-3B model.
     
-    Phi-4 uses the format:
-    <|system|>System Message<|end|><|user|>User Message<|end|><|assistant|>Assistant Message
+    Based on token verification, LLaMA-3.2-3B recognizes:
+    - <|begin_of_text|> as the BOS token (ID: 128000)
+    - <|eot_id|> as the EOS token (ID: 128009)
     """
     
-    input_str = "<|system|>A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer.<|end|>"
+    input_str = "<|begin_of_text|>"
     
-    input_str += "<|user|>" + INSTRUCTION
+    # System instruction
+    input_str += "System: A conversation between User and Assistant. The User asks a question, and the Assistant solves it. The Assistant first thinks about the reasoning process in the mind and then provides the User with the answer.\n\n"
+    
+    # User message
+    input_str += "User: " + INSTRUCTION
     input_str += """The Assistant should show his thinking process in <think> </think> tags. The Assistant should return the final answer in JSON format in <answer> </answer> tags, 
 For example:
 <think>
@@ -51,8 +56,10 @@ Note: The query should use Boolean operators (AND, OR) and parentheses for group
 The research is defined by the following PICO:
 """
 
-    input_str +=  dp['input'] + "<|end|>"
-    input_str += "<|assistant|>\nAssistant: Let me solve this step by step. \n<think>"
+    input_str += dp['input'] + "\n\n"
+    
+    # Assistant start
+    input_str += "Assistant: Let me solve this step by step. \n<think>"
     
     return input_str
 
@@ -70,18 +77,17 @@ def convert_dict_to_str(pico_dict):
     return pico_str
 
 
-
 def load_matching_dataset():
     
     data_train = []
     data_test = []
     data_val = []
     
-    with open('data/raw_data/pubmed/train.jsonl', 'r') as f:
+    with open('data/raw_data/ctgov/train.jsonl', 'r') as f:
         for line in f:
             data_train.append(json.loads(line))
 
-    with open('data/raw_data/pubmed/test.jsonl', 'r') as f:
+    with open('data/raw_data/ctgov/test.jsonl', 'r') as f:
         cnt = 0
         for line in f:
             data_val.append(json.loads(line))
@@ -92,9 +98,9 @@ def load_matching_dataset():
         for line in f:
             data_test.append(json.loads(line))
     
-    train_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['publication_pmids'], 'pub_date': x['pub_date']} for x in data_train]
-    test_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['publication_pmids'], 'pub_date': x['pub_date']} for x in data_test]
-    val_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['publication_pmids'], 'pub_date': x['pub_date']} for x in data_val]
+    train_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['trial_nctids'], 'pub_date': x['pub_date']} for x in data_train]
+    test_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['trial_nctids'], 'pub_date': x['pub_date']} for x in data_test]
+    val_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['trial_nctids'], 'pub_date': x['pub_date']} for x in data_val]
     
     return train_data, test_data, val_data
 
@@ -104,7 +110,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--local_dir', default='data/search_engine')
     parser.add_argument('--hdfs_dir', default=None)
-    parser.add_argument('--dataset', type=str, default='pubmed_4b')
+    parser.add_argument('--dataset', type=str, default='ctgov_32')
 
     args = parser.parse_args()
     
@@ -119,7 +125,7 @@ if __name__ == '__main__':
 
     def make_map_fn(split):
         def process_fn(example, idx):
-            question = make_prefix_phi4(example, dataset=args.dataset)
+            question = make_prefix_llama_32_3b(example, dataset=args.dataset)
             solution = {
                 "target": example['label'],
             }
