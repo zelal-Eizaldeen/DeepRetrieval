@@ -12,7 +12,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(os.path.dirname(current_dir))
 sys.path.insert(0, project_root)
 
-from src.sql.spider import SpiderDatabaseSearcher
+from src.sql.bird import BirdDatabaseSearcher
 
 
 
@@ -21,7 +21,7 @@ _searcher = None
 
 def get_searcher():
     global _searcher
-    _searcher = SpiderDatabaseSearcher()
+    _searcher = BirdDatabaseSearcher()
     return _searcher
     
 
@@ -75,7 +75,7 @@ def calculate_execution_score(pred_sql, gold_sql, db_path):
 
     return execution_score
 
-def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, batch_size=8, with_reasoning=True):
+def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, batch_size=8, with_reasoning=True, data_id=None):
     df = pd.read_parquet(data_path)
     
     inputs = [item[0]['content'] for item in df['prompt'].tolist()]
@@ -88,6 +88,11 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
     sampled_text = []
     
     for batch_start in tqdm(range(0, len(inputs), batch_size), desc="Evaluating"):
+
+
+        if batch_start != data_id:
+            continue
+
         batch_end = min(batch_start + batch_size, len(inputs))
         batch_inputs = inputs[batch_start:batch_end]
         
@@ -98,6 +103,8 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
                 batch_inputs[i] = batch_inputs[i].replace("<think>\n[thinking process]\n</think>", "")
                 batch_inputs[i] = batch_inputs[i].replace("<think>", "")
 
+        # print(batch_inputs[0])
+
         tokenized_inputs = tokenizer(batch_inputs, return_tensors="pt", padding=True, truncation=True).to(device)
 
 
@@ -106,10 +113,13 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
         
         for i, output in enumerate(output_ids):
             try:
+                
                 generated_text = tokenizer.decode(output, skip_special_tokens=True)
+                # print(generated_text)
                 sampled_text.append(generated_text)
 
                 idx = batch_start + i
+
                 answer_text, processed_str = extract_solution(generated_text)
                 if answer_text:
                     try:
@@ -120,7 +130,21 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
                             db_paths[idx]
                         )
                         execution_scores.append(score)
-                        
+
+                        if score == 0:
+                            print('Error!')
+                        else:
+                            print("--------------------------------")
+                            print('True!')
+                            print(f'data id: {idx}')
+                            print('data_input:')
+                            print(batch_inputs[i])
+                            print("--------------------------------")
+                            print(f'data id: {idx}')
+                            print('generated_text:')
+                            print(generated_text)
+                            print("--------------------------------")
+
                     except (json.JSONDecodeError, KeyError) as e:
                         print(f"[Error] JSON parsing error: {e}")
                         execution_scores.append(0.0)
@@ -162,21 +186,23 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_path", type=str, default="/dev/v-langcao/training_outputs/spider_3b/actor/global_step_400")
-    parser.add_argument("--data_path", type=str, default="data/sql/spider/test.parquet")
-    parser.add_argument("--model_name", type=str, default="spider-3b-step-400")
+    parser.add_argument("--model_path", type=str, default="/shared/eng/pj20/lmr_model/bird_3b/actor/global_step_400")
+    parser.add_argument("--data_path", type=str, default="data/sql/bird/test.parquet")
+    parser.add_argument("--model_name", type=str, default="bird-cases-tudy")
     parser.add_argument("--save_dir", type=str, default="results")
-    parser.add_argument("--batch_size", type=int, default=8)
+    parser.add_argument("--batch_size", type=int, default=1)
     parser.add_argument("--with_reasoning", type=str, default=True)
     args = parser.parse_args()
-    
+
+
+    data_id = 100
+
     args.with_reasoning = True if args.with_reasoning.lower() == "true" else False
-    
     print(f'args.with_reasoning: {args.with_reasoning}')
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tokenizer, model = load_model(args.model_path)
-    evaluate_model(model, tokenizer, args.data_path, device, args.model_name, args.save_dir, args.batch_size, args.with_reasoning)
+    evaluate_model(model, tokenizer, args.data_path, device, args.model_name, args.save_dir, args.batch_size, args.with_reasoning, data_id)
 
 if __name__ == "__main__":
     main()

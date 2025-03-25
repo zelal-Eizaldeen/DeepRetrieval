@@ -101,7 +101,6 @@ def evaluate_model(llm_name, data_path, save_dir, with_reasoning=True):
     
     for idx, data_input in tqdm(enumerate(inputs), desc="Evaluating", total=len(inputs)):
         try:
-
             if not with_reasoning:
                 data_input = data_input.replace("You first think about the reasoning process in the mind and then provides the user with the answer.", "You need to provide the user with the answer.")
                 data_input = data_input.replace("Show your work in <think> </think> tags. ", "")
@@ -123,6 +122,20 @@ def evaluate_model(llm_name, data_path, save_dir, with_reasoning=True):
                         db_paths[idx]
                     )
                     execution_scores.append(score)
+
+                    # # case study
+                    # if score == 0.0:
+                    #     print("--------------------------------")
+                    #     print(f'data id: {idx}')
+                    #     print('data_input:')
+                    #     print(data_input)
+                    #     print("--------------------------------")
+                    #     print(f'data id: {idx}')
+                    #     print('generated_text:')
+                    #     print(generated_text)
+                    #     print("--------------------------------")
+                    #     input('Next?')
+
                 except (json.JSONDecodeError, KeyError) as e:
                     print(f"[Error] JSON parsing error: {e}")
                     execution_scores.append(0.0)
@@ -136,7 +149,7 @@ def evaluate_model(llm_name, data_path, save_dir, with_reasoning=True):
             execution_scores.append(0.0)
             error_count += 1
             continue
-            
+
         # Print intermediate results
         if len(execution_scores) > 0:
             print(f"Current Execution Accuracy: {sum(execution_scores) / len(execution_scores):.4f}")
