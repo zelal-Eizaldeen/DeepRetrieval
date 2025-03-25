@@ -21,6 +21,8 @@ with open(file_path, 'r') as file:
 answers = {}
 for key, value in data.items():
     match = re.search(r"<answer>\s*(.*?)\s*</answer>", value["generated_text"], re.DOTALL)
+    if match is None:
+        match = re.search(r'"query"\s*:\s*"([^"]+)"', value["generated_text"], re.DOTALL)
     try:
         query_text = match.group(1)
         # json loads

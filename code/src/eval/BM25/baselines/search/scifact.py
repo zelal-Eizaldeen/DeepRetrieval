@@ -22,8 +22,10 @@ if __name__ == '__main__':
     # res_path = '../results/no_reason/claude-3.5_post_scifact.json'
     # res_path = '../results/no_reason/gpt-4o_post_scifact.json'
     # res_path = '../results/no_reason/gpt-35_post_scifact.json'
-    res_path = '../results/gpt-35_post_scifact.json'
-
+    # res_path = '../results/gpt-35_post_scifact.json'
+    # res_path = '../results/no_reason/claude-haiku_post_scifact.json'
+    res_path = '../results/claude-haiku_post_scifact.json'
+    
     search_system = PyseriniMultiFieldSearch(index_dir=f"data/local_index_search/{args.dataset}/pyserini_index")
 
     with open(res_path, "r", encoding="utf-8") as file:
@@ -39,8 +41,8 @@ if __name__ == '__main__':
 
     for i in tqdm(range(0, len(test_data), batch_size)):
         batch = test_data[i:i+batch_size]
-        queries = [item['generated_text'] for item in batch]
-        targets = {item['generated_text']: item['target'] for item in batch} 
+        queries = [str(item['generated_text']) for item in batch]
+        targets = {str(item['generated_text']): item['target'] for item in batch} 
         
         results = search_system.batch_search(queries, top_k=10, threads=16)
         
