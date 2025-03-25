@@ -1,6 +1,6 @@
 export HYDRA_FULL_ERROR=1
 # export CUDA_VISIBLE_DEVICES=0,1
-export CUDA_VISIBLE_DEVICES=2,3
+# export CUDA_VISIBLE_DEVICES=2,3
 
 PROJECT_NAME=bird
 
@@ -8,8 +8,11 @@ PROJECT_NAME=bird
 # INIT_MODEL=Qwen/Qwen2.5-Coder-3B-Instruct
 # INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
 
-EXP_NAME=bird_3b_coder_cs_e1
-INIT_MODEL=/dev/v-langcao/DeepRetrieval-SQL/cold_start/bird_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-2114
+EXP_NAME=bird_7b_coder
+INIT_MODEL=/dev/v-langcao/qwen-7
+
+# EXP_NAME=bird_3b_coder_cs_e1
+# INIT_MODEL=/dev/v-langcao/DeepRetrieval-SQL/cold_start/bird_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-2114
 
 # EXP_NAME=bird_3b_coder_cs_e4
 # INIT_MODEL=/dev/v-langcao/DeepRetrieval-SQL/cold_start/bird_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-8456
@@ -26,12 +29,12 @@ python3 -m verl.trainer.main_ppo \
     actor_rollout_ref.actor.optim.lr=1e-6 \
     actor_rollout_ref.actor.strategy=fsdp \
     actor_rollout_ref.actor.ppo_mini_batch_size=16 \
-    actor_rollout_ref.actor.ppo_micro_batch_size=2 \
-    critic.ppo_micro_batch_size=2 \
-    actor_rollout_ref.rollout.log_prob_micro_batch_size=2 \
+    actor_rollout_ref.actor.ppo_micro_batch_size=4 \
+    critic.ppo_micro_batch_size=4 \
+    actor_rollout_ref.rollout.log_prob_micro_batch_size=4 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
     actor_rollout_ref.rollout.gpu_memory_utilization=0.2 \
-    actor_rollout_ref.ref.log_prob_micro_batch_size=2 \
+    actor_rollout_ref.ref.log_prob_micro_batch_size=4 \
     actor_rollout_ref.rollout.temperature=0.6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
     actor_rollout_ref.ref.fsdp_config.param_offload=True \
@@ -42,9 +45,9 @@ python3 -m verl.trainer.main_ppo \
     trainer.logger=['wandb'] \
     +trainer.val_before_train=False \
     trainer.default_hdfs_dir=null \
-    trainer.n_gpus_per_node=2 \
+    trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
-    trainer.save_freq=200 \
+    trainer.save_freq=400 \
     trainer.test_freq=20 \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXP_NAME \
