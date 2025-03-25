@@ -1,15 +1,19 @@
 export HYDRA_FULL_ERROR=1
-export CUDA_VISIBLE_DEVICES=2,3
+export CUDA_VISIBLE_DEVICES=0,1
+# export CUDA_VISIBLE_DEVICES=2,3
 
 PROJECT_NAME=spider
 # EXP_NAME=spider_3b
 # INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
 
-# EXP_NAME=spider_3b_coder
-# INIT_MODEL=Qwen/Qwen2.5-Coder-3B-Instruct
+EXP_NAME=spider_3b_coder_wor
+INIT_MODEL=Qwen/Qwen2.5-Coder-3B-Instruct
 
-EXP_NAME=spider_3b_coder_cs_e1
-INIT_MODEL=/dev/v-langcao/DeepRetrieval-SQL/cold_start/spider_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-2090
+# EXP_NAME=spider_7b_coder
+# INIT_MODEL=/dev/v-langcao/qwen-7
+
+# EXP_NAME=spider_3b_coder_cs_e1
+# INIT_MODEL=/dev/v-langcao/DeepRetrieval-SQL/cold_start/spider_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-2090
 
 # EXP_NAME=spider_3b_coder_cs_e4
 # INIT_MODEL=/dev/v-langcao/sft_training_outputs/spider/checkpoint-4180
@@ -17,9 +21,10 @@ INIT_MODEL=/dev/v-langcao/DeepRetrieval-SQL/cold_start/spider_Qwen/Qwen2.5-Coder
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
+
 python3 -m verl.trainer.main_ppo \
-    data.train_files=data/sql/spider/train.parquet \
-    data.val_files=data/sql/spider/test.parquet \
+    data.train_files=data/sql/wor/spider_wor/train.parquet \
+    data.val_files=data/sql/wor/spider_wor/test.parquet \
     data.train_batch_size=64 \
     data.val_batch_size=64 \
     data.max_prompt_length=2048 \

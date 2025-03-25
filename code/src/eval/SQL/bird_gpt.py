@@ -169,8 +169,8 @@ def main():
     parser.add_argument("--llm_name", type=str, default="gpt-4o")
     parser.add_argument("--data_path", type=str, default="data/sql/bird/test.parquet")
     parser.add_argument("--save_dir", type=str, default="results/sql/bird")
-    # parser.add_argument("--with_reasoning", type=str, default='True')
-    parser.add_argument("--with_reasoning", type=str, default='false')
+    parser.add_argument("--with_reasoning", type=str, default='True')
+    # parser.add_argument("--with_reasoning", type=str, default='false')
     args = parser.parse_args()
     
     args.with_reasoning = True if args.with_reasoning.lower() == "true" else False

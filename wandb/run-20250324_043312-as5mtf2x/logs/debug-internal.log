@@ -1,0 +1,7 @@
+{"time":"2025-03-24T04:33:12.128635777Z","level":"INFO","msg":"stream: starting","core version":"0.19.8","symlink path":"/mnt/batch/tasks/shared/LS_root/mounts/clusters/v-langcao2/code/DeepRetrieval/wandb/run-20250324_043312-as5mtf2x/logs/debug-core.log"}
+{"time":"2025-03-24T04:33:12.233488457Z","level":"INFO","msg":"created new stream","id":"as5mtf2x"}
+{"time":"2025-03-24T04:33:12.233520487Z","level":"INFO","msg":"stream: started","id":"as5mtf2x"}
+{"time":"2025-03-24T04:33:12.233543335Z","level":"INFO","msg":"writer: Do: started","stream_id":"as5mtf2x"}
+{"time":"2025-03-24T04:33:12.233601029Z","level":"INFO","msg":"handler: started","stream_id":"as5mtf2x"}
+{"time":"2025-03-24T04:33:12.233653857Z","level":"INFO","msg":"sender: started","stream_id":"as5mtf2x"}
+{"time":"2025-03-24T04:33:12.405595496Z","level":"INFO","msg":"Starting system monitor"}

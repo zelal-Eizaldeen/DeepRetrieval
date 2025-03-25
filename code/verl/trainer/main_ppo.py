@@ -105,11 +105,19 @@ def _select_rm_score_fn(data_source):
         from verl.utils.reward_score import msmarco
         return msmarco.compute_score
     elif 'bird' in data_source:
-        from verl.utils.reward_score import bird
-        return bird.compute_score
+        if 'wor' in data_source:
+            from verl.utils.reward_score import bird_no_reason
+            return bird_no_reason.compute_score
+        else:
+            from verl.utils.reward_score import bird
+            return bird.compute_score
     elif 'spider' in data_source:
-        from verl.utils.reward_score import spider
-        return spider.compute_score
+        if 'wor' in data_source:
+            from verl.utils.reward_score import spider_no_reason
+            return spider_no_reason.compute_score
+        else:
+            from verl.utils.reward_score import spider
+            return spider.compute_score
     elif 'wikisql' in data_source:
         from verl.utils.reward_score import wikisql
         return wikisql.compute_score
