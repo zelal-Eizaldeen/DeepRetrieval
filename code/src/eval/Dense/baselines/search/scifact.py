@@ -18,6 +18,13 @@ if __name__ == '__main__':
     parser.add_argument('--res_path', type=str, default="../results_dense/no_reason/gpt-4o_post_scifact.json", help="Path to the qrels file")
     args = parser.parse_args()
     
+    # res_dir = '../results_dense/no_reason/gpt-35_post_scifact.json'
+    # res_dir = '../results_dense/gpt-35_post_scifact.json'
+    # res_dir = '../results_dense/no_reason/claude-haiku_post_scifact.json'
+    res_dir = '../results_dense/claude-haiku_post_scifact.json'
+    
+    args.res_path = res_dir
+
     model_path = "intfloat/multilingual-e5-large-instruct"
     output_dir = "data/local_index_search/scifact/dense_index"
     index_path = f"{output_dir}/faiss_hnsw_index.bin"
@@ -40,8 +47,8 @@ if __name__ == '__main__':
 
     for i in tqdm(range(0, len(test_data), batch_size)):
         batch = test_data[i:i+batch_size]
-        queries = [item['generated_text'] for item in batch]
-        targets = {item['generated_text']: item['target'] for item in batch} 
+        queries = [str(item['generated_text']) for item in batch]
+        targets = {str(item['generated_text']): item['target'] for item in batch} 
         
         results = search_system.batch_search(queries, top_k=10, threads=16)
         for idx, query in enumerate(queries):

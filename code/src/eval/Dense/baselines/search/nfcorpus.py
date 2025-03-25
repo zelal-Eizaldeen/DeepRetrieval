@@ -25,7 +25,11 @@ if __name__ == '__main__':
     # res_dir = '../results_dense/Qwen-inst-nfcorpus.json'
     # res_dir = '../results_dense/no_reason/Qwen-inst-nfcorpus.json'
     # res_dir = '../results_dense/no_reason/claude-3.5_post_nfcorpus.json'
-    res_dir = '../results_dense/no_reason/gpt-4o_post_nfcorpus.json'
+    # res_dir = '../results_dense/no_reason/gpt-4o_post_nfcorpus.json'
+    # res_dir = '../results_dense/no_reason/gpt-35_post_nfcorpus.json'
+    # res_dir = '../results_dense/gpt-35_post_nfcorpus.json'
+    # res_dir = '../results_dense/no_reason/claude-haiku_post_nfcorpus.json'
+    res_dir = '../results_dense/claude-haiku_post_nfcorpus.json'
     with open(res_dir, "r", encoding="utf-8") as file:
         res = json.load(file)
     

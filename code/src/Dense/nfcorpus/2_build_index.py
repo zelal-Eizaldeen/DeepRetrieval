@@ -17,7 +17,7 @@ def build_faiss_hnsw_index(embedding_path, doc_ids_path, output_index_path, M=32
     print(f"Loading embeddings from {embedding_path}...")
     embeddings = np.load(embedding_path).astype(np.float32)  # FAISS requires float32
     doc_ids = np.load(doc_ids_path)
-
+    
     # Normalize embeddings for cosine similarity
     faiss.normalize_L2(embeddings)
 

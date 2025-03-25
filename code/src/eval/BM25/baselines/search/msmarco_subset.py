@@ -35,7 +35,20 @@ if __name__ == '__main__':
     # res_dir = '../results/no_reason/gpt-4o_post_msmarco_tech.json'
     # res_dir = '../results/no_reason/claude-3.5_msmarco_health.json'
     # res_dir = '../results/no_reason/claude-3.5_msmarco_science.json'
-    res_dir = '../results/no_reason/claude-3.5_msmarco_tech.json'
+    # res_dir = '../results/no_reason/claude-3.5_msmarco_tech.json'
+    # res_dir = '../results/gpt-35_post_msmarco_health.json'
+    # res_dir = '../results/gpt-35_post_msmarco_science.json'
+    # res_dir = '../results/gpt-35_post_msmarco_tech.json'
+    # res_dir = '../results/no_reason/gpt-35_post_msmarco_health.json'
+    # res_dir = '../results/no_reason/gpt-35_post_msmarco_science.json'
+    # res_dir = '../results/no_reason/gpt-35_post_msmarco_tech.json'
+    # res_dir = '../results/no_reason/claude-haiku_post_msmarco_health.json'
+    # res_dir = '../results/no_reason/claude-haiku_post_msmarco_science.json'
+    # res_dir = '../results/no_reason/claude-haiku_post_msmarco_tech.json'
+    # res_dir = '../results/claude-haiku_post_msmarco_health.json'
+    # res_dir = '../results/claude-haiku_post_msmarco_science.json'
+    res_dir = '../results/claude-haiku_post_msmarco_tech.json'
+
     with open(res_dir, "r", encoding="utf-8") as file:
         res = json.load(file)
 

@@ -32,7 +32,7 @@ def process_corpus(jsonl_path, output_dir):
 
     embedding_output = f"{output_dir}/embeddings.npy"
     doc_ids_output = f"{output_dir}/doc_ids.npy"
-
+    
     # Read JSONL corpus
     with open(jsonl_path, "r", encoding="utf-8") as f:
         for line in tqdm(f, desc="Loading corpus"):
