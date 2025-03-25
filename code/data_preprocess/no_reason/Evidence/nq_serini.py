@@ -72,7 +72,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--local_dir', default='data/local_index_search/no_reason')
     parser.add_argument('--hdfs_dir', default=None)
-    parser.add_argument('--dataset', type=str, default='nq_serini')
+    parser.add_argument('--dataset', type=str, default='nq_serini_no_reason')
 
     args = parser.parse_args()
     

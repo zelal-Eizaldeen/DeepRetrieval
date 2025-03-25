@@ -71,7 +71,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--local_dir', default='data/local_index_search/no_reason')
     parser.add_argument('--hdfs_dir', default=None)
-    parser.add_argument('--dataset', type=str, default='triviaqa')
+    parser.add_argument('--dataset', type=str, default='triviaqa_no_reason')
 
     args = parser.parse_args()
     

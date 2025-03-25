@@ -34,13 +34,15 @@ def load_model(model_path):
 def extract_solution(solution_str):
     """Extract the SQL query from the solution string."""
     # Remove everything before the first "Assistant:"
-    if "Assistant:" in solution_str:
-        processed_str = solution_str.split("Assistant:", 1)[1].strip()
-    elif "<|im_start|>assistant" in solution_str:
-        processed_str = solution_str.split("<|im_start|>assistant", 1)[1].strip()
-    else:
-        print("[Error] Failed to locate model response header")
-        return None, processed_str
+    # if "Assistant:" in solution_str:
+    #     processed_str = solution_str.split("Assistant:", 1)[1].strip()
+    # elif "<|im_start|>assistant" in solution_str:
+    #     processed_str = solution_str.split("<|im_start|>assistant", 1)[1].strip()
+    # else:
+    #     print("[Error] Failed to locate model response header")
+    #     return None, processed_str
+
+    processed_str = solution_str
 
     # Regular expression to find the last occurrence of <answer>...</answer>
     answer_pattern = r'<answer>(.*?)</answer>'
@@ -73,7 +75,7 @@ def calculate_execution_score(pred_sql, gold_sql, db_path):
 
     return execution_score
 
-def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, batch_size=8):
+def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, batch_size=8, with_reasoning=True):
     df = pd.read_parquet(data_path)
     
     inputs = [item[0]['content'] for item in df['prompt'].tolist()]
@@ -89,14 +91,26 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
         batch_end = min(batch_start + batch_size, len(inputs))
         batch_inputs = inputs[batch_start:batch_end]
         
+        for i in range(len(batch_inputs)):
+            if not with_reasoning:
+                batch_inputs[i] = batch_inputs[i].replace("You first think about the reasoning process in the mind and then provides the user with the answer.", "You need to provide the user with the answer.")
+                batch_inputs[i] = batch_inputs[i].replace("Show your work in <think> </think> tags. ", "")
+                batch_inputs[i] = batch_inputs[i].replace("<think>\n[thinking process]\n</think>", "")
+                batch_inputs[i] = batch_inputs[i].replace("<think>", "")
+
+        # print(batch_inputs[0])
+
         tokenized_inputs = tokenizer(batch_inputs, return_tensors="pt", padding=True, truncation=True).to(device)
-        
+
+
         with torch.no_grad():
-            output_ids = model.generate(**tokenized_inputs, max_new_tokens=256)
+            output_ids = model.generate(**tokenized_inputs, max_new_tokens=512)
         
         for i, output in enumerate(output_ids):
             try:
+                
                 generated_text = tokenizer.decode(output, skip_special_tokens=True)
+                # print(generated_text)
                 sampled_text.append(generated_text)
 
                 idx = batch_start + i
@@ -156,11 +170,15 @@ def main():
     parser.add_argument("--model_name", type=str, default="bird-3b-step-400")
     parser.add_argument("--save_dir", type=str, default="results")
     parser.add_argument("--batch_size", type=int, default=8)
+    parser.add_argument("--with_reasoning", type=str, default=True)
     args = parser.parse_args()
-    
+
+    args.with_reasoning = True if args.with_reasoning.lower() == "true" else False
+    print(f'args.with_reasoning: {args.with_reasoning}')
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tokenizer, model = load_model(args.model_path)
-    evaluate_model(model, tokenizer, args.data_path, device, args.model_name, args.save_dir, args.batch_size)
+    evaluate_model(model, tokenizer, args.data_path, device, args.model_name, args.save_dir, args.batch_size, args.with_reasoning)
 
 if __name__ == "__main__":
     main()

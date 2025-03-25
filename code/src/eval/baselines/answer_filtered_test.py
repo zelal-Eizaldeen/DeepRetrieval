@@ -68,49 +68,6 @@ def get_if_answer_span_in_query_batch(original_queries, queries, answer_candidat
     Returns:
         List of LLM responses in the same order as the input queries
     """
-#     def create_prompt(query, answer_candidates):
-#         if type(query) == list:
-#             query = query[0]
-#         # print(answer_candidates)
-#         return """Your task is to analyze if there are answer spans in the query that match or paraphrase any of the answer candidates.
-
-# Instructions:
-# 1. Check if any part of the query exactly matches or paraphrases any answer candidate
-# 2. If found, remove those answer spans from the query
-# 3. Return your analysis in a strict JSON format
-
-# IMPORTANT: 
-# You must respond with valid JSON wrapped in <answer> tags. The JSON must have this exact structure:
-# {
-#     "has_answer": boolean (true or false),
-#     "answer_span_in_query": [string],
-#     "matched_answer_candidates": [string],
-#     "cleaned_query": string
-# }
-
-# The content between <answer> and </answer> must be a valid JSON object:
-# - Use double quotes for strings
-# - Escape special characters with backslashes (e.g., \\" for quotes within strings)
-# - Follow standard JSON formatting rules
-
-# Example valid response:
-# <answer>
-# {
-#     "has_answer": true,
-#     "answer_span_in_query": ["new york city"],
-#     "matched_answer_candidates": ["NYC"],
-#     "cleaned_query": "(\\"population\\" OR \\"residents\\") AND \\"2020\\""
-# }
-# </answer>
-
-# Query to analyze:
-# """ + query + """   
-
-# Answer candidates to check against:
-# """ + str(answer_candidates) + """
-
-# Your response:
-# """
 
     def create_prompt(original_query, query, answer_candidates):
         if type(query) == list:
@@ -127,7 +84,6 @@ Instructions:
 
 IMPORTANT: 
 You must respond with valid JSON wrapped in <answer> tags. The JSON must have this exact structure:
-
 The content between <answer> and </answer> MUST be a valid JSON object:
 - Use double quotes for strings
 - Escape special characters with backslashes (e.g., \\" for quotes within strings)
@@ -138,15 +94,18 @@ For the following original query:
 "How many people live in New York City in 2020?"
 
 and the augmented query:
-("population" OR "residents") AND "new york city" AND "2020"
+("population" OR "residents") AND "new york city" AND "2020" AND "8 million"
+
+Answer candidates to check against:
+["8.253 million", "8,253,213", "8.25M", "approximately 8.25 million"]
 
 <answer>
 {
     "has_answer": true,
     "cannot_be_derived": true,
-    "answer_span_in_query": ["new york city"],
-    "matched_answer_candidates": ["NYC"],
-    "cleaned_query": "(\\"population\\" OR \\"residents\\") AND \\"2020\\""
+    "answer_span_in_query": ["8 million"],
+    "matched_answer_candidates": ["approximately 8.25 million", "8.25M"],
+    "cleaned_query": "(\"population\" OR \"residents\") AND \"new york city\" AND \"2020\""
 }
 </answer>
 
@@ -269,9 +228,23 @@ def extract_json_from_llm_output(text):
         result = debug_json_parse(json_str)
         if result:
             return result
-        print(f"Warning: Failed to parse JSON from response: {text}")
-        return None
-    
+        else:
+            try:
+                print(f"Warning: Failed to parse JSON from response: {text}")
+                result = {
+                    "has_answer": json_str.split("\"has_answer\":")[1].split("\"cannot_be_derived\":")[0].strip(),
+                    "cannot_be_derived": json_str.split("\"cannot_be_derived\":")[1].split("\"answer_span_in_query\":")[0].strip(),
+                    "answer_span_in_query": json_str.split("\"answer_span_in_query\":")[1].split("\"matched_answer_candidates\":")[0].strip(),
+                    "matched_answer_candidates": json_str.split("\"matched_answer_candidates\":")[1].split("\"cleaned_query\":")[0].strip(),
+                    "cleaned_query": json_str.split("\"cleaned_query\":")[1].split("}", 1)[0].strip()
+                }
+                print("Result: ", result)
+                print("type of result: ", type(result))
+                return result
+            except Exception as e:
+                print(f"Error parsing JSON from response: {str(e)}")
+                return None
+
     print(f"Warning: No JSON structure found in response: {text}")
     return None
 
@@ -402,6 +375,10 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
                     cleaned_metrics = evaluate_query(cleaned_query, target)
                     for k, v in cleaned_metrics.items():
                         results["cleaned_metrics"][k].append(v)
+                elif injection_result == None:
+                    sample_info["has_injection"] = True
+                    results["injection_stats"]["queries_with_injection"] += 1
+                    results["injection_stats"]["answer_spans"].extend(target)
                 else:
                     # If no injection, use same metrics as original
                     for k, v in original_metrics.items():
@@ -451,7 +428,7 @@ def process_generations(dataset_name, model_name, generations_path, data_path):
     }
     
     # Save results
-    output_dir = "results/answer_filtered_new"
+    output_dir = "results/answer_filtered_new_new"
     os.makedirs(output_dir, exist_ok=True)
     output_file = os.path.join(output_dir, f"{dataset_name}_{model_name}_results.json")
     with open(output_file, 'w') as f:
@@ -468,6 +445,7 @@ def main():
     # parser.add_argument("--models", nargs="+", default=["gpt4o", "claude35"])
     # parser.add_argument("--models", nargs="+", default=["gpt35", "claude3"])
     parser.add_argument("--models", nargs="+", default=["gpt4o", "ours", "claude35", "gpt35", "claude3"])
+    # parser.add_argument("--models", nargs="+", default=["base"])
     args = parser.parse_args()
     
     all_results = {}
@@ -488,7 +466,7 @@ def main():
             all_results[dataset][model] = results
     
     # Save overall results
-    with open("results/answer_filtered_new/overall_results_ours.json", "w") as f:
+    with open("results/answer_filtered_new_new/overall_results_ours.json", "w") as f:
         json.dump(all_results, f, indent=2)
 
 if __name__ == "__main__":

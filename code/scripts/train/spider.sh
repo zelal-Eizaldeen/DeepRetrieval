@@ -1,14 +1,30 @@
 export HYDRA_FULL_ERROR=1
-export CUDA_VISIBLE_DEVICES=2,3
+export CUDA_VISIBLE_DEVICES=0,1
+# export CUDA_VISIBLE_DEVICES=2,3
 
 PROJECT_NAME=spider
-EXP_NAME=spider_3b
+# EXP_NAME=spider_3b
+# INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
+
+EXP_NAME=spider_3b_coder_wor
+INIT_MODEL=Qwen/Qwen2.5-Coder-3B-Instruct
+
+# EXP_NAME=spider_7b_coder
+# INIT_MODEL=/dev/v-langcao/qwen-7
+
+# EXP_NAME=spider_3b_coder_cs_e1
+# INIT_MODEL=/dev/v-langcao/DeepRetrieval-SQL/cold_start/spider_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-2090
+
+# EXP_NAME=spider_3b_coder_cs_e4
+# INIT_MODEL=/dev/v-langcao/sft_training_outputs/spider/checkpoint-4180
+# INIT_MODEL=/dev/v-langcao/DeepRetrieval-SQL/cold_start/spider_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-8360
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
+
 python3 -m verl.trainer.main_ppo \
-    data.train_files=data/sql/spider/train.parquet \
-    data.val_files=data/sql/spider/test.parquet \
+    data.train_files=data/sql/wor/spider_wor/train.parquet \
+    data.val_files=data/sql/wor/spider_wor/test.parquet \
     data.train_batch_size=64 \
     data.val_batch_size=64 \
     data.max_prompt_length=2048 \
@@ -34,11 +50,11 @@ python3 -m verl.trainer.main_ppo \
     trainer.default_hdfs_dir=null \
     trainer.n_gpus_per_node=2 \
     trainer.nnodes=1 \
-    trainer.save_freq=20 \
+    trainer.save_freq=200 \
     trainer.test_freq=20 \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXP_NAME \
-    actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct \
-    critic.model.path=Qwen/Qwen2.5-3B-Instruct \
+    actor_rollout_ref.model.path=$INIT_MODEL \
+    critic.model.path=$INIT_MODEL \
     trainer.default_local_dir=/dev/v-langcao/training_outputs/${EXP_NAME} \
     trainer.total_epochs=5 2>&1 | tee exp_log/$PROJECT_NAME-3b-ppo-verl_demo_$DATE.log 

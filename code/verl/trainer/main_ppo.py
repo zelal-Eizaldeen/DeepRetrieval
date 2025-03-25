@@ -60,13 +60,25 @@ def _select_rm_score_fn(data_source):
             from verl.utils.reward_score import nfcorpus
             return nfcorpus.compute_score
     elif 'nq_serini' in data_source:
-        from verl.utils.reward_score import nq_serini
-        return nq_serini.compute_score
+        if 'no_reason' in data_source:
+            from verl.utils.reward_score import nq_no_reason
+            return nq_no_reason.compute_score
+        else:
+            from verl.utils.reward_score import nq_serini
+            return nq_serini.compute_score
     elif 'triviaqa' in data_source:
-        from verl.utils.reward_score import triviaqa
-        return triviaqa.compute_score
+        if 'no_reason' in data_source:
+            from verl.utils.reward_score import tqa_no_reason
+            return tqa_no_reason.compute_score
+        else:
+            from verl.utils.reward_score import triviaqa
+            return triviaqa.compute_score
     elif 'squad' in data_source:
-        from verl.utils.reward_score import squad
+        if 'no_reason' in data_source:
+            from verl.utils.reward_score import squad_no_reason
+            return squad_no_reason.compute_score
+        else:
+            from verl.utils.reward_score import squad
         return squad.compute_score
     elif 'hotpotqa' in data_source:
         if 'dense' in data_source:
@@ -93,11 +105,22 @@ def _select_rm_score_fn(data_source):
         from verl.utils.reward_score import msmarco
         return msmarco.compute_score
     elif 'bird' in data_source:
-        from verl.utils.reward_score import bird
-        return bird.compute_score
+        if 'wor' in data_source:
+            from verl.utils.reward_score import bird_no_reason
+            return bird_no_reason.compute_score
+        else:
+            from verl.utils.reward_score import bird
+            return bird.compute_score
     elif 'spider' in data_source:
-        from verl.utils.reward_score import spider
-        return spider.compute_score
+        if 'wor' in data_source:
+            from verl.utils.reward_score import spider_no_reason
+            return spider_no_reason.compute_score
+        else:
+            from verl.utils.reward_score import spider
+            return spider.compute_score
+    elif 'wikisql' in data_source:
+        from verl.utils.reward_score import wikisql
+        return wikisql.compute_score
     else:
         raise NotImplementedError
 
@@ -171,6 +194,10 @@ class RewardManager():
             elif 'bird' in data_source or 'spider' in data_source:
                 db_path = data_item.non_tensor_batch['extra_info']['db_path']
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, data_source=data_source, db_path=db_path)
+            elif 'wikisql' in data_source:
+                db_path = data_item.non_tensor_batch['extra_info']['db_path']
+                db_id = data_item.non_tensor_batch['extra_info']['db_id']
+                score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth, data_source=data_source, db_path=db_path, db_id=db_id)
             else:
                 score = compute_score_fn(solution_str=sequences_str, ground_truth=ground_truth)
             

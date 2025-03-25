@@ -12,6 +12,7 @@ import random
 import pdb
 import sqlite3
 
+
 # prompt reference: https://github.com/AlibabaResearch/DAMO-ConvAI/blob/main/bird/llm/src/gpt_request.py
 
 
@@ -102,7 +103,7 @@ def make_prefix(dp, split):
     input_str += f"""External Knowledge: {dp['knowledge']}
 """
 
-    input_str += """Note: Using valid SQLite and understading External Knowledge, answer the following questions for the tables provided above.
+    input_str += """Note: Using valid SQLite and understanding External Knowledge, answer the following questions for the tables provided above.
 
 Show your work in <think> </think> tags. Your final response must be in JSON format within <answer> </answer>. For example,
 <think>
@@ -127,7 +128,7 @@ Here's the user query:
 """
 
     input_str +=  dp['question'] + """<|im_end|>
-<|im_start|>assistant\n
+<|im_start|>assistant
 Let me write the SQL query with reasoning. 
 <think>
 """

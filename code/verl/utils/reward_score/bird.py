@@ -136,7 +136,11 @@ def calculate_answer_score(pred_sql, gold_sql, db_path, do_print=False):
         pred_results = execute_sql(pred_sql, db_path)
         gold_results = execute_sql(gold_sql, db_path)
         
+        # other
+        # answer_score = 1 if set(pred_results) == set(gold_results) else 0.3
         # answer_score = 2 if set(pred_results) == set(gold_results) else 0.5
+
+        # bird-7b-coder
         answer_score = 1 if set(pred_results) == set(gold_results) else 0
         
     except Exception as e:
@@ -152,8 +156,8 @@ def calculate_answer_score(pred_sql, gold_sql, db_path, do_print=False):
         #     answer_score = 0.1
 
     if do_print:
-        print(f"Retrieved results: {pred_results}")
-        print(f"Target: {gold_results} ")
+        # print(f"Retrieved results: {pred_results}")
+        # print(f"Target: {gold_results} ")
         print(f"Answer score: {answer_score}")
 
     
