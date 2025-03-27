@@ -98,21 +98,22 @@ def load_matching_dataset():
             data_train.append(json.loads(line))
 
     with open('data/raw_data/pubmed/test.jsonl', 'r') as f:
-        cnt = 0
-        for line in f:
-            data_val.append(json.loads(line))
-            cnt += 1
-            if cnt > 100:
-                break
+        # cnt = 0
+        # for line in f:
+        #     data_val.append(json.loads(line))
+        #     cnt += 1
+        #     if cnt > 100:
+        #         break
             
         for line in f:
             data_test.append(json.loads(line))
     
     train_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['publication_pmids'], 'pub_date': x['pub_date']} for x in data_train]
     test_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['publication_pmids'], 'pub_date': x['pub_date']} for x in data_test]
-    val_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['publication_pmids'], 'pub_date': x['pub_date']} for x in data_val]
+    # val_data = [{'input': convert_dict_to_str(x['pico']), 'label': x['publication_pmids'], 'pub_date': x['pub_date']} for x in data_val]
     
-    return train_data, test_data, val_data
+    # return train_data, test_data, val_data
+    return train_data, test_data
 
 
 
@@ -126,11 +127,11 @@ if __name__ == '__main__':
     
     data_source = args.dataset
     
-    train_data, test_data, val_data = load_matching_dataset()
+    train_data, test_data = load_matching_dataset()
 
     train_dataset = Dataset.from_list(train_data)
     test_dataset = Dataset.from_list(test_data)
-    val_dataset = Dataset.from_list(val_data)
+    # val_dataset = Dataset.from_list(val_data)
 
 
     def make_map_fn(split):
@@ -160,11 +161,11 @@ if __name__ == '__main__':
     
     train_dataset = train_dataset.map(function=make_map_fn('train'), with_indices=True)
     test_dataset = test_dataset.map(function=make_map_fn('test'), with_indices=True)
-    val_dataset = val_dataset.map(function=make_map_fn('val'), with_indices=True)
+    # val_dataset = val_dataset.map(function=make_map_fn('val'), with_indices=True)
     # shuffle the dataset
     train_dataset = train_dataset.shuffle(seed=42)
     test_dataset = test_dataset.shuffle(seed=42)
-    val_dataset = val_dataset.shuffle(seed=42)
+    # val_dataset = val_dataset.shuffle(seed=42)
     
     lengths_list = []
     for d in train_dataset:
@@ -174,13 +175,13 @@ if __name__ == '__main__':
     for d in test_dataset:
         lengths_list_test.append(len(d['prompt'][0]['content'].split()))
         
-    lengths_list_val = []
-    for d in val_dataset:
-        lengths_list_val.append(len(d['prompt'][0]['content'].split()))
+    # lengths_list_val = []
+    # for d in val_dataset:
+    #     lengths_list_val.append(len(d['prompt'][0]['content'].split()))
         
     print(f"Average length of train dataset: {sum(lengths_list) / len(lengths_list)}")
     print(f"Average length of test dataset: {sum(lengths_list_test) / len(lengths_list_test)}")
-    print(f"Average length of val dataset: {sum(lengths_list_val) / len(lengths_list_val)}")
+    # print(f"Average length of val dataset: {sum(lengths_list_val) / len(lengths_list_val)}")
     
     local_dir = os.path.join(args.local_dir, args.dataset)
     hdfs_dir = os.path.join(args.hdfs_dir, args.dataset) if args.hdfs_dir is not None else None
@@ -189,7 +190,7 @@ if __name__ == '__main__':
     
     train_dataset.to_parquet(os.path.join(local_dir, 'train.parquet'))
     test_dataset.to_parquet(os.path.join(local_dir, 'test_full.parquet'))
-    val_dataset.to_parquet(os.path.join(local_dir, 'test.parquet'))
+    # val_dataset.to_parquet(os.path.join(local_dir, 'test.parquet'))
     
     if hdfs_dir is not None:
         makedirs(hdfs_dir)

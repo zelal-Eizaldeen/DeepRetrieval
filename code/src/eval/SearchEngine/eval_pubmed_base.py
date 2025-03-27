@@ -65,17 +65,41 @@ def main():
             test_data.append(json.loads(line))
     
     recalls = []
+    results = {}
+    cnt = 0
     for data in tqdm(test_data):
         query = f"{data['pico']['P']} OR {data['pico']['I']} OR {data['pico']['C']} OR {data['pico']['O']}"
         pub_date = data['pub_date']
         ground_truth = data['publication_pmids']
         
+        ranks = []
+        
         pmid_list = run_search_pubmed(query, search_api, pub_date)
         
         recall = len(set(pmid_list) & set(ground_truth)) / len(ground_truth)
         recalls.append(recall)
+        
+        for gt in ground_truth:
+            if gt in pmid_list:
+                ranks.append(pmid_list.index(gt))
+            else:
+                ranks.append(999999)
+        
+        results[cnt] = {
+            'query': query,
+            'ground_truth': ground_truth,
+            # 'pmid_list': pmid_list,
+            'ranks': ranks,
+            'recall': recall
+        }
+        cnt += 1
     
         print(f"Average Recall: {sum(recalls) / len(recalls)}")
+        
+        # save results
+        if cnt % 100 == 0:
+            with open('results/pubmed_base_results.json', 'w') as f:
+                json.dump(results, f, indent=2)
         
 
 if __name__ == "__main__":
