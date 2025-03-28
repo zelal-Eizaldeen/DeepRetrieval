@@ -3,19 +3,19 @@ export HYDRA_FULL_ERROR=1
 PROJECT_NAME=sql_all
 
 EXP_NAME=sql_all_3b
-INIT_MODEL=/dev/v-langcao/Qwen2.5-Coder-3B-Instruct
+INIT_MODEL=/dev/v-langcao/hf_models/Qwen2.5-Coder-3B-Instruct
 # INIT_MODEL=Qwen/Qwen2.5-Coder-3B-Instruct
 
 # EXP_NAME=sql_all_7b
+# INIT_MODEL=/dev/v-langcao/hf_models/Qwen2.5-Coder-7B-Instruct
 # INIT_MODEL=Qwen/Qwen2.5-7B-Instruct
-# INIT_MODEL=/dev/v-langcao/Qwen2.5-Coder-7B-Instruct
 
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
 python3 -m verl.trainer.main_ppo \
-    data.train_files=data/sql/bird/train.parquet \
-    data.val_files=data/sql/bird/test.parquet \
+    data.train_files=data/sql/sql_all/train.parquet \
+    data.val_files=data/sql/sql_all/test.parquet \
     data.train_batch_size=64 \
     data.val_batch_size=64 \
     data.max_prompt_length=2048 \
@@ -41,8 +41,8 @@ python3 -m verl.trainer.main_ppo \
     trainer.default_hdfs_dir=null \
     trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
-    trainer.save_freq=200 \
-    trainer.test_freq=20 \
+    trainer.save_freq=40 \
+    trainer.test_freq=40 \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXP_NAME \
     actor_rollout_ref.model.path=$INIT_MODEL \

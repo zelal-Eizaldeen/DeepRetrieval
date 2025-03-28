@@ -961,7 +961,7 @@ class RayPPOTrainer(object):
                         # reward_metrics = compute_reward_metrics_recall_at_k(batch)
                     elif 'nq_serini' in self.config.data.train_files or 'triviaqa' in self.config.data.train_files or 'squad' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_nq_serini(batch)
-                    elif 'bird' in self.config.data.train_files or 'spider' in self.config.data.train_files or 'wikisql' in self.config.data.train_files:
+                    elif 'sql' in self.config.data.train_files or 'bird' in self.config.data.train_files or 'spider' in self.config.data.train_files or 'wikisql' in self.config.data.train_files:
                         reward_metrics = compute_reward_metrics_sql(batch)
                     else:
                         reward_metrics = compute_reward_metrics_search_engine(batch)
