@@ -7,8 +7,8 @@ PROJECT_NAME=bird
 # EXP_NAME=bird_3b_coder_wor
 # INIT_MODEL=Qwen/Qwen2.5-Coder-3B-Instruct
 
-EXP_NAME=bird_3b_base_wor
-INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
+# EXP_NAME=bird_3b_base_wor
+# INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
 
 EXP_NAME=bird_7b_coder
 INIT_MODEL=/dev/v-langcao/qwen-7
@@ -23,8 +23,8 @@ INIT_MODEL=/dev/v-langcao/qwen-7
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
 python3 -m verl.trainer.main_ppo \
-    data.train_files=data/sql/wor/bird_wor/train.parquet \
-    data.val_files=data/sql/wor/bird_wor/test.parquet \
+    data.train_files=data/sql/bird/train.parquet \
+    data.val_files=data/sql/bird/test.parquet \
     data.train_batch_size=64 \
     data.val_batch_size=64 \
     data.max_prompt_length=2048 \

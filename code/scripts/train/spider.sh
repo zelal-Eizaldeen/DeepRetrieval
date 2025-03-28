@@ -3,11 +3,14 @@ export CUDA_VISIBLE_DEVICES=0,1
 # export CUDA_VISIBLE_DEVICES=2,3
 
 PROJECT_NAME=spider
-# EXP_NAME=spider_3b
-# INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
+EXP_NAME=spider_3b_base
+INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
 
-EXP_NAME=spider_3b_coder_wor
-INIT_MODEL=Qwen/Qwen2.5-Coder-3B-Instruct
+# EXP_NAME=spider_3b_coder_wor
+# INIT_MODEL=Qwen/Qwen2.5-Coder-3B-Instruct
+
+# EXP_NAME=spider_3b_base_wor
+# INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
 
 # EXP_NAME=spider_7b_coder
 # INIT_MODEL=/dev/v-langcao/qwen-7
@@ -21,10 +24,11 @@ INIT_MODEL=Qwen/Qwen2.5-Coder-3B-Instruct
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
+    # data.train_files=data/sql/wor/spider_wor/train.parquet \
 
 python3 -m verl.trainer.main_ppo \
-    data.train_files=data/sql/wor/spider_wor/train.parquet \
-    data.val_files=data/sql/wor/spider_wor/test.parquet \
+    data.train_files=data/sql/spider/train.parquet \
+    data.val_files=data/sql/spider/test.parquet \
     data.train_batch_size=64 \
     data.val_batch_size=64 \
     data.max_prompt_length=2048 \
