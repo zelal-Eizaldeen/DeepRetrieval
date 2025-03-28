@@ -25,6 +25,9 @@ patches
 # corpus
 collection_800k.tsv
 
+# paper writing
+example_select.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
