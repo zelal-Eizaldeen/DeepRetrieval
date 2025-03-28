@@ -12,6 +12,7 @@ INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
 
 EXP_NAME=bird_7b_coder
 INIT_MODEL=/dev/v-langcao/qwen-7
+# INIT_MODEL=/dev/v-langcao/training_outputs/bird_7b_coder/actor/global_step_400
 
 # EXP_NAME=bird_3b_coder_cs_e1
 # INIT_MODEL=/dev/v-langcao/DeepRetrieval-SQL/cold_start/bird_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-2114
@@ -35,7 +36,7 @@ python3 -m verl.trainer.main_ppo \
     critic.ppo_micro_batch_size=4 \
     actor_rollout_ref.rollout.log_prob_micro_batch_size=4 \
     actor_rollout_ref.rollout.tensor_model_parallel_size=1 \
-    actor_rollout_ref.rollout.gpu_memory_utilization=0.2 \
+    actor_rollout_ref.rollout.gpu_memory_utilization=0.3 \
     actor_rollout_ref.ref.log_prob_micro_batch_size=4 \
     actor_rollout_ref.rollout.temperature=0.6 \
     actor_rollout_ref.model.enable_gradient_checkpointing=True \
@@ -49,7 +50,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.default_hdfs_dir=null \
     trainer.n_gpus_per_node=4 \
     trainer.nnodes=1 \
-    trainer.save_freq=400 \
+    trainer.save_freq=200 \
     trainer.test_freq=20 \
     trainer.project_name=$PROJECT_NAME \
     trainer.experiment_name=$EXP_NAME \
