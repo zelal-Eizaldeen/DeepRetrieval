@@ -149,7 +149,6 @@ modify `compute_reward_metrics()` in `code/verl/trainer/ppo/ray_trainer.py`
 
 
 ## 🏃 Run Training
-*(We have provided the pre-trained model on Huggingface, so you can skip the training if you just want to evaluate.)*
 ```bash
 conda activate zero
 ```
