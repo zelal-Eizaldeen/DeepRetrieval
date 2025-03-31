@@ -32,8 +32,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.save_freq=100 \
     trainer.test_freq=500 \
     trainer.project_name=pubmed_search \
-    trainer.experiment_name=pubmed_search_3b_continue \
-    actor_rollout_ref.model.path=/shared/eng/pj20/lmr_model/pubmed_3b_new/actor/global_step_600 \
-    critic.model.path=/shared/eng/pj20/lmr_model/pubmed_3b_new/critic/global_step_600 \
-    trainer.default_local_dir=/shared/eng/pj20/lmr_model/pubmed_3b_new_continue \
+    trainer.experiment_name=pubmed_search \
+    actor_rollout_ref.model.path=Qwen/Qwen2.5-3B-Instruct \
+    critic.model.path=Qwen/Qwen2.5-3B-Instruct \
     trainer.total_epochs=10 2>&1 | tee exp_log/3b-ppo-verl_demo_$DATE.log 
