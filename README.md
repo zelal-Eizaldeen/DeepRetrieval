@@ -1,9 +1,20 @@
 <div align="center">
 
-# DeepRetrieval - Hacking Search Engines & Retrievers with LLM + RL
+# DeepRetrieval - Hacking Search Engines & Retrievers with LLM + RL  
 ### **Let LLMs learn how to search!**
 
+<p align="center">
+  <a href="https://arxiv.org/abs/2503.00223">
+    <img src="https://img.shields.io/badge/arXiv-2503.00223-b31b1b.svg" alt="ArXiv">
+  </a>
+  <a href="https://huggingface.co/DeepRetrieval">
+    <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="Hugging Face" height="28">
+  </a>
+</p>
+
 </div>
+
+
 
 
 
@@ -13,10 +24,10 @@
 
 [Preliminary Technical Report (ArXiv preprint)](https://arxiv.org/pdf/2503.00223)
 
-[Example Wandb Training Log](https://wandb.ai/patjj/literature_search?nw=nwuserpj20)
+[Example Wandb Training Log on PubMed Search Engine](https://wandb.ai/patjj/literature_search?nw=nwuserpj20)
 
 
-## Installation
+## 📦 Installation
 
 **General Installation (for all retrieval methods):**
 ```
@@ -54,14 +65,14 @@ pip install install-jdk && python -c "import jdk; jdk.install('11')"
 pip install func_timeout
 ```
 
-## Get Started
+## 🫧 Get Started
 
-### **1. Data Preparation**
+### **1. Dataset Download/Preprocess**
 
 We provide two options for data preparation:
 
 <details>
-<summary style="font-weight: bold;">Option 1: Download pre-processed datasets from Huggingface (Recommended)</summary>
+<summary style="font-weight: bold;">🚀 Option 1: Download pre-processed datasets from Huggingface (Recommended)</summary>
 
 All preprocessed datasets are available on our Huggingface repository. You can download them using the provided script:
 
@@ -78,10 +89,9 @@ python download_datasets.py --categories search_engine --datasets pubmed_32 --ou
 ```
 </details>
 
-<br>
 
 <details>
-<summary style="font-weight: bold;">Option 2: Process the data yourself</summary>
+<summary style="font-weight: bold;">⛏️ Option 2: Process the data yourself</summary>
 
 For example, for PubMed:
 ```bash
@@ -116,7 +126,7 @@ Reward Design (e.g., in `code/verl/utils/reward_score/pubmed.py`):
 modify `compute_reward_metrics()` in `code/verl/trainer/ppo/ray_trainer.py`
 
 
-## Run Training
+## 🏃 Run Training
 ```bash
 conda activate zero
 ```
@@ -132,13 +142,13 @@ sh scripts/train/pubmed_32.sh
 ![alt text](/images/length_study_horizontal.png "think length and query length during training")
 
 
-## Run Evaluation
+## 🧐 Run Evaluation
 
 ```
 sh scripts/eval/pubmed_32.sh
 ```
 
-**Result (checkpoint date: Feb 16)**
+**Results on Search Engines**
 
 | Model | Method | Publication Recall | Clinical Trials Recall |
 |-------|--------|-------------------|----------------------|
@@ -162,11 +172,11 @@ sh scripts/eval/pubmed_32.sh
 
 **Note:** LEADS-7B is a state-of-the-art literature mining LLM trained on 20K reviews and 400K publications [https://arxiv.org/pdf/2501.16255]
 
-## Acknowledgement
+## 🤝 Acknowledgement
 
 This implementation is mainly based on [verl](https://github.com/volcengine/verl) and [PySerini](https://github.com/castorini/pySerini). The base model during the experiment is [Qwen2.5-3B](https://huggingface.co/Qwen/Qwen2.5-3B). We sincerely appreciate their contributions to the open-source community.
 
-## Cite DeepRetrieval
+## 📚 Cite DeepRetrieval
 Current version (will update the author list upon project completion):
 ```
 @misc{jiang2025deepretrievalpowerfulquerygeneration,
