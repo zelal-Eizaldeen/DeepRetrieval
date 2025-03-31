@@ -61,7 +61,7 @@ pip install func_timeout
 We provide two options for data preparation:
 
 <details>
-<summary>Option 1: Download pre-processed datasets from Huggingface (Recommended)</summary>
+<summary style="font-weight: bold;">Option 1: Download pre-processed datasets from Huggingface (Recommended)</summary>
 
 All preprocessed datasets are available on our Huggingface repository. You can download them using the provided script:
 
@@ -81,7 +81,7 @@ python download_datasets.py --categories search_engine --datasets pubmed_32 --ou
 <br>
 
 <details>
-<summary>Option 2: Process the data yourself</summary>
+<summary style="font-weight: bold;">Option 2: Process the data yourself</summary>
 
 For example, for PubMed:
 ```bash
@@ -92,7 +92,6 @@ python data_preprocess/pubmed_32.py
 (This will generate the required data structures in the appropriate format, but requires raw data access and more processing time.)
 </details>
 
-<br>
 
 ### **2. Get Your Search Engine API Key (required if use search engine)**
 
@@ -156,7 +155,7 @@ sh scripts/eval/pubmed_32.sh
 | LEADS-7B (SFT) | - | **24.68** | **32.11** |
 | Qwen2.5-3B-Inst | - | 6.59 | 6.09 |
 | | w/o reasoning | 9.46 | 7.97 |
-| **DeepRetrieval-3B** | - | **<span style="color:violet">65.07</span>** | **<span style="color:violet">63.18</span>** |
+| **DeepRetrieval-3B** | - | **✨ 65.07 ✨** | **✨ 63.18 ✨** |
 | | w/o reasoning | 51.90 | 53.31 |
 
 *Table: Comparison of different models and methods on publication search and clinical trials search tasks.
