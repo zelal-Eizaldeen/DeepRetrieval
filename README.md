@@ -26,14 +26,8 @@ The system works by having an LLM generate reasoning steps in a `<think>` sectio
 - **Powerful Performance**: Significantly outperforms previous state-of-the-art methods
   - 65.07% recall (vs. previous SOTA 24.68%) for publication search
   - 63.18% recall (vs. previous SOTA 32.11%) for clinical trials search
-- **Versatile Applications**: Excels across diverse retrieval tasks:
-  - Literature search using real-world search engines
-  - Evidence-seeking retrieval
-  - Classic information retrieval
-  - SQL database search
+- **Versatile Applications**: Excels across diverse retrieval tasks: (1) Literature search using real-world search engines (2) Evidence-seeking retrieval (3) Classic information retrieval (4) SQL database search
 - **Parameter Efficient**: Achieves superior results with only 3B parameters, outperforming larger models like **GPT-4o** and **Claude-3.5-Sonnet**
-
-DeepRetrieval represents a more efficient and effective paradigm for information retrieval, potentially transforming how users connect with relevant information across different domains.
 
 
 ![alt text](/images/performance_overview.png "performance overview")
@@ -43,7 +37,7 @@ DeepRetrieval represents a more efficient and effective paradigm for information
 [Example Wandb Training Log on PubMed Search Engine](https://wandb.ai/patjj/literature_search?nw=nwuserpj20)
 
 
-⭐️ Star our repository to stay up-to-date with exciting new features and improvements! Get instant notifications for new releases! 🌟
+⭐️ Star our repository to stay up-to-date with exciting new features and improvements! 🌟
 
 
 ## 📦 Installation
@@ -67,7 +61,7 @@ pip3 install flash-attn --no-build-isolation
 pip install wandb IPython matplotlib huggingface_hub
 ```
 
-**For Search Engine Retrieval, you can skip the following steps.**
+**(If you only want to run the Search Engine Retrieval, you can skip the following steps.)**
 
 If using sparse retrieval (e.g., BM25) or dense retrieval (e.g., DPR), please also install the following:
 ```
