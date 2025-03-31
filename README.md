@@ -1,7 +1,6 @@
 <div align="center">
 
-# DeepRetrieval - Hacking Search Engines & Retrievers with LLM via RL  
-### **Let LLMs learn how to search!**
+# DeepRetrieval - Hacking Real Search Engines & Retrievers with LLM via RL  
 
 <p align="center">
   <a href="https://arxiv.org/abs/2503.00223">
@@ -14,17 +13,37 @@
 
 </div>
 
+## What is DeepRetrieval?
 
+DeepRetrieval is a novel reinforcement learning approach that trains Large Language Models (LLMs) for query generation to enhance information retrieval performance. Unlike traditional methods that rely on supervised learning with labeled query-augmentation pairs, DeepRetrieval lets models learn through direct trial and error, using retrieval metrics as rewards to generate queries that maximize retrieval performance.
 
-
-
+The system works by having an LLM generate reasoning steps in a `<think>` section followed by the final augmented query in an `<answer>` section. This structured approach enables explicit chain-of-thought reasoning before committing to a query formulation.
 ![alt text](/images/framework.png "reward curve during training (on pubmed)")
+
+## Key Features and Results
+
+- **No Supervision Required**: Eliminates the need for expensive human-annotated or distilled reference queries
+- **Powerful Performance**: Significantly outperforms previous state-of-the-art methods
+  - 65.07% recall (vs. previous SOTA 24.68%) for publication search
+  - 63.18% recall (vs. previous SOTA 32.11%) for clinical trials search
+- **Versatile Applications**: Excels across diverse retrieval tasks:
+  - Literature search using real-world search engines
+  - Evidence-seeking retrieval
+  - Classic information retrieval
+  - SQL database search
+- **Parameter Efficient**: Achieves superior results with only 3B parameters, outperforming larger models like **GPT-4o** and **Claude-3.5-Sonnet**
+
+DeepRetrieval represents a more efficient and effective paradigm for information retrieval, potentially transforming how users connect with relevant information across different domains.
+
 
 ![alt text](/images/performance_overview.png "performance overview")
 
 [Preliminary Technical Report (ArXiv preprint)](https://arxiv.org/pdf/2503.00223)
 
 [Example Wandb Training Log on PubMed Search Engine](https://wandb.ai/patjj/literature_search?nw=nwuserpj20)
+
+
+⭐️ Star our repository to stay up-to-date with exciting new features and improvements! Get instant notifications for new releases! 🌟
 
 
 ## 📦 Installation
