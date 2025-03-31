@@ -1,6 +1,8 @@
 <div align="center">
 
 # DeepRetrieval - Hacking Real Search Engines & Retrievers with LLM via RL  
+<img src="images/logo.png" alt="DeepRetrieval Logo" width="400">
+
 
 <p align="center">
   <a href="https://arxiv.org/abs/2503.00223">
