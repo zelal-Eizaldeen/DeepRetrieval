@@ -1,6 +1,6 @@
 <div align="center">
 
-# DeepRetrieval - Hacking Search Engines & Retrievers with LLM + RL  
+# DeepRetrieval - Hacking Search Engines & Retrievers with LLM via RL  
 ### **Let LLMs learn how to search!**
 
 <p align="center">
@@ -147,6 +147,7 @@ sh scripts/train/pubmed_32.sh
 ```
 sh scripts/eval/pubmed_32.sh
 ```
+(You can run this script without training, as it will download our trained model from Huggingface by default)
 
 **Results on Search Engines**
 
