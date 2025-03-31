@@ -41,6 +41,13 @@ The system works by having an LLM generate reasoning steps in a `<think>` sectio
 
 ⭐️ Star our repository to stay up-to-date with exciting new features and improvements! 🌟
 
+## Table of Contents
+
+- [Installation](#-installation)
+- [Get Started](#-get-started)
+- [Run Training](#-run-training)
+- [Run Evaluation](#-run-evaluation)
+- [Cite DeepRetrieval](#-cite-deepretrieval)
 
 ## 📦 Installation
 
@@ -142,6 +149,7 @@ modify `compute_reward_metrics()` in `code/verl/trainer/ppo/ray_trainer.py`
 
 
 ## 🏃 Run Training
+*(We have provided the pre-trained model on Huggingface, so you can skip the training if you just want to evaluate.)*
 ```bash
 conda activate zero
 ```
