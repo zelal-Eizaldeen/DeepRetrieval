@@ -8,12 +8,12 @@
   <a href="https://pat-jj.github.io/DeepRetrieval-AI/static/pdfs/deepretrieval_preprint_0327.pdf">
     <img src="https://img.shields.io/badge/arXiv-2503.00223-b31b1b.svg" alt="ArXiv">
   </a>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <!-- Adds horizontal space -->
   <a href="https://huggingface.co/DeepRetrieval">
     <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="Hugging Face" height="28">
   </a>
 </p>
 
-</div>
 
 ## What is DeepRetrieval?
 
