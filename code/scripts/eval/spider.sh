@@ -16,12 +16,13 @@ export CUDA_VISIBLE_DEVICES=0
 
 # MODEL_PATH=/dev/v-langcao/qwen-7
 # MODEL_PATH=/dev/v-langcao/sft_qwen_7/spider_wo_reasoning/checkpoint-2088
-MODEL_PATH=/dev/v-langcao/sft_qwen_7/spider/checkpoint-4176
+# MODEL_PATH=/dev/v-langcao/sft_qwen_7/spider/checkpoint-4176
+MODEL_PATH=DeepRetrieval/DeepRetrieval-SQL-7B
 
 python src/eval/SQL/spider.py \
     --model_path $MODEL_PATH \
     --data_path data/sql/spider/val.parquet \
-    --model_name spider-3b-sft-full \
+    --model_name spider-7b-full \
     --save_dir ../results \
     --with_reasoning true \
     --batch_size 8
