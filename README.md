@@ -1,7 +1,7 @@
 <div align="center">
 
 # DeepRetrieval - Hacking Search Engines & Retrievers with LLM + RL
-### **Let LLMs learn how to search! (New results on ~10 more datasets coming soon!)**
+### **Let LLMs learn how to search!**
 
 </div>
 
@@ -9,9 +9,11 @@
 
 ![alt text](/images/framework.png "reward curve during training (on pubmed)")
 
+![alt text](/images/performance_overview.png "performance overview")
+
 [Preliminary Technical Report (ArXiv preprint)](https://arxiv.org/pdf/2503.00223)
 
-[Wandb Training Log](https://wandb.ai/patjj/literature_search?nw=nwuserpj20)
+[Example Wandb Training Log](https://wandb.ai/patjj/literature_search?nw=nwuserpj20)
 
 
 ## Installation
@@ -32,7 +34,7 @@ pip install -e .
 # flash attention 2
 pip3 install flash-attn --no-build-isolation
 # quality of life
-pip install wandb IPython matplotlib
+pip install wandb IPython matplotlib huggingface_hub
 ```
 
 **For Search Engine Retrieval, you can skip the following steps.**
@@ -53,27 +55,53 @@ pip install func_timeout
 ```
 
 ## Get Started
-```
+
+### **1. Data Preparation**
+
+We provide two options for data preparation:
+
+<details>
+<summary>Option 1: Download pre-processed datasets from Huggingface (Recommended)</summary>
+
+All preprocessed datasets are available on our Huggingface repository. You can download them using the provided script:
+
+```bash
 cd code
+# List available datasets
+python download_datasets.py --list_only --repo_id DeepRetrieval/datasets
+
+# Download all datasets
+python download_datasets.py --repo_id DeepRetrieval/datasets --output_dir ./data
+
+# Or download specific categories/datasets
+python download_datasets.py --categories search_engine --datasets pubmed_32 --output_dir ./data
 ```
+</details>
 
+<br>
 
-**1. Data Preparation (required)**
+<details>
+<summary>Option 2: Process the data yourself</summary>
 
 For example, for PubMed:
+```bash
+cd code
+python download_datasets.py --categories raw_data --datasets pubmed --output_dir ./data
+python data_preprocess/pubmed_32.py
 ```
-conda activate zero
-python data_preprocess/pubmed.py
-```
+(This will generate the required data structures in the appropriate format, but requires raw data access and more processing time.)
+</details>
 
-**2. Get Your Search Engine API Key (required if use search engine)**
+<br>
+
+### **2. Get Your Search Engine API Key (required if use search engine)**
 
 For example, for PubMed, you may get it following the instruction [here](https://support.nlm.nih.gov/kbArticle/?pn=KA-05317).
 
 Then, put it in under `code/verl/utils/reward_score/apis/` as `pubmed_api.key`.
 
 
-**3. Reward function Related (optional)**
+### **3. Reward function Related (optional)**
 
 Reward Design (e.g., in `code/verl/utils/reward_score/pubmed.py`):
 
@@ -84,57 +112,56 @@ Reward Design (e.g., in `code/verl/utils/reward_score/pubmed.py`):
 
 
 
-**4. Customize Monitor Info (optional)**
+### **4. Customize Monitor Info (optional)**
 
 modify `compute_reward_metrics()` in `code/verl/trainer/ppo/ray_trainer.py`
 
 
 ## Run Training
-```
+```bash
 conda activate zero
 ```
 
-For the following code, if you see Out-of-vram, try add `critic.model.enable_gradient_checkpointing=True` to the script
-
 For example, for PubMed:
+```bash
+sh scripts/train/pubmed_32.sh 
 ```
-sh scripts/train/pubmed.sh 
-```
+(if you see Out-of-vram, try add `critic.model.enable_gradient_checkpointing=True` to the script)
 
-### Reward Curve During Training
+### Think/Query Length During Training (PubMed)
 
-![alt text](/images/reward_curve.png "reward curve during training (on pubmed)")
+![alt text](/images/length_study_horizontal.png "think length and query length during training")
 
 
 ## Run Evaluation
 
 ```
-sh scripts/eval/pubmed.sh
+sh scripts/eval/pubmed_32.sh
 ```
 
 **Result (checkpoint date: Feb 16)**
 
-| Model | Method | Recall (Publication) | Recall (Trial) |
-|-------|--------|----------------------|----------------|
-| **GPT-4o** | Zero-shot | 5.79 | 6.74 |
-| | Few-shot | 7.67 | 4.69 |
-| | ICL | 19.72 | 14.26 |
-| | ICL+Few-shot | 11.95 | 7.98 |
-| **GPT-3.5** | Zero-shot | 4.01 | 3.37 |
-| | Few-shot | 4.15 | 3.34 |
-| | ICL | 18.68 | 13.94 |
-| | ICL+Few-shot | 7.06 | 5.54 |
-| **Haiku-3** | Zero-shot | 10.98 | 11.59 |
-| | Few-shot | 14.71 | 7.47 |
-| | ICL | 20.92 | 24.68 |
-| | ICL+Few-shot | 19.11 | 9.27 |
-| **Mistral-7B** | Zero-shot | 7.18 | 8.08 |
-| **LEADS**$^{*}$ | Zero-shot | 24.68 | 32.11 |
-| **DeepRetrieval** | Zero-shot | **64.57** | **70.84** |
+| Model | Method | Publication Recall | Clinical Trials Recall |
+|-------|--------|-------------------|----------------------|
+| Original Query | - | 10.36 | 18.01 |
+| GPT-3.5 | - | 11.67 | 9.42 |
+| | w/o reasoning | 18.68 | 13.94 |
+| GPT-4o | - | 17.59 | 16.25 |
+| | w/o reasoning | 19.72 | 14.26 |
+| Claude-3-Haiku | - | 11.26 | 10.10 |
+| | w/o reasoning | 20.92 | 24.68 |
+| Claude-3.5-Sonnet | - | 20.94 | 18.33 |
+| | w/o reasoning | 19.08 | 18.41 |
+| Mistral-7B-Inst | - | 7.18 | 8.08 |
+| LEADS-7B (SFT) | - | **24.68** | **32.11** |
+| Qwen2.5-3B-Inst | - | 6.59 | 6.09 |
+| | w/o reasoning | 9.46 | 7.97 |
+| **DeepRetrieval-3B** | - | **<span style="color:violet">65.07</span>** | **<span style="color:violet">63.18</span>** |
+| | w/o reasoning | 51.90 | 53.31 |
 
-*Table: Comparison of different models and methods on publication search and trial search tasks. Bold numbers indicate the best performance.*
+*Table: Comparison of different models and methods on publication search and clinical trials search tasks.
 
-$^{*}$ *LEADS: a state-of-the-art literature mining LLM trained on 20K reviews and 400K publications [https://arxiv.org/pdf/2501.16255]*
+**Note:** LEADS-7B is a state-of-the-art literature mining LLM trained on 20K reviews and 400K publications [https://arxiv.org/pdf/2501.16255]
 
 ## Acknowledgement
 
