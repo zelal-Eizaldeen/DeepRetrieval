@@ -5,7 +5,7 @@
 
 
 <p align="center">
-  <a href="https://arxiv.org/abs/2503.00223">
+  <a href="https://pat-jj.github.io/DeepRetrieval-AI/static/pdfs/deepretrieval_preprint_0327.pdf">
     <img src="https://img.shields.io/badge/arXiv-2503.00223-b31b1b.svg" alt="ArXiv">
   </a>
   <a href="https://huggingface.co/DeepRetrieval">
