@@ -5,8 +5,8 @@
 
 
 <p align="center">
-  <a href="https://pat-jj.github.io/DeepRetrieval-AI/static/pdfs/deepretrieval_preprint_0327.pdf">
-    <img src="https://img.shields.io/badge/arXiv-2503.00223-b31b1b.svg" alt="ArXiv">
+  <a href="https://arxiv.org/pdf/2503.00223">
+    <img src="https://img.shields.io/badge/arXiv-2503.00223-b31b1b.svg" alt="arXiv">
   </a>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <!-- Adds horizontal space -->
   <a href="https://huggingface.co/DeepRetrieval">
@@ -35,7 +35,6 @@ The system works by having an LLM generate reasoning steps in a `<think>` sectio
 
 ![alt text](/images/performance_overview.png "performance overview")
 
-[Preliminary Technical Report (ArXiv preprint)](https://arxiv.org/pdf/2503.00223)
 
 [Example Wandb Training Log on PubMed Search Engine](https://wandb.ai/patjj/literature_search?nw=nwuserpj20)
 
