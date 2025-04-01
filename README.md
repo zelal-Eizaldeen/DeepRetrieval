@@ -200,26 +200,15 @@ sh scripts/eval/pubmed_32.sh
 This implementation is mainly based on [verl](https://github.com/volcengine/verl) and [PySerini](https://github.com/castorini/pySerini). The base model during the experiment is [Qwen2.5-3B](https://huggingface.co/Qwen/Qwen2.5-3B). We sincerely appreciate their contributions to the open-source community.
 
 ## 📚 Cite DeepRetrieval
-Current version (will update the author list upon project completion):
-```
-@misc{jiang2025deepretrievalpowerfulquerygeneration,
-      title={DeepRetrieval: Powerful Query Generation for Information Retrieval with Reinforcement Learning}, 
-      author={Pengcheng Jiang},
-      year={2025},
-      eprint={2503.00223},
-      archivePrefix={arXiv},
-      primaryClass={cs.IR},
-      url={https://arxiv.org/abs/2503.00223}, 
-}
-```
 
 ```
-@article{deepretrieval,
-  title={DeepRetrieval: Hacking Real Search Engines and Retrievers with Large Language Models and Reinforcement Learning},
-  author={Jiang, Pengcheng and Lin, Jiacheng and Cao, Lang and Tian, Runchu and Kang, SeongKu and Wang, Zifeng and Sun, Jimeng and Han, Jiawei},
-  howpublished={\url{https://github.com/pat-jj/DeepRetrieval}},
-  year={2025}
-}
+@article{jiang2025deepretrievalhackingrealsearch,
+      title={DeepRetrieval: Hacking Real Search Engines and Retrievers with Large Language Models via Reinforcement Learning}, 
+      author={Pengcheng Jiang and Jiacheng Lin and Lang Cao and Runchu Tian and SeongKu Kang and Zifeng Wang and Jimeng Sun and Jiawei Han},
+      year={2025},
+      journal = {arXiv preprint arXiv: 2503.00223},
+      url={https://arxiv.org/abs/2503.00223}
+  }
 ```
 
 Thanks for your interests! 😊
