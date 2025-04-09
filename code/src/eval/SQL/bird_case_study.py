@@ -102,6 +102,7 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
                 batch_inputs[i] = batch_inputs[i].replace("Show your work in <think> </think> tags. ", "")
                 batch_inputs[i] = batch_inputs[i].replace("<think>\n[thinking process]\n</think>", "")
                 batch_inputs[i] = batch_inputs[i].replace("<think>", "")
+                batch_inputs[i] = batch_inputs[i].split("<|im_start|>user")[1]
 
         # print(batch_inputs[0])
 
