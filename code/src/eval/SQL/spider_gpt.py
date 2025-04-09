@@ -106,6 +106,7 @@ def evaluate_model(llm_name, data_path, save_dir, with_reasoning=True):
                 data_input = data_input.replace("Show your work in <think> </think> tags. ", "")
                 data_input = data_input.replace("<think>\n[thinking process]\n</think>", "")
                 data_input = data_input.replace("<think>", "")
+                data_input = data_input.split("<|im_start|>user")[1]
             
             data_input = data_input + '\nYour output of SQL query must be in one line.'
 
