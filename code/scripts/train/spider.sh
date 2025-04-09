@@ -13,14 +13,14 @@ INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
 # INIT_MODEL=Qwen/Qwen2.5-3B-Instruct
 
 # EXP_NAME=spider_7b_coder
-# INIT_MODEL=/dev/v-langcao/qwen-7
+# INIT_MODEL=/dev/ana/qwen-7
 
 # EXP_NAME=spider_3b_coder_cs_e1
-# INIT_MODEL=/dev/v-langcao/DeepRetrieval-SQL/cold_start/spider_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-2090
+# INIT_MODEL=/dev/ana/DeepRetrieval-SQL/cold_start/spider_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-2090
 
 # EXP_NAME=spider_3b_coder_cs_e4
-# INIT_MODEL=/dev/v-langcao/sft_training_outputs/spider/checkpoint-4180
-# INIT_MODEL=/dev/v-langcao/DeepRetrieval-SQL/cold_start/spider_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-8360
+# INIT_MODEL=/dev/ana/sft_training_outputs/spider/checkpoint-4180
+# INIT_MODEL=/dev/ana/DeepRetrieval-SQL/cold_start/spider_Qwen/Qwen2.5-Coder-3B-Instruct/checkpoint-8360
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
@@ -60,5 +60,5 @@ python3 -m verl.trainer.main_ppo \
     trainer.experiment_name=$EXP_NAME \
     actor_rollout_ref.model.path=$INIT_MODEL \
     critic.model.path=$INIT_MODEL \
-    trainer.default_local_dir=/dev/v-langcao/training_outputs/${EXP_NAME} \
+    trainer.default_local_dir=/dev/ana/training_outputs/${EXP_NAME} \
     trainer.total_epochs=5 2>&1 | tee exp_log/$PROJECT_NAME-3b-ppo-verl_demo_$DATE.log 

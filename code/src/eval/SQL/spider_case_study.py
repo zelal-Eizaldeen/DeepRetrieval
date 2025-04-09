@@ -181,7 +181,7 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_path", type=str, default="/dev/v-langcao/training_outputs/spider_7b_coder/actor/global_step_400")
+    parser.add_argument("--model_path", type=str, default="/dev/ana/training_outputs/spider_7b_coder/actor/global_step_400")
     parser.add_argument("--data_path", type=str, default="data/sql/spider/test.parquet")
     parser.add_argument("--model_name", type=str, default="spider-case-study")
     parser.add_argument("--save_dir", type=str, default="results")

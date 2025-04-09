@@ -97,6 +97,7 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
                 batch_inputs[i] = batch_inputs[i].replace("Show your work in <think> </think> tags. ", "")
                 batch_inputs[i] = batch_inputs[i].replace("<think>\n[thinking process]\n</think>", "")
                 batch_inputs[i] = batch_inputs[i].replace("<think>", "")
+                batch_inputs[i] = batch_inputs[i].split("<|im_start|>user")[1]
 
         tokenized_inputs = tokenizer(batch_inputs, return_tensors="pt", padding=True, truncation=True).to(device)
 
@@ -162,7 +163,7 @@ def evaluate_model(model, tokenizer, data_path, device, model_name, save_dir, ba
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_path", type=str, default="/dev/v-langcao/training_outputs/spider_3b/actor/global_step_400")
+    parser.add_argument("--model_path", type=str, default="/dev/ana/training_outputs/spider_3b/actor/global_step_400")
     parser.add_argument("--data_path", type=str, default="data/sql/spider/test.parquet")
     parser.add_argument("--model_name", type=str, default="spider-3b-step-400")
     parser.add_argument("--save_dir", type=str, default="results")

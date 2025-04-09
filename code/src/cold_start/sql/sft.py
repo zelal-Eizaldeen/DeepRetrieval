@@ -93,9 +93,9 @@ if tokenizer.pad_token is None:
 # Training
 ################
 if wo_reasoning:
-    output_dir = f"/dev/v-langcao/sft_qwen_7/{dataset}_wo_reasoning"
+    output_dir = f"/dev/ana/sft_qwen_7/{dataset}_wo_reasoning"
 else:
-    output_dir = f"/dev/v-langcao/sft_qwen_7/{dataset}"
+    output_dir = f"/dev/ana/sft_qwen_7/{dataset}"
 
 training_args = SFTConfig(
     learning_rate=2e-5,

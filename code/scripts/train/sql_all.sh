@@ -3,11 +3,11 @@ export HYDRA_FULL_ERROR=1
 PROJECT_NAME=sql_all
 
 EXP_NAME=sql_all_3b
-INIT_MODEL=/dev/v-langcao/hf_models/Qwen2.5-Coder-3B-Instruct
+INIT_MODEL=/dev/ana/hf_models/Qwen2.5-Coder-3B-Instruct
 # INIT_MODEL=Qwen/Qwen2.5-Coder-3B-Instruct
 
 # EXP_NAME=sql_all_7b
-# INIT_MODEL=/dev/v-langcao/hf_models/Qwen2.5-Coder-7B-Instruct
+# INIT_MODEL=/dev/ana/hf_models/Qwen2.5-Coder-7B-Instruct
 # INIT_MODEL=Qwen/Qwen2.5-7B-Instruct
 
 
@@ -47,5 +47,5 @@ python3 -m verl.trainer.main_ppo \
     trainer.experiment_name=$EXP_NAME \
     actor_rollout_ref.model.path=$INIT_MODEL \
     critic.model.path=$INIT_MODEL \
-    trainer.default_local_dir=/dev/v-langcao/training_outputs/${EXP_NAME} \
+    trainer.default_local_dir=/dev/ana/training_outputs/${EXP_NAME} \
     trainer.total_epochs=5 2>&1 | tee exp_log/$PROJECT_NAME-3b-ppo-verl_demo_$DATE.log 
