@@ -127,7 +127,7 @@ python data_preprocess/pubmed_32.py
 
 ### **2. Get Your Search Engine API Key (required if use search engine)**
 
-For example, for PubMed, you may get it following the instruction [here](https://support.nlm.nih.gov/kbArticle/?pn=KA-05317).
+For example, for PubMed, you may get it following the instruction [here](https://support.nlm.nih.gov/kbArticle/?pn=KA-05317). (PubMed API is 100% ✨FREE✨ to use!)
 
 Then, put it in under `code/verl/utils/reward_score/apis/` as `pubmed_api.key`.
 
@@ -197,7 +197,7 @@ sh scripts/eval/pubmed_32.sh
 
 ## 🤝 Acknowledgement
 
-This implementation is mainly based on [verl](https://github.com/volcengine/verl) and [PySerini](https://github.com/castorini/pySerini). The base model during the experiment is [Qwen2.5-3B](https://huggingface.co/Qwen/Qwen2.5-3B). We sincerely appreciate their contributions to the open-source community.
+This implementation is mainly based on [verl](https://github.com/volcengine/verl) and [PySerini](https://github.com/castorini/pySerini). The base model during the experiment is [Qwen2.5-3B-Instruct](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct). We sincerely appreciate their contributions to the open-source community.
 
 ## 📚 Cite DeepRetrieval
 
