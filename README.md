@@ -44,7 +44,7 @@ The system works by having an LLM generate reasoning steps in a `<think>` sectio
 ## Table of Contents
 
 - [📦 Installation](#-installation)
-- [⚡️ Easy-to-use API for Query Rewriting](#-easy-to-use-api-for-query-rewriting)
+- [⚡️ Easy-to-use API for Query Rewriting](#️-easy-to-use-api-for-query-rewriting)
 - [🫧 Get Started](#-get-started)
 - [🏃 Run Training](#-run-training)
 - [🧐 Run Evaluation](#-run-evaluation)
