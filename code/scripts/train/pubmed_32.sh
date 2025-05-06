@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=3,4
+export CUDA_VISIBLE_DEVICES=4,7
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
@@ -29,7 +29,7 @@ python3 -m verl.trainer.main_ppo \
     trainer.default_hdfs_dir=null \
     trainer.n_gpus_per_node=2 \
     trainer.nnodes=1 \
-    trainer.save_freq=50 \
+    trainer.save_freq=300 \
     trainer.test_freq=500 \
     trainer.project_name=pubmed_search \
     trainer.experiment_name=pubmed_search_32 \

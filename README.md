@@ -43,11 +43,12 @@ The system works by having an LLM generate reasoning steps in a `<think>` sectio
 
 ## Table of Contents
 
-- [Installation](#-installation)
-- [Get Started](#-get-started)
-- [Run Training](#-run-training)
-- [Run Evaluation](#-run-evaluation)
-- [Cite DeepRetrieval](#-cite-deepretrieval)
+- [📦 Installation](#-installation)
+- [⚡️ Easy-to-use API for Query Rewriting](#-easy-to-use-api-for-query-rewriting)
+- [🫧 Get Started](#-get-started)
+- [🏃 Run Training](#-run-training)
+- [🧐 Run Evaluation](#-run-evaluation)
+- [📚 Cite DeepRetrieval](#-cite-deepretrieval)
 
 ## 📦 Installation
 
@@ -86,6 +87,17 @@ pip install install-jdk && python -c "import jdk; jdk.install('11')"
 # support sql execution
 pip install func_timeout
 ```
+
+## ⚡️ Easy-to-use API for Query Rewriting
+
+```bash
+sh vllm_host.sh # you can specify the local port and the model to use
+python query_rewrite.py --query "Who built DeepRetrieval in 2025?"
+# Original query: Who built DeepRetrieval in 2025?
+# Rewritten query: (The DeepRetrieval system, which was built in 2025)
+```
+
+
 
 ## 🫧 Get Started
 
