@@ -16,6 +16,12 @@
 
 </div>
 
+## News
+- [2025-05-19] Our new work [s3](https://github.com/pat-jj/s3), for efficient RAG agent training, is coming! Star ⭐️ our repo to stay tuned!
+- [2025-05-06] You can now easily deploy our model and call the api for query rewriting. See [here](https://github.com/pat-jj/DeepRetrieval?tab=readme-ov-file#%EF%B8%8F-easy-to-use-api-for-query-rewriting) for more details.
+- [2025-02-28] 🎉 We are excited to release the code for DeepRetrieval!
+
+
 ## What is DeepRetrieval?
 
 DeepRetrieval is a novel reinforcement learning approach that trains Large Language Models (LLMs) for query generation to enhance information retrieval performance. Unlike traditional methods that rely on supervised learning with labeled query-augmentation pairs, DeepRetrieval lets models learn through direct trial and error, using retrieval metrics as rewards to generate queries that maximize retrieval performance.
