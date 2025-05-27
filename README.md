@@ -220,13 +220,12 @@ This implementation is mainly based on [verl](https://github.com/volcengine/verl
 ## 📚 Cite DeepRetrieval
 
 ```
-@article{jiang2025deepretrievalhackingrealsearch,
-      title={DeepRetrieval: Hacking Real Search Engines and Retrievers with Large Language Models via Reinforcement Learning}, 
-      author={Pengcheng Jiang and Jiacheng Lin and Lang Cao and Runchu Tian and SeongKu Kang and Zifeng Wang and Jimeng Sun and Jiawei Han},
-      year={2025},
-      journal = {arXiv preprint arXiv: 2503.00223},
-      url={https://arxiv.org/abs/2503.00223}
-  }
+@article{jiang2025deepretrieval,
+  title={Deepretrieval: Hacking real search engines and retrievers with large language models via reinforcement learning},
+  author={Jiang, Pengcheng and Lin, Jiacheng and Cao, Lang and Tian, Runchu and Kang, SeongKu and Wang, Zifeng and Sun, Jimeng and Han, Jiawei},
+  journal={arXiv preprint arXiv:2503.00223},
+  year={2025}
+}
 ```
 
 Thanks for your interests! 😊
