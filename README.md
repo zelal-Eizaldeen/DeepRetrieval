@@ -17,7 +17,7 @@
 </div>
 
 ## News
-- [2025-05-19] Our new work [s3](https://github.com/pat-jj/s3), for **efficient** (using 70x less samples than previous SOTA) and **powerful** (new SOTA on Agentic RAG) RAG agent training, is coming! Star ⭐️ our repo to stay tuned!
+- [2025-05-19] Our new work [s3](https://github.com/pat-jj/s3), for **efficient** (using 70x less samples than previous SOTA) and **powerful** (new SOTA on Agentic RAG) search agent training, is coming! Star ⭐️ our repo to stay tuned!
 - [2025-05-06] You can now easily deploy our model and call the api for query rewriting. See [here](https://github.com/pat-jj/DeepRetrieval?tab=readme-ov-file#%EF%B8%8F-easy-to-use-api-for-query-rewriting) for more details.
 - [2025-02-28] 🎉 We are excited to release the code for DeepRetrieval!
 
