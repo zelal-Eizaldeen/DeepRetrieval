@@ -2,6 +2,7 @@ import requests
 import json
 import argparse
 import re
+import time
 
 INSTRUCTION = """
 You are a query rewriting expert. Your task is to create query terms for user query to find relevant literature in a Wikipedia corpus using BM25.
@@ -58,7 +59,7 @@ def rewrite_query(query: str, api_url: str = "http://localhost:8000/v1/chat/comp
     messages = format_prompt(query)
     
     payload = {
-        "model": "DeepRetrieval/DeepRetrieval-TriviaQA-BM25-3B",
+        "model": "DeepRetrieval/DeepRetrieval-NQ-BM25-3B",
         "messages": messages,
         "temperature": 0.7,
         "max_tokens": 512
@@ -92,9 +93,12 @@ def main():
     args = parser.parse_args()
     
     try:
+        start_time = time.time()
         rewritten_query = rewrite_query(args.query, args.api_url)
+        end_time = time.time()
         print(f"Original query: {args.query}")
         print(f"Rewritten query: {rewritten_query}")
+        print(f"Time taken: {end_time - start_time:.2f} seconds")
     except Exception as e:
         print(f"Error: {e}")
 

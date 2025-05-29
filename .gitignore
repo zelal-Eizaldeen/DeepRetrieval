@@ -1,5 +1,6 @@
 #others
 .vscode
+*.log
 
 # cache files
 indexes
@@ -32,6 +33,8 @@ code/data/sql/cold_start/
 DeepRetrieval-MSMARCO
 code/data/sql/wor
 play.ipynb
+*_outputs
+code/extra
 
 # code/data/sql/spider/
 # code/data/sql/bird/
