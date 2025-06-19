@@ -12,12 +12,14 @@
   <a href="https://huggingface.co/DeepRetrieval">
     <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="Hugging Face" height="28">
   </a>
+</br>
+  ⭐️ Star ⭐️ our repo to stay tuned with new features!!
 </p>
 
 </div>
 
 ## News
-- [2025-05-19] Our new work [s3](https://github.com/pat-jj/s3), for **efficient** (using 70x less samples than previous SOTA) and **powerful** (new SOTA on Agentic RAG) search agent training, is coming! Star ⭐️ our repo to stay tuned!
+- [2025-05-19] If you're particularly interested in RAG tasks, we recommend checking out our latest work, [s3](https://github.com/pat-jj/s3), a training-efficient framework specifically designed for RAG.
 - [2025-05-06] You can now easily deploy our model and call the api for query rewriting. See [here](https://github.com/pat-jj/DeepRetrieval?tab=readme-ov-file#%EF%B8%8F-easy-to-use-api-for-query-rewriting) for more details.
 - [2025-02-28] 🎉 We are excited to release the code for DeepRetrieval!
 
