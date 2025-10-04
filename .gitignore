@@ -1,6 +1,8 @@
 #others
 .vscode
 *.log
+*.error
+*.out
 
 # cache files
 indexes
