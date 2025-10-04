@@ -4,6 +4,8 @@
 *.error
 *.out
 
+
+
 # cache files
 indexes
 results
@@ -37,6 +39,7 @@ code/data/sql/wor
 play.ipynb
 *_outputs
 code/extra
+code/zilalcontribution/logs/
 
 # code/data/sql/spider/
 # code/data/sql/bird/
