@@ -25,6 +25,7 @@ wandb
 
 
 # large files
+# added Try it 
 code/data/local_index_search/msmarco_all
 code/data/raw_data/msmarco/msmarco_all/queries.train.tsv
 code/data/raw_data/msmarco/msmarco_all/queries.dev.tsv
