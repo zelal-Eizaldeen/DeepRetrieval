@@ -1,7 +1,0 @@
-
-CondaError: Run 'conda init' before 'conda activate'
-
-Traceback (most recent call last):
-  File "/projects/illinois/eng/cs/jimeng/zelalae2/scratch/DeepRetrieval/code/src/eval/SearchEngine/eval_pubmed.py", line 22, in <module>
-    from verl.utils.apis.pubmed import PubmedAPI
-ModuleNotFoundError: No module named 'verl'
