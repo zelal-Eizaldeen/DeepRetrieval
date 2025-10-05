@@ -223,6 +223,20 @@ sh scripts/eval/pubmed_32.sh
 
 Before running any training or evaluation scripts on the cluster, make sure to **load the correct CUDA module** and **activate your conda environment**.
 
+
+
+
+
+
+<details>
+<summary>slurm-related</summary>
+
+**GPUs Allocation**
+If your CUDA inside slurm job doesn't match the one inside your script, then you may get this UserWarning:
+CUDA driver initialization failed, you might not have a CUDA gpu. (Triggered internally at ../c10/cuda/CUDAFunctions.cpp:108.)
+  return torch._C._cuda_getDeviceCount() > 0
+To fix these missing dependencies, simply don't spicify your device inside the script, and load the CUDA inside the slurm job:
+
 Add the following lines to your Slurm job script (before running any Python commands):
 
 ```bash
@@ -233,13 +247,11 @@ module load cuda/12.6
 source ~/miniconda/etc/profile.d/conda.sh  # adjust path if your conda installation differs
 conda activate zero
 ```
+Remove the following from pubmed_32.sh
 
-
-
-
-<details>
-<summary>slurm-related</summary>
-
+```bash
+export CUDA_VISIBLE_DEVICES=4,7
+```
 **DEPENDENCIES**
 When setting up the environment, you might encounter dependency resolver warnings such as:
 
@@ -255,7 +267,14 @@ To fix these missing dependencies, simply run:
 pip install pyparsing decorator bitsandbytes
 ```
 
+pyhealth 1.1.4 requires numpy<2.0, but you have numpy 2.0.2 which is incompatible.
+outlines 0.0.46 requires numpy<2.0.0, but you have numpy 2.0.2 which is incompatible.
+vllm 0.6.3 requires numpy<2.0.0, but you have numpy 2.0.2 which is incompatible.
+```bash
+pip install "numpy<2.0.0" --upgrade --force-reinstall
+pip install pyserini
 
+```
 ## 🤝 Acknowledgement
 
 This implementation is mainly based on [verl](https://github.com/volcengine/verl) and [PySerini](https://github.com/castorini/pySerini). The base model during the experiment is [Qwen2.5-3B-Instruct](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct). We sincerely appreciate their contributions to the open-source community.
