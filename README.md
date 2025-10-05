@@ -234,6 +234,28 @@ source ~/miniconda/etc/profile.d/conda.sh  # adjust path if your conda installat
 conda activate zero
 ```
 
+
+
+
+<details>
+<summary>slurm-related</summary>
+
+**DEPENDENCIES**
+When setting up the environment, you might encounter dependency resolver warnings such as:
+
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed.
+This behaviour is the source of the following dependency conflicts.
+matplotlib 3.9.4 requires pyparsing>=2.3.1, which is not installed.
+mne 1.8.0 requires decorator, which is not installed.
+pyhealth 1.1.4 requires bitsandbytes, which is not installed.
+
+
+To fix these missing dependencies, simply run:
+```bash
+pip install pyparsing decorator bitsandbytes
+```
+
+
 ## 🤝 Acknowledgement
 
 This implementation is mainly based on [verl](https://github.com/volcengine/verl) and [PySerini](https://github.com/castorini/pySerini). The base model during the experiment is [Qwen2.5-3B-Instruct](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct). We sincerely appreciate their contributions to the open-source community.
