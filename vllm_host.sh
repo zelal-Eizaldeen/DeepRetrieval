@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=0,1
+# export CUDA_VISIBLE_DEVICES=0,1
 
 python3 -m vllm.entrypoints.openai.api_server \
     --model DeepRetrieval/DeepRetrieval-NQ-BM25-3B \

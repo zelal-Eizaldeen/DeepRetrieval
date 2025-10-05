@@ -1,16 +1,16 @@
 #!/bin/bash
 #SBATCH --partition=IllinoisComputes-GPU
 #SBATCH --account=jimeng-ic
-#SBATCH --job-name=eval_pubmed_32
-#SBATCH --output=logs/eval_pubmed_32_%j.out
-#SBATCH --error=logs/eval_pubmed_32_%j.err
-#SBATCH --gres=gpu:A100:1
+#SBATCH --job-name=run_vllm
+#SBATCH --output=logs/run_vllm_%j.out
+#SBATCH --error=logs/run_vllm_%j.err
+#SBATCH --gres=gpu:A100:2
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=3-00:00:00
 
 echo "=========================================="
-echo " Starting Cluster infoat: $(date)"
+echo " Starting VLLM: $(date)"
 echo " Running on host: $(hostname)"
 echo " SLURM Job ID: $SLURM_JOB_ID"
 echo " GPUs requested: $SLURM_GPUS"
@@ -21,9 +21,9 @@ module load cuda/12.6
 
 # --- Activate conda environment ---
 source ~/miniconda/etc/profile.d/conda.sh  # adjust if different
-conda activate zero
+conda activate zero2
 
-cd /projects/illinois/eng/cs/jimeng/zelalae2/scratch/testDeepRetrieval/DeepRetrieval/code/
+cd /projects/illinois/eng/cs/jimeng/zelalae2/scratch/testDeepRetrieval/DeepRetrieval/
 
 # --- Diagnostic Info ---
 echo "=== GPU Info (nvidia-smi) ==="
@@ -50,10 +50,10 @@ PYCODE
 echo "==============================="
 
 # --- Run your actual script ---
-echo "Starting main script: scripts/train/pubmed_32.sh"
-sh scripts/train/pubmed_32.sh
+echo "Starting main script: "
+python query_rewrite.py --query "Who built DeepRetrieval in 2025?"
 echo "Finished main script."
 
 echo "=========================================="
-echo " Finished Eval PubMed Job at: $(date)"
+echo " Finished  at: $(date)"
 echo "=========================================="

@@ -1,4 +1,4 @@
-export CUDA_VISIBLE_DEVICES=4,7
+# export CUDA_VISIBLE_DEVICES=4,7
 
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
