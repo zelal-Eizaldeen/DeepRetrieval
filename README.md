@@ -232,6 +232,7 @@ module load cuda/12.6
 # --- Activate conda environment ---
 source ~/miniconda/etc/profile.d/conda.sh  # adjust path if your conda installation differs
 conda activate zero
+```
 
 ## 🤝 Acknowledgement
 
