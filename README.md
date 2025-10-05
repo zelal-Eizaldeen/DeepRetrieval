@@ -253,7 +253,7 @@ If you previously specified a device inside your training script or job file (e.
 export CUDA_VISIBLE_DEVICES=4,7
 This ensures CUDA is managed correctly by SLURM.
 
-⚙️ Dependency Conflicts
+### ⚙️ Dependency Conflicts
 When setting up the environment, you might encounter pip dependency warnings such as:
 ```
 ERROR: pip's dependency resolver does not currently take into account all the packages that are installed.
@@ -264,11 +264,13 @@ pyhealth 1.1.4 requires bitsandbytes, which is not installed.
 ```
 
 To fix these missing dependencies, simply run:
-
+```bash
 pip install pyparsing decorator bitsandbytes
+```
 
 You may also encounter NumPy incompatibility warnings like:
-```pyhealth 1.1.4 requires numpy<2.0, but you have numpy 2.0.2 which is incompatible.
+```
+pyhealth 1.1.4 requires numpy<2.0, but you have numpy 2.0.2 which is incompatible.
 outlines 0.0.46 requires numpy<2.0.0, but you have numpy 2.0.2 which is incompatible.
 vllm 0.6.3 requires numpy<2.0.0, but you have numpy 2.0.2 which is incompatible.
 ```
