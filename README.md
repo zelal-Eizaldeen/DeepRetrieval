@@ -247,7 +247,7 @@ module load cuda/12.6
 # --- Activate Conda environment ---
 source ~/miniconda/etc/profile.d/conda.sh  # adjust path if your conda installation differs
 conda activate zero
-
+```
 If you previously specified a device inside your training script or job file (e.g., pubmed_32.sh), remove lines like:
 
 export CUDA_VISIBLE_DEVICES=4,7
@@ -264,12 +264,11 @@ pyhealth 1.1.4 requires bitsandbytes, which is not installed.
 ```
 
 To fix these missing dependencies, simply run:
-```bash
+
 pip install pyparsing decorator bitsandbytes
-```
+
 You may also encounter NumPy incompatibility warnings like:
-```bash
-pyhealth 1.1.4 requires numpy<2.0, but you have numpy 2.0.2 which is incompatible.
+```pyhealth 1.1.4 requires numpy<2.0, but you have numpy 2.0.2 which is incompatible.
 outlines 0.0.46 requires numpy<2.0.0, but you have numpy 2.0.2 which is incompatible.
 vllm 0.6.3 requires numpy<2.0.0, but you have numpy 2.0.2 which is incompatible.
 ```
@@ -278,60 +277,8 @@ To fix these, reinstall a compatible NumPy version and re-install dependent pack
 pip install "numpy<2.0.0" --upgrade --force-reinstall
 pip install pyserini
 ```
-## ⚠️ Commonly Encountered Issues
-
-## ⚙️ Cluster Setup: CUDA and Conda Environment
 
 
-<details>
-<summary>slurm-related</summary>
-Before running any training or evaluation scripts on the cluster, make sure to **load the correct CUDA module** and **activate your conda environment**.
-
-
-**GPUs Allocation**
-If your CUDA inside slurm job doesn't match the one inside your script, then you may get this UserWarning:
-CUDA driver initialization failed, you might not have a CUDA gpu. (Triggered internally at ../c10/cuda/CUDAFunctions.cpp:108.)
-  return torch._C._cuda_getDeviceCount() > 0
-To fix these missing dependencies, simply don't spicify your device inside the script, and load the CUDA inside the slurm job:
-
-Add the following lines to your Slurm job script (before running any Python commands):
-
-```bash
-# --- Load CUDA module ---
-module load cuda/12.6
-
-# --- Activate conda environment ---
-source ~/miniconda/etc/profile.d/conda.sh  # adjust path if your conda installation differs
-conda activate zero
-```
-Remove the following from pubmed_32.sh
-
-```bash
-export CUDA_VISIBLE_DEVICES=4,7
-```
-**DEPENDENCIES**
-When setting up the environment, you might encounter dependency resolver warnings such as:
-
-ERROR: pip's dependency resolver does not currently take into account all the packages that are installed.
-This behaviour is the source of the following dependency conflicts.
-matplotlib 3.9.4 requires pyparsing>=2.3.1, which is not installed.
-mne 1.8.0 requires decorator, which is not installed.
-pyhealth 1.1.4 requires bitsandbytes, which is not installed.
-
-
-To fix these missing dependencies, simply run:
-```bash
-pip install pyparsing decorator bitsandbytes
-```
-
-pyhealth 1.1.4 requires numpy<2.0, but you have numpy 2.0.2 which is incompatible.
-outlines 0.0.46 requires numpy<2.0.0, but you have numpy 2.0.2 which is incompatible.
-vllm 0.6.3 requires numpy<2.0.0, but you have numpy 2.0.2 which is incompatible.
-```bash
-pip install "numpy<2.0.0" --upgrade --force-reinstall
-pip install pyserini
-
-```
 ## 🤝 Acknowledgement
 
 This implementation is mainly based on [verl](https://github.com/volcengine/verl) and [PySerini](https://github.com/castorini/pySerini). The base model during the experiment is [Qwen2.5-3B-Instruct](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct). We sincerely appreciate their contributions to the open-source community.
