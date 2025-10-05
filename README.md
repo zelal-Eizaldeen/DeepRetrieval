@@ -221,15 +221,11 @@ sh scripts/eval/pubmed_32.sh
 
 ## ⚙️ Cluster Setup: CUDA and Conda Environment
 
-Before running any training or evaluation scripts on the cluster, make sure to **load the correct CUDA module** and **activate your conda environment**.
-
-
-
-
-
 
 <details>
 <summary>slurm-related</summary>
+Before running any training or evaluation scripts on the cluster, make sure to **load the correct CUDA module** and **activate your conda environment**.
+
 
 **GPUs Allocation**
 If your CUDA inside slurm job doesn't match the one inside your script, then you may get this UserWarning:
