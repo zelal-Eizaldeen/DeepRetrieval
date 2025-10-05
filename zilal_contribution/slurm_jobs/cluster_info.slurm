@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --partition=IllinoisComputes-GPU
 #SBATCH --account=jimeng-ic
-#SBATCH --job-name=eval_pubmed_32
-#SBATCH --output=logs/eval_pubmed_32_%j.out
-#SBATCH --error=logs/eval_pubmed_32_%j.err
-#SBATCH --gres=gpu:A100:1
+#SBATCH --job-name=cluster_info
+#SBATCH --output=logs/cluster_info_%j.out
+#SBATCH --error=logs/cluster_info_%j.err
+#SBATCH --gres=gpu:A100:2
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=128G
 #SBATCH --time=3-00:00:00

@@ -18,7 +18,7 @@ import re
 from collections import deque
 from threading import Lock
 import time
-
+sys.path.append("/projects/illinois/eng/cs/jimeng/zelalae2/scratch/DeepRetrieval/code")
 from verl.utils.apis.pubmed import PubmedAPI
 from verl.utils.apis.ctgov import CTGovAPI
 

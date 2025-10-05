@@ -215,6 +215,24 @@ sh scripts/eval/pubmed_32.sh
 
 **Note:** LEADS-7B is a state-of-the-art literature mining LLM trained on 20K reviews and 400K publications [https://arxiv.org/pdf/2501.16255]
 
+
+
+## ⚠️ Commonly Encountered Issues
+
+## ⚙️ Cluster Setup: CUDA and Conda Environment
+
+Before running any training or evaluation scripts on the cluster, make sure to **load the correct CUDA module** and **activate your conda environment**.
+
+Add the following lines to your Slurm job script (before running any Python commands):
+
+```bash
+# --- Load CUDA module ---
+module load cuda/12.6
+
+# --- Activate conda environment ---
+source ~/miniconda/etc/profile.d/conda.sh  # adjust path if your conda installation differs
+conda activate zero
+
 ## 🤝 Acknowledgement
 
 This implementation is mainly based on [verl](https://github.com/volcengine/verl) and [PySerini](https://github.com/castorini/pySerini). The base model during the experiment is [Qwen2.5-3B-Instruct](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct). We sincerely appreciate their contributions to the open-source community.
