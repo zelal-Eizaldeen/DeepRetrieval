@@ -285,7 +285,7 @@ pip install pyhealth==1.1.4
 pip install outlines==0.0.46
 
 ```
-
+</details>
 
 ## 🤝 Acknowledgement
 
