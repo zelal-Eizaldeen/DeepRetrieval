@@ -215,6 +215,78 @@ sh scripts/eval/pubmed_32.sh
 
 **Note:** LEADS-7B is a state-of-the-art literature mining LLM trained on 20K reviews and 400K publications [https://arxiv.org/pdf/2501.16255]
 
+## ⚠️ Commonly Encountered Issues
+
+### ⚙️ Cluster Setup: CUDA and Conda Environment
+
+<details>
+<summary><b>💻 slurm-related</b></summary>
+
+Before running any training or evaluation scripts on the cluster, make sure to **load the correct CUDA module** and **activate your Conda environment**.
+
+---
+
+### 🧩 GPUs Allocation
+
+If your CUDA inside a SLURM job doesn’t match the CUDA seen by your Python script, you may get a warning like:
+
+UserWarning: CUDA initialization: CUDA driver initialization failed, you might not have a CUDA GPU.
+(Triggered internally at ../c10/cuda/CUDAFunctions.cpp:108.)
+return torch._C._cuda_getDeviceCount() > 0
+
+
+To fix this, **do not manually set your CUDA device** inside the script.  
+Instead, load the CUDA module directly inside your SLURM job:
+
+Add the following lines **before running any Python commands**:
+
+```bash
+# --- Load CUDA module ---
+module load cuda/12.6
+
+# --- Activate Conda environment ---
+source ~/miniconda/etc/profile.d/conda.sh  # adjust path if your conda installation differs
+conda activate zero
+```
+If you previously specified a device inside your training script or job file (e.g., pubmed_32.sh), remove lines like:
+
+export CUDA_VISIBLE_DEVICES=4,7
+This ensures CUDA is managed correctly by SLURM.
+
+### ⚙️ Dependency Conflicts
+When setting up the environment, you might encounter pip dependency warnings such as:
+```
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed.
+This behaviour is the source of the following dependency conflicts.
+matplotlib 3.9.4 requires pyparsing>=2.3.1, which is not installed.
+mne 1.8.0 requires decorator, which is not installed.
+pyhealth 1.1.4 requires bitsandbytes, which is not installed.
+```
+
+To fix these missing dependencies, simply run:
+```bash
+pip install pyparsing decorator bitsandbytes
+```
+
+You may also encounter NumPy incompatibility warnings like:
+```
+pyhealth 1.1.4 requires numpy<2.0, but you have numpy 2.0.2 which is incompatible.
+outlines 0.0.46 requires numpy<2.0.0, but you have numpy 2.0.2 which is incompatible.
+vllm 0.6.3 requires numpy<2.0.0, but you have numpy 2.0.2 which is incompatible.
+```
+To fix these, reinstall a compatible NumPy version and re-install dependent packages:
+```bash
+pip install pyserini
+pip install "numpy<2.0.0" --force-reinstall
+pip install transformers==4.46.3
+pip install vllm==0.6.3
+pip install verl==0.1
+pip install pyhealth==1.1.4
+pip install outlines==0.0.46
+
+```
+
+
 ## 🤝 Acknowledgement
 
 This implementation is mainly based on [verl](https://github.com/volcengine/verl) and [PySerini](https://github.com/castorini/pySerini). The base model during the experiment is [Qwen2.5-3B-Instruct](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct). We sincerely appreciate their contributions to the open-source community.
