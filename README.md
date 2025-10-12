@@ -281,7 +281,6 @@ pip install "numpy<2.0.0" --force-reinstall
 pip install transformers==4.46.3
 pip install vllm==0.6.3
 pip install verl==0.1
-pip install pyhealth==1.1.4
 pip install outlines==0.0.46
 pip install pyserini
 
