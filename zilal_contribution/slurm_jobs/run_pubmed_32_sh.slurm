@@ -22,8 +22,9 @@ module load cuda/12.6
 # --- Activate conda environment ---
 source ~/miniconda/etc/profile.d/conda.sh  # adjust if different
 conda activate zero
+pip install omegaconf 
 
-cd /projects/illinois/eng/cs/jimeng/zelalae2/scratch/testDeepRetrieval/DeepRetrieval/code/
+cd /projects/illinois/eng/cs/jimeng/zelalae2/scratch/DeepRetrieval/code/
 
 # --- Diagnostic Info ---
 echo "=== GPU Info (nvidia-smi) ==="
