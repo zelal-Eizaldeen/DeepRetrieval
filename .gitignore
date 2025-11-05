@@ -35,10 +35,11 @@ code/data/sql/wor
 play.ipynb
 *_outputs
 code/extra
-
+code/zilal_contribution/slurm_jobs/logs/
 # code/data/sql/spider/
 # code/data/sql/bird/
 # code/data/sql/sql_all/
 
 # other
 *.key
+zilal_contribution/slurm_jobs/logs/
