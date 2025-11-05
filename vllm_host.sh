@@ -10,3 +10,4 @@ python3 -m vllm.entrypoints.openai.api_server \
 # --model DeepRetrieval/DeepRetrieval-NQ-BM25-3B
 # --model DeepRetrieval/DeepRetrieval-TriviaQA-BM25-3B \
 # --model DeepRetrieval/DeepRetrieval-SQuAD-BM25-3B-200 \
+
