@@ -1,10 +1,10 @@
-export CUDA_VISIBLE_DEVICES=0,1
+# export CUDA_VISIBLE_DEVICES=0,1
 
 python3 -m vllm.entrypoints.openai.api_server \
-    --model DeepRetrieval/DeepRetrieval-NQ-BM25-3B \
+    --model DeepRetrieval/DeepRetrieval-PubMed-3B-Llama \
     --port 8000 \
     --max-model-len 2048 \
-    --tensor-parallel-size 2 
+    --tensor-parallel-size 2 \
 
 
 # --model DeepRetrieval/DeepRetrieval-NQ-BM25-3B
