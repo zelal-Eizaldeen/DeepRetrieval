@@ -1,0 +1,23 @@
+# Use NVIDIA PyTorch runtime as base
+FROM nvcr.io/nvidia/pytorch:24.05-py3
+
+# Install vLLM & dependencies
+RUN pip install --no-cache-dir \
+    vllm==0.6.3 fastapi uvicorn flask
+
+
+# we choose flash-attn v2.7.0 or v2.7.2 which contain pre-built wheels
+RUN pip install --no-build-isolation --no-cache-dir "flash-attn==2.6.3"
+# Zilal added this to solve internal 500 error
+RUN pip3 install git+https://github.com/NICTA/pyairports.git
+#ended
+# Copy model-serving app
+WORKDIR /app
+COPY . /app
+
+EXPOSE 8000
+CMD ["bash", "-c", "python3 -m vllm.entrypoints.openai.api_server \
+      --model DeepRetrieval/DeepRetrieval-PubMed-3B-Llama \
+      --port 8000 \
+      --max-model-len 2048 \
+      --tensor-parallel-size 2"]
