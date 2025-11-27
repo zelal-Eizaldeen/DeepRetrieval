@@ -3,8 +3,8 @@ export CUDA_VISIBLE_DEVICES=4,7
 DATE=$(date '+%Y-%m-%d-%H-%M-%S')
 
 python3 -m verl.trainer.main_ppo \
-    data.train_files=data/search_engine/pubmed_32/train.parquet \
-    data.val_files=data/search_engine/pubmed_32/test.parquet \
+    /home/zelalae2/DeepRetrieval/DeepRetrieval/code/data/search_engine/pubmed_32/train.parquet \
+    /home/zelalae2/DeepRetrieval/DeepRetrieval/code/data/search_engine/pubmed_32/test.parquet \
     data.train_batch_size=64 \
     data.val_batch_size=64 \
     data.max_prompt_length=500 \

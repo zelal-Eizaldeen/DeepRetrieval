@@ -29,6 +29,9 @@ RUN pip3 install --no-cache-dir vllm==0.6.3
 
 # we choose flash-attn v2.7.0 or v2.7.2 which contain pre-built wheels
 RUN pip3 install --no-cache-dir --no-build-isolation flash-attn==2.7.0.post2
+# Zilal added this to solve internal 500 error
+RUN pip3 install git+https://github.com/NICTA/pyairports.git
+#ended
 
 # install apex, set MAX_JOBS to avoid OOMs
 RUN MAX_JOBS=4 pip3 install -v --disable-pip-version-check --no-cache-dir --no-build-isolation \
@@ -41,3 +44,16 @@ RUN MAX_JOBS=4 NINJA_FLAGS="-j4" pip3 install git+https://github.com/NVIDIA/Tran
 
 # Pin wandb to v0.18 since v0.19.1 is released with ImportError
 RUN pip3 install wandb==0.18.7 py-spy
+
+#Added by Zilal
+
+# Copy model-serving app
+WORKDIR /app
+COPY . /app
+
+EXPOSE 8000
+CMD ["bash", "-c", "python3 -m vllm.entrypoints.openai.api_server \
+      --model DeepRetrieval/DeepRetrieval-PubMed-3B-Llama \
+      --port 8000 \
+      --max-model-len 2048 \
+      --tensor-parallel-size 2"]
