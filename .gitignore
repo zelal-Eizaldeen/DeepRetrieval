@@ -1,6 +1,10 @@
 #others
 .vscode
 *.log
+*.error
+*.out
+*.err
+
 
 # cache files
 indexes
@@ -21,6 +25,7 @@ wandb
 
 
 # large files
+# added Try it 
 code/data/local_index_search/msmarco_all
 code/data/raw_data/msmarco/msmarco_all/queries.train.tsv
 code/data/raw_data/msmarco/msmarco_all/queries.dev.tsv
@@ -35,10 +40,12 @@ code/data/sql/wor
 play.ipynb
 *_outputs
 code/extra
-
+code/zilal_contribution/slurm_jobs/logs/
 # code/data/sql/spider/
 # code/data/sql/bird/
 # code/data/sql/sql_all/
 
 # other
 *.key
+zilal_contribution/slurm_jobs/logs/
+zilal_contribution/app/query_service/__pycache__/

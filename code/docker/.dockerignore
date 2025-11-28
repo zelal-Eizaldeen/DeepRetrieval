@@ -1,0 +1,19 @@
+# .dockerignore
+*.pem
+*.ppk
+*.key
+*.crt
+*.env
+*.txt
+*.json
+.git
+.gitignore
+__pycache__/
+*.pyc
+scratch/
+.vscode/
+*.zip
+*.tar.gz
+*.ckpt
+*.safetensors
+node_modules/

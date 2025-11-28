@@ -44,16 +44,23 @@ RUN MAX_JOBS=4 NINJA_FLAGS="-j4" pip3 install git+https://github.com/NVIDIA/Tran
 
 # Pin wandb to v0.18 since v0.19.1 is released with ImportError
 RUN pip3 install wandb==0.18.7 py-spy
-
-#Added by Zilal
+RUN pip install pydantic
 
 # Copy model-serving app
 WORKDIR /app
 COPY . /app
+
+# Overwrite vLLM api_server with your patched version By Zilal
+COPY zilal_contribution/vllm_patch/api_server.py \
+    /usr/local/lib/python3.10/dist-packages/vllm/entrypoints/openai/api_server.py
+
+# Add your custom Python package folder to PYTHONPATH
+ENV PYTHONPATH="/app:${PYTHONPATH}"
 
 EXPOSE 8000
 CMD ["bash", "-c", "python3 -m vllm.entrypoints.openai.api_server \
       --model DeepRetrieval/DeepRetrieval-PubMed-3B-Llama \
       --port 8000 \
       --max-model-len 2048 \
-      --tensor-parallel-size 2"]
+      --gpu-memory-utilization 0.80 \
+      --tensor-parallel-size 1"]

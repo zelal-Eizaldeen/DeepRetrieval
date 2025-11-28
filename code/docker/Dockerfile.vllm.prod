@@ -1,0 +1,98 @@
+###########################################
+# Stage 1 — Base Image with CUDA + PyTorch
+###########################################
+FROM nvcr.io/nvidia/pytorch:24.05-py3 AS base
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Remove NVidia pre-installed conflicting packages
+RUN pip3 uninstall -y \
+    pytorch-quantization pytorch-triton torch \
+    torch-tensorrt torchvision xgboost \
+    transformer_engine flash_attn apex megatron-core || true
+
+# Install specific PyTorch versions
+RUN pip3 install --no-cache-dir \
+    torch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 \
+    --index-url https://download.pytorch.org/whl/cu124
+
+# Core libs (shared by vLLM)
+RUN pip3 install --no-cache-dir \
+    accelerate codetiming datasets dill \
+    hydra-core numpy pybind11 tensordict \
+    "transformers<=4.46.0"
+
+###########################################
+# Stage 2 — Install vLLM + Dependencies
+###########################################
+FROM base AS vllm_stage
+
+# vLLM must be installed *after* PyTorch
+RUN pip3 install --no-cache-dir vllm==0.6.3
+
+# FlashAttention
+RUN pip3 install --no-cache-dir --no-build-isolation flash-attn==2.7.0.post2
+
+# Fix internal 500 error
+RUN pip3 install git+https://github.com/NICTA/pyairports.git
+
+# Install apex + older flash-attn needed by TransformerEngine
+RUN MAX_JOBS=4 pip3 install --no-cache-dir --no-build-isolation \
+    git+https://github.com/NVIDIA/apex \
+    flash-attn==2.5.8
+
+# TransformerEngine
+RUN MAX_JOBS=4 pip3 install --no-cache-dir --no-build-isolation \
+    git+https://github.com/NVIDIA/TransformerEngine.git@v1.7
+
+RUN pip3 install wandb==0.18.7 py-spy pydantic
+
+###########################################
+# Stage 3 — Final minimal runtime image
+###########################################
+FROM vllm_stage AS final
+
+# Create app directory
+WORKDIR /app
+
+###########################################
+# Copy ONLY what is needed for production
+###########################################
+COPY zilal_contribution/app /app/query_service
+COPY zilal_contribution/vllm_patch/api_server.py \
+    /usr/local/lib/python3.10/dist-packages/vllm/entrypoints/openai/api_server.py
+
+    
+###########################################
+# Security Hardening
+###########################################
+# Add a non-root user
+RUN useradd -m druser
+USER druser
+
+###########################################
+# Environment Setup
+###########################################
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    VLLM_WORKER_MULTIPROC_METHOD=spawn
+
+###########################################
+# HEALTHCHECK (Cloud-Ready)
+###########################################
+HEALTHCHECK CMD curl --fail http://localhost:8000/health || exit 1
+
+###########################################
+# Expose port for vLLM server
+###########################################
+EXPOSE 8000
+
+###########################################
+# Default CMD — Load your PubMed model
+###########################################
+CMD python3 -m vllm.entrypoints.openai.api_server \
+    --model DeepRetrieval/DeepRetrieval-PubMed-3B-Llama \
+    --port 8000 \
+    --max-model-len 2048 \
+    --gpu-memory-utilization 0.85 \
+    --tensor-parallel-size 1
