@@ -424,7 +424,7 @@ def build_app(args: Namespace) -> FastAPI:
     # Custom DeepRetrieval Search-Term API (Zilal)
     # ------------------------------------------
     try:
-        from query_service.api import router as query_router
+        from zilal_contribution.app.query_service.api import router as query_router
         app.include_router(query_router, prefix="/v1")
         logger.info("Custom query_service router mounted successfully.")
     except Exception as e:

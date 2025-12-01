@@ -55,14 +55,17 @@ FROM vllm_stage AS final
 # Create app directory
 WORKDIR /app
 
+COPY . /app
 ###########################################
 # Copy ONLY what is needed for production
 ###########################################
-COPY zilal_contribution/app /app/query_service
+# COPY zilal_contribution/app/query_service /app/query_service
 COPY zilal_contribution/vllm_patch/api_server.py \
     /usr/local/lib/python3.10/dist-packages/vllm/entrypoints/openai/api_server.py
 
-    
+
+
+
 ###########################################
 # Security Hardening
 ###########################################
@@ -95,4 +98,5 @@ CMD python3 -m vllm.entrypoints.openai.api_server \
     --port 8000 \
     --max-model-len 2048 \
     --gpu-memory-utilization 0.85 \
-    --tensor-parallel-size 1
+    --tensor-parallel-size 1 \
+    --dtype float16
