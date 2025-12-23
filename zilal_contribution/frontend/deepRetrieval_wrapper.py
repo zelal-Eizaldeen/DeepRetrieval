@@ -1,37 +1,10 @@
+import logging
 from typing import List, Optional
 from pydantic import BaseModel
-from zilal_contribution.app.query_service.data_models import CustomFilter, SearchQueryInputWrapper, SearchQueryOutputWrapper, MASearchQueryGenerationBody
+from data_models import CustomFilter, SearchQueryInputWrapper, SearchQueryOutputWrapper, MASearchQueryGenerationBody
+from fastapi.responses import JSONResponse
 
-#To be removed into data_models.py
-# class CustomFilter(BaseModel):
-#     name: str
-#     value: str
-#     description: Optional[str] = None
-
-
-# class SearchQueryInputWrapper(BaseModel):
-#     wrapper_type: str = "search_query_generation_input"
-#     research_topic: str
-#     custom_filters: List[CustomFilter]
-
-
-# class SearchQueryOutputWrapper(BaseModel):
-#     wrapper_type: str = "search_query_generation_output"
-#     categories: List[dict]
-#     final_query: str
-    
-# class MASearchQueryGenerationBody(BaseModel):
-#     research_topic: str = ""
-#     population: str = ""
-#     intervention: str = ""
-#     comparator: str = ""
-#     outcome: str = ""
-#     custom_filters: List[CustomFilter] = []
-#     user_request: str = ""
-#     category_name: str = ""
-#     llm: str = "gpt-4o"
-#     final_query: str = "" #Added by Zilal
-    
+   
 def build_search_prompt(wrapper: SearchQueryInputWrapper) -> str:
     return f"""
 You are an expert clinical literature search engine. 
@@ -108,3 +81,5 @@ def generate_search_terms(wrapper: SearchQueryInputWrapper, vllm_url: str):
     prompt = build_search_prompt(wrapper)
     raw_output = call_deepretrieval_model(prompt, vllm_url)
     return extract_output_wrapper(raw_output)
+  
+  

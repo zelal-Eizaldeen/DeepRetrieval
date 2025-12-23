@@ -99,4 +99,7 @@ CMD python3 -m vllm.entrypoints.openai.api_server \
     --max-model-len 2048 \
     --gpu-memory-utilization 0.85 \
     --tensor-parallel-size 1 \
-    --dtype float16
+    --dtype float16 \
+    --allowed-origins https://dev.trialmindapis.com \
+    --allowed-methods '*' \
+    --allowed-headers '*'

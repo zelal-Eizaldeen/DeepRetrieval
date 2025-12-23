@@ -62,7 +62,7 @@ from vllm.utils import FlexibleArgumentParser, get_open_zmq_ipc_path
 from vllm.version import __version__ as VLLM_VERSION
 
 #Addded by Zilal
-sys.path.append("/home/zelalae2/DeepRetrieval/DeepRetrieval/zilal_contribution/app")
+sys.path.append("/home/zelalae2/DeepRetrieval/DeepRetrieval")
 #Ended 
 TIMEOUT_KEEP_ALIVE = 5  # seconds
 
@@ -429,6 +429,17 @@ def build_app(args: Namespace) -> FastAPI:
         logger.info("Custom query_service router mounted successfully.")
     except Exception as e:
         logger.error(f"Failed to mount query_service router: {e}")
+    
+    # ------------------------------------------
+    # NEW: Literature Review Product API Integration
+    # ------------------------------------------
+    try:
+        # Import the router you defined in literature_review.py
+        from zilal_contribution.frontend.literature_review import router as lr_router
+        app.include_router(lr_router, prefix="/v1")
+        logger.info("Literature Review router mounted successfully.")
+    except Exception as e:
+        logger.error(f"Failed to mount Literature Review router: {e}")
     #Ended by Zilal
     app.root_path = args.root_path
 
